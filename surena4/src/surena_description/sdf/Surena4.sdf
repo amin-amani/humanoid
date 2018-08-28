@@ -1,0 +1,553 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <model name="Surena4">
+    <pose>0 0 0.951 0 0 0</pose>
+    <!--   -----------------------------------------------------------------trunk link-------------------------------------------------------->
+    
+##################################################################################################################################################
+<!--   ------------------------------------------------------------start of Links------------------------------------------------------------------->
+##################################################################################################################################################
+
+
+<<<<<<<----------------------------------------------------------------lowerbody links----------------------------------------------------->>>>>>
+
+
+ <!--   ----------------------------------------------------------------- Pelvis_LINK--------------------------------------------------------->
+     <link name="pelvis">
+<pose>0 0 0  0 0 0</pose>
+      <visual name="Pelvis_LINK_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/pelvis.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+ <joint type="revolute" name="RLeg_HipY_J1">
+        <pose>0 0 0  0 0 0</pose>
+        <parent>pelvis</parent>
+        <child>RLeg_HipY_Link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+
+  <!--   -----------------------------------------------------------------RLeg_HipY_Link--------------------------------------------------------->
+     <link name="RLeg_HipY_Link">
+<pose>0 -0.115 0  0 0 0</pose>
+    </link>
+
+
+
+<joint type="revolute" name="RLeg_HipR_J2 ">
+        <pose>0 0 0 0 0 0</pose>
+        <parent>RLeg_HipY_Link</parent>
+        <child>RLeg_Hip_Uni_Link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+
+  <!--   ---------------------------------------------------------------- RLeg_Hip_Uni_Link------------------------------------------------------>
+     <link name="RLeg_Hip_Uni_Link">
+     <pose>0 -0.115 -0.109  0 0 0</pose>
+     </link>
+  
+
+
+
+<joint type="revolute" name="RLeg_HipP_J3 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RLeg_Hip_Uni_Link</parent>
+        <child>RLeg_Hip_Thigh_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+  <!--   -----------------------------------------------------------------RLeg_Hip_Thigh_Link----------------------------------------------------->
+     <link name="RLeg_Hip_Thigh_Link">
+<pose>0 -0.115 -0.109  0 0 0</pose>
+      <visual name="RLeg_Hip_Thigh_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Thigh-Right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="RLeg_KneeP_J4 ">
+        <pose>0 0 0  0 0 0</pose>
+        <parent>RLeg_Hip_Thigh_Link</parent>
+        <child>RLeg_Shank_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------RLeg_Shank_Link----------------------------------------------------->
+     <link name="RLeg_Shank_Link">
+<pose>0 -0.115 -0.479  0 0 0</pose>
+      <visual name="RLeg_Shank_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Shank-Right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+
+<joint type="revolute" name="RLeg_AnkleP_J5 ">
+        <pose>0 0 0  0 0 0</pose>
+        <parent>RLeg_Shank_Link</parent>
+        <child>RLeg_Ankle_Uni_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+
+  <!--   ---------------------------------------------------------------- RLeg_Hip_Uni_Link----------------------------------------------------->
+     <link name="RLeg_Ankle_Uni_Link">
+<pose>0 -0.115 -0.839  0 0 0</pose>
+    </link>
+
+
+<joint type="revolute" name="RLeg_AnkleR_J6 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RLeg_Ankle_Uni_Link</parent>
+        <child>RLeg_Foot_Link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+
+
+<!--   -----------------------------------------------------------------RLeg_Foot_Link----------------------------------------------------->
+     <link name="RLeg_Foot_Link">
+<pose>0 -0.115 -0.839  0 0 0</pose>
+      <visual name="RLeg_Foot_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Foot-Right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+
+
+
+
+<!--   -----------------------------------------------------------------LLeg_HipY_Link----------------------------------------------------->
+     <link name="LLeg_HipY_Link">
+<pose>0 0.115 0  0 0 0</pose>
+    </link>
+ <joint type="revolute" name="LLeg_HipY_J1">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>pelvis</parent>
+        <child>LLeg_HipY_Link</child>       
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+  <!--   ---------------------------------------------------------------- LLeg_Hip_Uni_Link----------------------------------------------------->
+     <link name="LLeg_Hip_Uni_Link">
+<pose>0 0.115 -0.109  0 0 0</pose>
+    </link>
+  
+<joint type="revolute" name="LLeg_HipR_J2 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LLeg_HipY_Link</parent>
+        <child>LLeg_Hip_Uni_Link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+  <!--   -----------------------------------------------------------------LLeg_Hip_Thigh_Link----------------------------------------------------->
+     <link name="LLeg_Hip_Thigh_Link">
+<pose>0 0.115 -0.109  0 0 0</pose>
+      <visual name="LLeg_Hip_Thigh_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Thigh-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="LLeg_HipP_J3 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LLeg_Hip_Uni_Link</parent>
+        <child>LLeg_Hip_Thigh_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+
+<!--   -----------------------------------------------------------------LLeg_Shank_Link----------------------------------------------------->
+     <link name="LLeg_Shank_Link">
+<pose>0 0.115 -0.479  0 0 0</pose>
+      <visual name="LLeg_Shank_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Shank-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+
+<joint type="revolute" name="LLeg_KneeP_J4 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LLeg_Hip_Thigh_Link</parent>
+        <child>LLeg_Shank_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+  <!--   ---------------------------------------------------------------- LLeg_Hip_Uni_Link----------------------------------------------------->
+     <link name="LLeg_Ankle_Uni_Link">
+<pose>0 0.115 -0.839  0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="LLeg_AnkleP_J5 ">
+        <pose>0 0 0  0 0 0</pose>
+        <parent>LLeg_Shank_Link</parent>
+        <child>LLeg_Ankle_Uni_Link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------LLeg_Foot_Link--------------------------------------------------------->
+     <link name="LLeg_Foot_Link">
+<pose>0 0.115 -0.839  0 0 0</pose>
+      <visual name="LLeg_Foot_Link_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Foot-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="LLeg_AnkleR_J6 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LLeg_Ankle_Uni_Link</parent>
+       <child>LLeg_Foot_Link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+<<<<<<<----------------------------------------------------------------upperbody links----------------------------------------------------->>>>>>
+
+
+<!--   -----------------------------------------------------------------WAIST_LINK1--------------------------------------------------------->
+     <link name="WAIST_LINK1">
+<pose>0 0 0.0 0 0 0</pose>   
+    </link>
+
+<joint type="revolute" name="Waist_Y_J1  ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>pelvis</parent>
+        <child>WAIST_LINK1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------WAIST_LINK2--------------------------------------------------------->
+     <link name="WAIST_LINK2">
+<pose>0 0 0.132 0 0 0</pose>
+      <visual name="WAIST_LINK2_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/tORSO.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="Waist_P_J2 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>WAIST_LINK1</parent>
+        <child>WAIST_LINK2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------RARM_LINK1--------------------------------------------------------->
+<link name="RARM_LINK1">
+<pose>0 -0.207 0.417 0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="RArm_ShoulderP_J1 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>WAIST_LINK2</parent>
+        <child>RARM_LINK1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------RARM_LINK2--------------------------------------------------------->
+<link name="RARM_LINK2">
+<pose>0 -0.207 0.417 0 0 0</pose>  
+    </link>
+
+<joint type="revolute" name="RArm_ShoulderR_J2 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK1</parent>
+        <child>RARM_LINK2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+
+<!--   -----------------------------------------------------------------RARM_LINK3--------------------------------------------------------->
+<link name="RARM_LINK3">
+<pose>0 -0.207 0.417 0 0 0</pose>
+      <visual name="RARM_LINK3_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Upper-arm-right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="RArm_ShoulderY_J3 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK2</parent>
+        <child>RARM_LINK3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------RARM_LINK4--------------------------------------------------------->
+<link name="RARM_LINK4">
+<pose>0 -0.207 0.183 0 0 0</pose>
+      <visual name="RARM_LINK4_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/fore-arm-right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="RArm_ElbowP_J4 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK3</parent>
+        <child>RARM_LINK4</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+
+<!--   -----------------------------------------------------------------RARM_LINK5--------------------------------------------------------->
+<link name="RARM_LINK5">
+<pose>0 -0.207 -0.1795 0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="RArm_WristY_J5 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK4</parent>
+        <child>RARM_LINK5</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------RARM_LINK6--------------------------------------------------------->
+<link name="RARM_LINK6">
+<pose>0 -0.207 -0.1795 0 0 0</pose>
+    </link>
+
+
+<joint type="revolute" name="RArm_WristR_J6 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK5</parent>
+        <child>RARM_LINK6</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------RARM_LINK7--------------------------------------------------------->
+<link name="RARM_LINK7">
+<pose>0 -0.207 -0.1795 0 0 0</pose>
+      <visual name="RARM_LINK7_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Hand-Right.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="RArm_WristP_J7 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>RARM_LINK6</parent>
+        <child>RARM_LINK7</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+
+
+
+<!--   -----------------------------------------------------------------LARM_LINK1--------------------------------------------------------->
+<link name="LARM_LINK1">
+<pose>0 0.207 0.417 0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="LArm_ShoulderP_J1 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>WAIST_LINK2</parent>
+        <child>LARM_LINK1</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------LARM_LINK2--------------------------------------------------------->
+<link name="LARM_LINK2">
+<pose>0 0.207 0.417 0 0 0</pose>  
+    </link>
+
+<joint type="revolute" name="LArm_ShoulderR_J2 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LARM_LINK1</parent>
+        <child>LARM_LINK2</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------LARM_LINK3--------------------------------------------------------->
+<link name="LARM_LINK3">
+<pose>0 0.207 0.417 0 0 0</pose>
+      <visual name="LARM_LINK3_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Upper-arm-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="LArm_ShoulderY_J3 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LARM_LINK2</parent>
+        <child>LARM_LINK3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------LARM_LINK4--------------------------------------------------------->
+<link name="LARM_LINK4">
+<pose>0 0.207 0.183 0 0 0</pose>
+      <visual name="LARM_LINK4_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/fore-arm-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="LArm_ElbowP_J4 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LARM_LINK3</parent>
+        <child>LARM_LINK4</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------LARM_LINK5--------------------------------------------------------->
+<link name="LARM_LINK5">
+<pose>0 0.207 -0.1795 0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="LArm_WristY_J5 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LARM_LINK4</parent>
+        <child>LARM_LINK5</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+<!--   -----------------------------------------------------------------LARM_LINK6--------------------------------------------------------->
+<link name="LARM_LINK6">
+<pose>0 +0.207 -0.1795 0 0 0</pose>
+    </link>
+
+<joint type="revolute" name="LArm_WristR_J6 ">
+        <pose>0.0 0.00 0.00 0 0 0</pose>
+        <parent>LARM_LINK5</parent>
+        <child>LARM_LINK6</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+
+<!--   -----------------------------------------------------------------LARM_LINK7--------------------------------------------------------->
+<link name="LARM_LINK7">
+<pose>0 0.207 -0.1795 0 0 0</pose>
+      <visual name="LARM_LINK7_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://Surena4/meshes/Hand-Left.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+<joint type="revolute" name="LArm_WristP_J7 ">
+        <pose>0.0 0 0.00 0 0 0</pose>
+        <parent>LARM_LINK6</parent>
+        <child>LARM_LINK7</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+##################################################################################################################################################
+  ------------------------------------------------------------end of Links------------------------------------------------------------------->
+##################################################################################################################################################
+
+
+
+
+##################################################################################################################################################
+<!--   ------------------------------------------------------------start of Joints------------------------------------------------------------------->
+##################################################################################################################################################
+    
+
+
+  </model>
+</sdf>

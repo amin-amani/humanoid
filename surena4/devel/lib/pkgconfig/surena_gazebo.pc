@@ -1,0 +1,8 @@
+prefix=/home/amin/humanoid/surea4/devel
+
+Name: surena_gazebo
+Description: Description of surena_gazebo
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/amin/humanoid/surea4/devel/lib 
+Requires: 

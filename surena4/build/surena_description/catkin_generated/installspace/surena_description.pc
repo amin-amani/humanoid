@@ -1,0 +1,8 @@
+prefix=/home/amin/humanoid/surea4/install
+
+Name: surena_description
+Description: Description of surena_description
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/amin/humanoid/surea4/install/lib 
+Requires: 
