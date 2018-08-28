@@ -1,0 +1,8 @@
+prefix=/home/amin/humanoid/surea4/devel
+
+Name: offlinepublisher
+Description: Description of offlinepublisher
+Version: 0.1.0
+Cflags: -I/home/amin/humanoid/surea4/devel/include
+Libs: -L/home/amin/humanoid/surea4/devel/lib 
+Requires: 

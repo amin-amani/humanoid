@@ -1,0 +1,8 @@
+prefix=/home/amin/humanoid/surea4/devel
+
+Name: surena_usb
+Description: Description of surena_usb
+Version: 0.1.0
+Cflags: -I/home/amin/humanoid/surea4/devel/include
+Libs: -L/home/amin/humanoid/surea4/devel/lib 
+Requires: 
