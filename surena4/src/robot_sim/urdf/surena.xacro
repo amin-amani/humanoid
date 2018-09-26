@@ -1,0 +1,1350 @@
+<?xml version='1.0'?>
+
+<robot name="rrbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+
+<!--  <xacro:include filename="$(find robot_sim)/urdf/surena.gazebo" />
+  <xacro:include filename="$(find robot_sim)/urdf/materials.xacro" />
+  <xacro:include filename="$(find robot_sim)/urdf/macros.xacro" />-->
+
+
+<link name="pelvis">
+<inertial>
+      <origin
+        xyz="0 0.0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="30" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.951" rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/pelvis.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0.951" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder radius="0.08" length="0.23"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="RLeg_HipY_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RLeg_Hip_Uni_Link">
+
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="5" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RLeg_Hip_Thigh_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Thigh-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.185" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+<link name="RLeg_Hip_Shank_Link"> 
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Shank-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="RLeg_Ankle_Uni_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="RLeg_Foot_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Right.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_HipY_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LLeg_Hip_Uni_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LLeg_Hip_Thigh_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Thigh-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_Hip_Shank_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Shank-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_Ankle_Uni_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="LLeg_Foot_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Left.STL" />
+        </geometry>
+      </collision>
+      <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+                <fdir1>0 0 1</fdir1>
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+                 <ode>
+                    <min_depth>5</min_depth>
+                     <kp>1e8</kp>
+                 </ode>
+            </contact>
+      </surface>
+
+
+  </link>
+
+<link name="WAIST_LINK1">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/tORSO.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+
+<link name="WAIST_LINK2">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/tORSO.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/tORSO.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+<link name="RARM_LINK1">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RARM_LINK2">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RARM_LINK3">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+<visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Upper-arm-right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Upper-arm-right.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="RARM_LINK4">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/fore-arm-right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+  </link>
+
+
+
+<link name="RARM_LINK5">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="RARM_LINK6">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+
+<link name="RARM_LINK7">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Hand-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Hand-Right.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+
+<link name="LARM_LINK1">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LARM_LINK2">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LARM_LINK3">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Upper-arm-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Upper-arm-Left.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LARM_LINK4">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/fore-arm-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+  </link>
+
+
+
+<link name="LARM_LINK5">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="LARM_LINK6">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+
+<link name="LARM_LINK7">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Hand-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Hand-Left.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+
+
+
+<joint name="RLeg_HipY_J1" type="continuous">
+   <origin xyz="0 -0.115 0.951 " rpy="0 0 0"/>
+   <parent link="pelvis"/>
+   <child link="RLeg_HipY_Link"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J1t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor1">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipY_J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+ <joint name="RLeg_HipR_J2" type="continuous">
+    <origin xyz="0 0 -0.109 " rpy="0 0 0"/>
+    <parent link="RLeg_HipY_Link"/>
+    <child link="RLeg_Hip_Uni_Link"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+  </joint>
+
+<transmission name="J2t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor2">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipR_J2">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+  <joint name="RLeg_HipP_J3" type="continuous">
+     <origin xyz="0 0 0 " rpy="0 0 0"/>
+     <parent link="RLeg_Hip_Uni_Link"/>
+     <child link="RLeg_Hip_Thigh_Link"/>
+     <axis xyz="0 1 0"/>
+      <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+   </joint>
+
+<transmission name="J3t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor3">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipP_J3">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+ <joint name="RLeg_KneeP_J4" type="continuous">
+    <origin xyz="0 0 -0.37 " rpy="0 0 0"/>
+    <parent link="RLeg_Hip_Thigh_Link"/>
+    <child link="RLeg_Hip_Shank_Link"/>
+    <axis xyz="0 1 0"/>
+     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+  </joint>
+
+<transmission name="J4t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor4">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_KneeP_J4">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RLeg_AnkleP_J5" type="continuous">
+   <origin xyz="0 0 -0.36 " rpy="0 0 0"/>
+   <parent link="RLeg_Hip_Shank_Link"/>
+   <child link="RLeg_Ankle_Uni_Link"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J5t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor5">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_AnkleP_J5">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RLeg_AnkleR_J6" type="continuous">
+   <origin xyz="0 0 0 " rpy="0 0 0"/>
+   <parent link="RLeg_Ankle_Uni_Link"/>
+   <child link="RLeg_Foot_Link"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J6t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor6">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_AnkleR_J6">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="LLeg_HipY_J1" type="continuous">
+   <origin xyz="0 +0.115 0.951 " rpy="0 0 0"/>
+   <parent link="pelvis"/>
+   <child link="LLeg_HipY_Link"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J7t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor7">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipY_J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+ <joint name="LLeg_HipR_J2" type="continuous">
+    <origin xyz="0 0 -0.109 " rpy="0 0 0"/>
+    <parent link="LLeg_HipY_Link"/>
+    <child link="LLeg_Hip_Uni_Link"/>
+    <axis xyz="1 0 0"/>
+     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+  </joint>
+
+<transmission name="J8t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor8">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipR_J2">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+  <joint name="LLeg_HipP_J3" type="continuous">
+     <origin xyz="0 0 0 " rpy="0 0 0"/>
+     <parent link="LLeg_Hip_Uni_Link"/>
+     <child link="LLeg_Hip_Thigh_Link"/>
+     <axis xyz="0 1 0"/>
+      <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+   </joint>
+
+<transmission name="J9t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor9">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipP_J3">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+ <joint name="LLeg_KneeP_J4" type="continuous">
+    <origin xyz="0 0 -0.37 " rpy="0 0 0"/>
+    <parent link="LLeg_Hip_Thigh_Link"/>
+    <child link="LLeg_Hip_Shank_Link"/>
+    <axis xyz="0 1 0"/>
+     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+  </joint>
+
+<transmission name="J10t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor10">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_KneeP_J4">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LLeg_AnkleP_J5" type="continuous">
+   <origin xyz="0 0 -0.36 " rpy="0 0 0"/>
+   <parent link="LLeg_Hip_Shank_Link"/>
+   <child link="LLeg_Ankle_Uni_Link"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J11t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor11">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_AnkleP_J5">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LLeg_AnkleR_J6" type="continuous">
+   <origin xyz="0 0 0 " rpy="0 0 0"/>
+   <parent link="LLeg_Ankle_Uni_Link"/>
+   <child link="LLeg_Foot_Link"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J12t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor12">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_AnkleR_J6">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="Waist_Y_J1" type="continuous">
+   <origin xyz="0 0.0 1.082" rpy="0 0 0"/>
+   <parent link="pelvis"/>
+   <child link="WAIST_LINK1"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J13t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor13">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="Waist_Y_J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="Waist_Y_J2" type="continuous">
+   <origin xyz="0 0.0 0" rpy="0 0 0"/>
+   <parent link="WAIST_LINK1"/>
+   <child link="WAIST_LINK2"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J14t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor14">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="Waist_Y_J2">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="RArm_ShoulderP_J1" type="continuous">
+   <origin xyz="0 -0.207 0.285" rpy="0 0 0"/>
+   <parent link="WAIST_LINK2"/>
+   <child link="RARM_LINK1"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J15t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor15">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_ShoulderP_J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="RArm_ShoulderR_J2" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="RARM_LINK1"/>
+   <child link="RARM_LINK2"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J16t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor16">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_ShoulderR_J2">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="RArm_ShoulderY_J3" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="RARM_LINK2"/>
+   <child link="RARM_LINK3"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J17t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor17">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_ShoulderY_J3">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RArm_ElbowP_J4" type="continuous">
+   <origin xyz="0 0 -0.234" rpy="0 0 0"/>
+   <parent link="RARM_LINK3"/>
+   <child link="RARM_LINK4"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J18t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor18">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_ElbowP_J4">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="RArm_WristY_J5" type="continuous">
+   <origin xyz="0 0 -0.3625" rpy="0 0 0"/>
+   <parent link="RARM_LINK4"/>
+   <child link="RARM_LINK5"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J19t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor19">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_WristY_J5">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RArm_WristR_J6" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="RARM_LINK5"/>
+   <child link="RARM_LINK6"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J20t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor20">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_WristR_J6">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RArm_WristP_J7" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="RARM_LINK6"/>
+   <child link="RARM_LINK7"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J21t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor21">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RArm_WristP_J7">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+
+
+
+<joint name="LArm_ShoulderP_J1" type="continuous">
+   <origin xyz="0 +0.207 0.285" rpy="0 0 0"/>
+   <parent link="WAIST_LINK2"/>
+   <child link="LARM_LINK1"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J22t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor22">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_ShoulderP_J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LArm_ShoulderR_J2" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="LARM_LINK1"/>
+   <child link="LARM_LINK2"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J23t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor23">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_ShoulderR_J2">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LArm_ShoulderY_J3" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="LARM_LINK2"/>
+   <child link="LARM_LINK3"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J24t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor24">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_ShoulderY_J3">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="LArm_ElbowP_J4" type="continuous">
+   <origin xyz="0 0 -0.234" rpy="0 0 0"/>
+   <parent link="LARM_LINK3"/>
+   <child link="LARM_LINK4"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J25t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor25">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_ElbowP_J4">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LArm_WristY_J5" type="continuous">
+   <origin xyz="0 0 -0.3625" rpy="0 0 0"/>
+   <parent link="LARM_LINK4"/>
+   <child link="LARM_LINK5"/>
+   <axis xyz="0 0 1"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J26t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor26">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_WristY_J5">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="LArm_WristR_J6" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="LARM_LINK5"/>
+   <child link="LARM_LINK6"/>
+   <axis xyz="1 0 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J27t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor27">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_WristR_J6">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="LArm_WristP_J7" type="continuous">
+   <origin xyz="0 0 0" rpy="0 0 0"/>
+   <parent link="LARM_LINK6"/>
+   <child link="LARM_LINK7"/>
+   <axis xyz="0 1 0"/>
+    <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
+ </joint>
+
+<transmission name="J28t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor28">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LArm_WristP_J7">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<!-- Gazebo plugin for ROS Control -->
+<gazebo>
+  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/rrbot</robotNamespace>
+  </plugin>
+</gazebo>
+
+
+
+</robot>

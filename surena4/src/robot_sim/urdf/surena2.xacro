@@ -1,0 +1,593 @@
+<?xml version='1.0'?>
+
+<robot name="surena" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+
+<!--  <xacro:include filename="$(find robot_sim)/urdf/surena.gazebo" />
+  <xacro:include filename="$(find robot_sim)/urdf/materials.xacro" />
+  <xacro:include filename="$(find robot_sim)/urdf/macros.xacro" />-->
+
+
+<link name="pelvis">
+<inertial>
+      <origin
+        xyz="0 0.0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.951" rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/pelvis.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0.951" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder radius="0.08" length="0.23"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="RLeg_HipY_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RLeg_Hip_Uni_Link">
+
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="RLeg_Hip_Thigh_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Thigh-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.185" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+<link name="RLeg_Hip_Shank_Link"> 
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Shank-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="RLeg_Ankle_Uni_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="RLeg_Foot_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Right.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_HipY_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LLeg_Hip_Uni_Link">
+<inertial>
+      <origin xyz="0 -0 0 " rpy="0 0 0" />
+      <mass value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+<link name="LLeg_Hip_Thigh_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Thigh-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_Hip_Shank_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Shank-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 -0.18" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="0.04" length="0.35"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+<link name="LLeg_Ankle_Uni_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+  </link>
+
+
+<link name="LLeg_Foot_Link">
+<inertial>
+      <origin
+        xyz="0 -0 0.0 "
+        rpy="0 0 0" />
+      <mass
+        value="2.50321784932644" />
+      <inertia
+        ixx="0.0344409751913919"
+        ixy="0.000203000704156372"
+        ixz="-0.000402443503216186"
+        iyy="0.0459468264001583"
+        iyz="-0.00410422593827533"
+        izz="0.0404358469485904" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+        <origin xyz="0  0 0" rpy="0 0 0"/>
+        <geometry>
+        <mesh
+          filename="package://robot_sim/meshes/Foot-Left.STL" />
+        </geometry>
+      </collision>
+  </link>
+
+
+
+
+
+
+<joint name="RLeg_HipY_J1" type="continuous">
+   <origin xyz="0 -0.115 0.951 " rpy="0 0 0"/>
+   <parent link="pelvis"/>
+   <child link="RLeg_HipY_Link"/>
+   <axis xyz="0 0 1"/>
+ </joint>
+
+<transmission name="J1t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipY_J1">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+ <joint name="RLeg_HipR_J2" type="continuous">
+    <origin xyz="0 0 -0.109 " rpy="0 0 0"/>
+    <parent link="RLeg_HipY_Link"/>
+    <child link="RLeg_Hip_Uni_Link"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+<transmission name="J2t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipR_J2">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+  <joint name="RLeg_HipP_J3" type="continuous">
+     <origin xyz="0 0 0 " rpy="0 0 0"/>
+     <parent link="RLeg_Hip_Uni_Link"/>
+     <child link="RLeg_Hip_Thigh_Link"/>
+     <axis xyz="0 1 0"/>
+   </joint>
+
+<transmission name="J3t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_HipP_J3">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+ <joint name="RLeg_KneeP_J4" type="continuous">
+    <origin xyz="0 0 -0.37 " rpy="0 0 0"/>
+    <parent link="RLeg_Hip_Thigh_Link"/>
+    <child link="RLeg_Hip_Shank_Link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+<transmission name="J4t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_KneeP_J4">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RLeg_AnkleP_J5" type="continuous">
+   <origin xyz="0 0 -0.36 " rpy="0 0 0"/>
+   <parent link="RLeg_Hip_Shank_Link"/>
+   <child link="RLeg_Ankle_Uni_Link"/>
+   <axis xyz="0 1 0"/>
+ </joint>
+
+<transmission name="J5t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_AnkleP_J5">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="RLeg_AnkleR_J6" type="continuous">
+   <origin xyz="0 0 0 " rpy="0 0 0"/>
+   <parent link="RLeg_Ankle_Uni_Link"/>
+   <child link="RLeg_Foot_Link"/>
+   <axis xyz="1 0 0"/>
+ </joint>
+
+<transmission name="J6t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="RLeg_AnkleR_J6">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+<joint name="LLeg_HipY_J1" type="continuous">
+   <origin xyz="0 +0.115 0.951 " rpy="0 0 0"/>
+   <parent link="pelvis"/>
+   <child link="LLeg_HipY_Link"/>
+   <axis xyz="0 0 1"/>
+ </joint>
+
+<transmission name="J7t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipY_J1">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+ <joint name="LLeg_HipR_J2" type="continuous">
+    <origin xyz="0 0 -0.109 " rpy="0 0 0"/>
+    <parent link="LLeg_HipY_Link"/>
+    <child link="LLeg_Hip_Uni_Link"/>
+    <axis xyz="1 0 0"/>
+  </joint>
+
+<transmission name="J8t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipR_J2">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+  <joint name="LLeg_HipP_J3" type="continuous">
+     <origin xyz="0 0 0 " rpy="0 0 0"/>
+     <parent link="LLeg_Hip_Uni_Link"/>
+     <child link="LLeg_Hip_Thigh_Link"/>
+     <axis xyz="0 1 0"/>
+   </joint>
+
+<transmission name="J9t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_HipP_J3">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+ <joint name="LLeg_KneeP_J4" type="continuous">
+    <origin xyz="0 0 -0.37 " rpy="0 0 0"/>
+    <parent link="LLeg_Hip_Thigh_Link"/>
+    <child link="LLeg_Hip_Shank_Link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+<transmission name="J10t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_KneeP_J4">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LLeg_AnkleP_J5" type="continuous">
+   <origin xyz="0 0 -0.36 " rpy="0 0 0"/>
+   <parent link="LLeg_Hip_Shank_Link"/>
+   <child link="LLeg_Ankle_Uni_Link"/>
+   <axis xyz="0 1 0"/>
+ </joint>
+
+<transmission name="J11t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_AnkleP_J5">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<joint name="LLeg_AnkleR_J6" type="continuous">
+   <origin xyz="0 0 0 " rpy="0 0 0"/>
+   <parent link="LLeg_Ankle_Uni_Link"/>
+   <child link="LLeg_Foot_Link"/>
+   <axis xyz="1 0 0"/>
+ </joint>
+
+<transmission name="J12t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="LLeg_AnkleR_J6">
+     <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+
+<!-- Gazebo plugin for ROS Control -->
+<gazebo>
+  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>/</robotNamespace>
+  </plugin>
+</gazebo>
+
+
+
+</robot>

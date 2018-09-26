@@ -1,0 +1,3 @@
+type: "position_controllers/JointPositionController"
+joint: J3
+pid: {p: 100.0, i: 0.01, d: 1.0}

@@ -1,0 +1,14 @@
+type: "position_controllers/JointGroupPositionController"
+joints:
+- RLeg_HipY_J1
+- RLeg_HipR_J2
+- RLeg_HipP_J3
+- RLeg_KneeP_J4
+- RLeg_AnkleP_J5
+- RLeg_AnkleR_J6
+- LLeg_HipY_J1
+- LLeg_HipR_J2
+- LLeg_HipP_J3
+- LLeg_KneeP_J4
+- LLeg_AnkleP_J5
+- LLeg_AnkleR_J6
