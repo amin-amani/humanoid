@@ -29,6 +29,7 @@ class TaskSpaceOffline
     double _pelvisLength;
 public:
     TaskSpaceOffline();
+     double YOffsetOfAnkletrajectory;
     double TStart;
     double TEnd;
     double timeStepT;
@@ -171,6 +172,10 @@ double _timeStep;
     MatrixXd C_st_z_al;
     MatrixXd C_cy_x_al;
     MatrixXd C_cy_z_ar;
+     MatrixXd C_cy_y_ar;
+     MatrixXd C_cy_y_al;
+     MatrixXd C_st_y_al;
+     MatrixXd C_end_y_ar;
     MatrixXd C_end_z_ar;
     MatrixXd C_end_x_ar;
     MatrixXd C_cy_x_ar;
