@@ -28,7 +28,7 @@ xkf_scenario: 50
 # 1: sensor data
 # 2. sensor data w/ rate quantities
 # 3: filter estimates
-output_mode: 2
+output_mode: 3
 
 # Use rostime for IMU stamp instead of sensor reported time
 use_rostime: true
