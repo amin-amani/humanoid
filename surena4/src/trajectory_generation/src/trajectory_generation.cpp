@@ -192,7 +192,7 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
  pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
 
 
-  ros::Rate loop_rate(100);
+  ros::Rate loop_rate(500);
   std_msgs::Int32MultiArray msg;
   std_msgs::MultiArrayDimension msg_dim;
 
@@ -283,6 +283,8 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
         double m4;
         double m5;
         double m6;
+        double m7;
+        double m8;
         StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
         //qDebug()<<StartTime;
         MatrixXd P;
@@ -294,6 +296,8 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
             m4=m(3,0);
             m5=m(4,0);
             m6=m(5,0);
+            m7=m(6,0);
+            m8=m(7,0);
 
             P=SURENAOffilneTaskSpace.PelvisTrajectory (SURENAOffilneTaskSpace.globalTime);
 
@@ -314,18 +318,18 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
                         0,
                         0;
 
-                PoseRFoot<<m4,
-                        m5,
+                PoseRFoot<<m5,
                         m6,
+                        m7,
                         0,
-                        0,
+                        -1*m8*(M_PI/180),
                         0;
 
                 PoseLFoot<<m1,
                         m2,
                         m3,
                         0,
-                        0,
+                        -1*m4*(M_PI/180),
                         0;
 
                 SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
