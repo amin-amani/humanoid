@@ -25,7 +25,7 @@
         izz="0.0404358469485904" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0.951" rpy="0 0 0" />
+      <origin xyz="0 0 0.942" rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://robot_sim/meshes/pelvis.STL" />
@@ -37,7 +37,7 @@
       </material>
     </visual>
     <collision>
-        <origin xyz="0  0 0.951" rpy="1.57 0 0"/>
+        <origin xyz="0  0 0.942" rpy="1.57 0 0"/>
         <geometry>
           <cylinder radius="0.08" length="0.23"/>
         </geometry>
@@ -196,14 +196,13 @@
           rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
       </material>
     </visual>
-    <collision>
-        <origin xyz="0  0 0" rpy="0 0 0"/>
+    <collision name='RLeg_Foot_Link_collision'>
+        <origin xyz=".045  0 -.09" rpy="0 0 0"/>
         <geometry>
-        <mesh
-          filename="package://robot_sim/meshes/Foot-Right.STL" />
+           <box size="0.26 0.16 0.02"/>
         </geometry>
-      </collision>
-  </link>
+     </collision>
+</link>
 
 
 <link name="LLeg_HipY_Link">
@@ -325,6 +324,7 @@
         iyz="-0.00410422593827533"
         izz="0.0404358469485904" />
     </inertial>
+
   </link>
 
 
@@ -357,33 +357,25 @@
           rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
       </material>
     </visual>
-    <collision>
-        <origin xyz="0  0 0" rpy="0 0 0"/>
+    <collision  name='LLeg_Foot_Link_collision'>
+    <origin xyz=".045  0 -.09" rpy="0 0 0"/>
         <geometry>
-        <mesh
-          filename="package://robot_sim/meshes/Foot-Left.STL" />
+          <box size="0.26 0.16 0.02"/>
         </geometry>
-      </collision>
-      <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <fdir1>0 0 1</fdir1>
-                <slip1>0.0</slip1>
-                <slip2>0.0</slip2>
-              </ode>
-            </friction>
-            <contact>
-                 <ode>
-                    <min_depth>5</min_depth>
-                     <kp>1e8</kp>
-                 </ode>
-            </contact>
-      </surface>
-
+    </collision>
 
   </link>
+
+<gazebo reference="LLeg_Foot_Link">
+        <mu1>3</mu1>
+        <mu2>3</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
+<gazebo reference="RLeg_Foot_Link">
+        <mu1>3</mu1>
+         <mu2>3</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
 
 <link name="WAIST_LINK1">
 <inertial>
@@ -818,7 +810,7 @@
 
 
 <joint name="RLeg_HipY_J1" type="continuous">
-   <origin xyz="0 -0.115 0.951 " rpy="0 0 0"/>
+   <origin xyz="0 -0.115 0.942 " rpy="0 0 0"/>
    <parent link="pelvis"/>
    <child link="RLeg_HipY_Link"/>
    <axis xyz="0 0 1"/>
@@ -926,7 +918,7 @@
  </transmission>
 
 <joint name="LLeg_HipY_J1" type="continuous">
-   <origin xyz="0 +0.115 0.951 " rpy="0 0 0"/>
+   <origin xyz="0 +0.115 0.942 " rpy="0 0 0"/>
    <parent link="pelvis"/>
    <child link="LLeg_HipY_Link"/>
    <axis xyz="0 0 1"/>
@@ -1039,7 +1031,7 @@
  </transmission>
 
 <joint name="Waist_Y_J1" type="continuous">
-   <origin xyz="0 0.0 1.082" rpy="0 0 0"/>
+   <origin xyz="0 0.0 1.071" rpy="0 0 0"/>
    <parent link="pelvis"/>
    <child link="WAIST_LINK1"/>
    <axis xyz="0 0 1"/>
@@ -1345,6 +1337,15 @@
   </plugin>
 </gazebo>
 
-
+<gazebo>
+    <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+      <alwaysOn>true</alwaysOn>
+      <bodyName>LLeg_Foot_Link</bodyName>
+      <topicName>yei2000154</topicName>
+      <serviceName>imu_service</serviceName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <updateRate>1000.0</updateRate>
+    </plugin>
+  </gazebo>
 
 </robot>

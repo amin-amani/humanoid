@@ -66,6 +66,11 @@ ros::Publisher pub26 ;
 ros::Publisher pub27 ;
 ros::Publisher pub28 ;
 
+//ros::Publisher pid1 ;
+
+
+
+
 
 void  SendGazebo(QList<LinkM> links){
 if(links.count()<28){qDebug()<<"index err";return;}
@@ -130,6 +135,14 @@ pub28.publish(data);
 
 
 }
+
+//void  SendGazeboPID(){
+//    std_msgs::Float64 data;
+//    data.data=666;
+//    pid1.publish(data);
+//}
+
+
 int main(int argc, char **argv)
 {
   //check _timesteps
@@ -190,6 +203,11 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
  pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
  pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
  pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+
+ //pid1= nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/pid/parameter_updates",1000);
+
+
+
 
 
   ros::Rate loop_rate(100);
@@ -420,6 +438,7 @@ mappingJoints<<links[6].JointAngle*(1/(2*M_PI))*(2304)*100,
     // std::string varAsString = std::to_string(qref[i-1]);
     // msg.data =varAsString;
     SendGazebo(links);
+   // SendGazeboPID();
   chatter_pub.publish(msg);
     ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
     //

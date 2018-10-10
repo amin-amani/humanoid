@@ -83,6 +83,14 @@ target_link_libraries(yei_imu
 )
 install(TARGETS yei_imu RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+#add_executable(yei src/yei.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#target_link_libraries(yei
+#    ${catkin_LIBRARIES}
+#    Qt5::Core
+#    Qt5::Widgets
+#    Qt5::PrintSupport
+#)
+#install(TARGETS yei RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 #cmake_minimum_required(VERSION 2.8.3)

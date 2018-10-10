@@ -225,6 +225,7 @@ set( QT_SOURCES
     src/LinkM.cpp
     src/Robot.cpp
     src/TaskSpace.cpp
+    src/pidcontroller.cpp
     )
 add_executable(trajectory_generation src/trajectory_generation.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(trajectory_generation
@@ -242,6 +243,15 @@ target_link_libraries(trajectory_generation_with_foot_corr
     Qt5::PrintSupport
 )
 install(TARGETS trajectory_generation_with_foot_corr RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(ankle_controller src/ankle_controller.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(ankle_controller
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS ankle_controller RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #add_executable(random_driver src/myNode.cpp )
 #target_link_libraries(random_driver ${catkin_LIBRARIES})
 

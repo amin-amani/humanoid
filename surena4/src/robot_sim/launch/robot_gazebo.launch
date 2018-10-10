@@ -64,6 +64,8 @@
                                         joint26_position_controller
                                         joint27_position_controller
                                         joint28_position_controller"/>
+
+
 </launch>
 
 
