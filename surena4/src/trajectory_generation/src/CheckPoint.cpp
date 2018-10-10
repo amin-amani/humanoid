@@ -70,6 +70,8 @@ ros::Publisher pub28 ;
 double teta=0;
 double phi=0;
 
+
+
 double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
     double R11,R32,R33,R31,theta;
     //    R11=q0*q0+q1*q1-q2*q2-q3*q3;
@@ -91,6 +93,40 @@ double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
     phi=atan2(R32,R33);
     return phi;
 }
+geometry_msgs::Pose GetLinkPosition(QString linkName ,const gazebo_msgs::LinkStates::ConstPtr linkStates)
+{
+  geometry_msgs::Pose result;
+const std::vector<std::string> &names = linkStates->name;
+const std::vector<geometry_msgs::Pose> positions = linkStates->pose;
+
+
+for(int i=0;i<names.size();i++)
+{
+
+
+  if(QString::fromStdString( names[i]).contains(linkName))
+  {
+
+    return  positions[i];
+
+  }
+}
+
+return result;
+}
+void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
+{
+//const std::vector<std::string> &names = msg->name;
+//const std::vector<geometry_msgs::Pose> psitions = msg->pose;
+//  double distance=0;
+
+ geometry_msgs::Pose parentPosition=GetLinkPosition("robot::LLeg_Foot_Link",msg);
+qDebug()<<"we are here:"<< parentPosition.position.x;
+ //qDebug()<<QString::fromStdString( names[9])<<psitions[9].position.x<<psitions[9].position.y<<psitions[9].position.z;
+//ROS_INFO("I heard");
+
+}
+
 
 PIDController teta_pid;
 PIDController phi_pid;
@@ -100,56 +136,13 @@ double phi_motor=0;
 double timestep=.01;
 double time_=0;
 
-geometry_msgs::Pose GetLinkPosition(QString linkName ,const gazebo_msgs::LinkStates::ConstPtr linkStates)
-{
-    geometry_msgs::Pose result;
-    const std::vector<std::string> &names = linkStates->name;
-    const std::vector<geometry_msgs::Pose> positions = linkStates->pose;
-
-
-
-    for(int i=0;i<names.size();i++)
-    {
-
-
-        if(QString::fromStdString( names[i]).contains(linkName))
-        {
-
-            return  positions[i];
-
-        }
-    }
-
-    return result;
-}
-void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
-{
-    //const std::vector<std::string> &names = msg->name;
-    //const std::vector<geometry_msgs::Pose> psitions = msg->pose;
-    //  double distance=0;
-
-    geometry_msgs::Pose parentPosition=GetLinkPosition("robot::LLeg_Foot_Link",msg);
-    //qDebug()<<"we are here:"<< parentPosition.orientation.x<<parentPosition.orientation.y<<parentPosition.orientation.z<<parentPosition.orientation.w;
-    teta= quaternion2ankle_pitch( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-    phi=quaternion2ankle_roll( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-    qDebug()<<"teta:"<< teta*180/3.141592<<", Phi="<<phi*180/3.141592;
-    //qDebug()<<QString::fromStdString( names[9])<<psitions[9].position.x<<psitions[9].position.y<<psitions[9].position.z;
-    //ROS_INFO("I heard");
-
-}
-
-
-
 //teta_pid.Init(0,0,0,0,0,0);
 //teta_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
 //phi_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
 
-void  SendGazebo(double t){
+void  SendGazebo(){
 
     std_msgs::Float64 data;
-
-    //ros::Time time = ros::Time::now();
-
     data.data=0;
     pub1.publish(data);
     pub2.publish(data);
@@ -159,9 +152,10 @@ void  SendGazebo(double t){
     pub6.publish(data);
     pub7.publish(data);
     pub8.publish(data);
-
-
-
+    pub9.publish(data);
+    pub10.publish(data);
+    pub11.publish(data);
+    pub12.publish(data);
     pub13.publish(data);
     pub14.publish(data);
     pub15.publish(data);
@@ -178,54 +172,16 @@ void  SendGazebo(double t){
     pub26.publish(data);
     pub27.publish(data);
     pub28.publish(data);
-
-
-    data.data=min(0.8*sin(t)*sin(t),1.0);
-    pub10.publish(data);
-
-    data.data=-data.data/2;
-    pub9.publish(data);
-
-    double maximum=.5;
-    teta_motor=teta_motor+teta_pid.Calculate(0,teta);
-    data.data=teta_motor;
-    if (data.data<-maximum){data.data=-maximum;}
-    if (data.data>maximum){data.data=maximum;}
-    pub11.publish(data);
-    phi_motor=phi_motor+phi_pid.Calculate(0,phi);
-    data.data=phi_motor;
-    if (data.data<-maximum){data.data=-maximum;}
-    if (data.data>maximum){data.data=maximum;}
-    pub12.publish(data);
-
-    //    double maximum=.5;
-    //        data.data=teta;
-    //        if (data.data<-maximum){data.data=-maximum;}
-    //        if (data.data>maximum){data.data=maximum;}
-    //        pub11.publish(data);
-    //        data.data=phi;
-    //        if (data.data<-maximum){data.data=-maximum;}
-    //        if (data.data>maximum){data.data=maximum;}
-    //        pub12.publish(daos::spinOnce();ta);
 }
-
-
-
 
 bool imuok=false;
 void RecievIMULeft(const sensor_msgs::Imu & msg)
 {
     imuok=true;
     ROS_INFO("Left:[%f] [%f] [%f] [%f]",  msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-
-    //time_=time_+timestep;
-
-    //if (IMULeft.getTopic()=="\0"){ time=0; }
-
-    SendGazebo(time_);
-
-    //DoController(teta,phi);
-    //  ROS_INFO("I heard");
+    teta= quaternion2ankle_pitch( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+    phi=quaternion2ankle_roll( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+    SendGazebo();
 }
 
 void RecievTime(const rosgraph_msgs::Clock & msg)
@@ -237,52 +193,21 @@ void RecievTime(const rosgraph_msgs::Clock & msg)
 void RecievIMURight(const sensor_msgs::Imu & msg)
 {
     ROS_INFO("Right:[%f] [%f] [%f] [%f]", msg.orientation.w, msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    //  ROS_INFO("I heard");
 }
 
 void RecievIMUCenter(const sensor_msgs::Imu & msg)
 {
     ROS_INFO("Center:[%f] [%f] [%f] [%f]", msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    //  ROS_INFO("I heard");
 }
-
-//QVector<double> get_quaternions(const sensor_msgs::Imu & msg){
-//    QVector<double> q(4);
-//    q(0)=msg.orientation.w;
-//    q(1)=msg.orientation.x;
-//    q(2)=msg.orientation.y;
-//    q(3)=msg.orientation.z;
-//    return q;
-//}
-
-
 
 int main(int argc, char **argv)
 {
-    //check _timesteps
-
-
-    //*******************This part of code is for initialization of joints of the robot for walking**********************************
     int count = 0;
-
-    ros::init(argc, argv, "footControllerNode");
-
+    ros::init(argc, argv, "myNode1");
     ros::NodeHandle nh;
-    //ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",10);
-
-    //ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
-
+   // ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
     ros::Subscriber  time_sub = nh.subscribe("/clock", 1, RecievTime);
-    ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
-
-    //ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 100, RecievIMURight);
-    //ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCenter);
-
-
-
-    //double theta,phi;
-    //theta=quaternion2ankle_pitch(quaternions(0),quaternions(1),quaternions(2),quaternions(3));
-    //phi=quaternion2ankle_roll(quaternions(0),quaternions(1),quaternions(2),quaternions(3));
+     ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
 
     pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1);
     pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1);
@@ -316,12 +241,7 @@ int main(int argc, char **argv)
     rate=100.0;
     ros::Rate loop_rate(rate);
     dt=1/rate;
-    p_teta=0.12;
-    p_phi=0.12;
-    i_teta=0;i_phi=0;
-    d_teta=0;d_phi=0;
-    teta_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
-    phi_pid.Init(dt,1,-1,p_phi,i_phi,d_phi);
+
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -330,25 +250,18 @@ int main(int argc, char **argv)
     msg.layout.dim.clear();
     msg.layout.dim.push_back(msg_dim);
 
-    //sensor imu----------------------------------------------sensor imu
-    //sensor imu----------------------------------------------sensor imu
-    //  timer.start();
-    //  ros::Subscriber sub = nh.subscribe("/mti/sensor/imu", 1000, chatterCallback);
-    //sensor imu----------------------------------------------sensor imu
-    //sensor imu----------------------------------------------sensor imu
+  //  SendGazebo();
 
-    SendGazebo(0);
-    std_msgs::Float64 data0;
+//    while (~imuok){
+//        ROS_INFO("No IMU data recieved! %i",IMULeft.getNumPublishers());
+//        SendGazebo();
+//        ROS_INFO("initialized!");
+//        continue;
+//    }
 
-    data0.data=0;
-    pub11.publish(data0);
-    pub12.publish(data0);
-    //ROS_INFO("Worked!!! %i",IMULeft.getNumPublishers());
     while (ros::ok())
-    {//time=timestep+time;
-        //if (IMULeft.getTopic()=="\0"){ time=0; }
+    {
         //ROS_INFO("In loop %i",IMULeft.getNumPublishers());
-        SendGazebo(time_);
         ros::spinOnce();
         loop_rate.sleep();
         ++count;

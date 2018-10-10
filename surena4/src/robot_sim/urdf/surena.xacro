@@ -1337,15 +1337,15 @@
   </plugin>
 </gazebo>
 
-<gazebo>
+<!--<gazebo>
     <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
       <alwaysOn>true</alwaysOn>
       <bodyName>LLeg_Foot_Link</bodyName>
       <topicName>yei2000154</topicName>
       <serviceName>imu_service</serviceName>
-      <gaussianNoise>0.0</gaussianNoise>
-      <updateRate>1000.0</updateRate>
+      <gaussianNoise>2e-8</gaussianNoise>
+      <updateRate>100.0</updateRate>
     </plugin>
-  </gazebo>
+  </gazebo>-->
 
 </robot>
