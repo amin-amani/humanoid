@@ -1,0 +1,2355 @@
+<?xml version='1.0'?>
+<robot name="rrbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<sdf version='1.6'>
+  <model name='robot'>
+    <link name='pelvis'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>30</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='pelvis_visual'>
+        <pose frame=''>0 0 0.951 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/pelvis.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='pelvis_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0.951 1.57 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>0.23</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LARM_LINK1'>
+      <pose frame=''>0 0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LARM_LINK2'>
+      <pose frame=''>0 0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LARM_LINK3'>
+      <pose frame=''>0 0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LARM_LINK3_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='LARM_LINK3_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LARM_LINK4'>
+      <pose frame=''>0 0.207 1.133 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LARM_LINK4_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/fore-arm-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <link name='LARM_LINK5'>
+      <pose frame=''>-0 0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LARM_LINK6'>
+      <pose frame=''>-0 0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LARM_LINK7'>
+      <pose frame=''>-0 0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LARM_LINK7_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='LARM_LINK7_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LLeg_Ankle_Uni_Link'>
+      <pose frame=''>0 0.115 0.112 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LLeg_Foot_Link'>
+      <pose frame=''>0 0.115 0.112 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LLeg_Foot_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='LLeg_Foot_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LLeg_HipY_Link'>
+      <pose frame=''>0 0.115 0.951 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='LLeg_Hip_Shank_Link'>
+      <pose frame=''>0 0.115 0.472 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LLeg_Hip_Shank_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Shank-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='LLeg_Hip_Shank_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.18 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.35</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LLeg_Hip_Thigh_Link'>
+      <pose frame=''>0 0.115 0.842 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='LLeg_Hip_Thigh_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Thigh-Left.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='LLeg_Hip_Thigh_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.18 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.35</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='LLeg_Hip_Uni_Link'>
+      <pose frame=''>0 0.115 0.842 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RARM_LINK1'>
+      <pose frame=''>0 -0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RARM_LINK2'>
+      <pose frame=''>0 -0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RARM_LINK3'>
+      <pose frame=''>0 -0.207 1.367 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='RARM_LINK3_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='RARM_LINK3_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='RARM_LINK4'>
+      <pose frame=''>-0 -0.207 1.133 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='RARM_LINK4_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/fore-arm-right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <link name='RARM_LINK5'>
+      <pose frame=''>0 -0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RARM_LINK6'>
+      <pose frame=''>0 -0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RARM_LINK7'>
+      <pose frame=''>0 -0.207 0.7705 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='RARM_LINK7_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='RARM_LINK7_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='RLeg_Ankle_Uni_Link'>
+      <pose frame=''>-0 -0.115 0.112 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RLeg_Foot_Link'>
+      <pose frame=''>-0 -0.115 0.112 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>0</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <visual name='RLeg_Foot_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='RLeg_Foot_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100</mu>
+              <mu2>100</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='RLeg_HipY_Link'>
+      <pose frame=''>-0 -0.115 0.951 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='RLeg_Hip_Shank_Link'>
+      <pose frame=''>-0 -0.115 0.472 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='RLeg_Hip_Shank_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Shank-Right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='RLeg_Hip_Shank_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.18 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.35</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='RLeg_Hip_Thigh_Link'>
+      <pose frame=''>0 -0.115 0.842 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='RLeg_Hip_Thigh_Link_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Thigh-Right.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='RLeg_Hip_Thigh_Link_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.185 0 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.35</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='RLeg_Hip_Uni_Link'>
+      <pose frame=''>0 -0.115 0.842 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>5</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+    <link name='WAIST_LINK1'>
+      <pose frame=''>0 0 1.082 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <collision name='WAIST_LINK1_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='WAIST_LINK2'>
+      <pose frame=''>0 0 1.082 0 -0 0</pose>
+      <inertial>
+        <pose frame=''>0 -0 0 0 -0 0</pose>
+        <mass>2.50322</mass>
+        <inertia>
+          <ixx>0.034441</ixx>
+          <ixy>0.000203001</ixy>
+          <ixz>-0.000402444</ixz>
+          <iyy>0.0459468</iyy>
+          <iyz>-0.00410423</iyz>
+          <izz>0.0404358</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+      <visual name='WAIST_LINK2_visual'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+      <collision name='WAIST_LINK2_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <joint name='LArm_ElbowP_J4' type='revolute'>
+      <parent>LARM_LINK3</parent>
+      <child>LARM_LINK4</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_ShoulderP_J1' type='revolute'>
+      <parent>WAIST_LINK2</parent>
+      <child>LARM_LINK1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_ShoulderR_J2' type='revolute'>
+      <parent>LARM_LINK1</parent>
+      <child>LARM_LINK2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_ShoulderY_J3' type='revolute'>
+      <parent>LARM_LINK2</parent>
+      <child>LARM_LINK3</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_WristP_J7' type='revolute'>
+      <parent>LARM_LINK6</parent>
+      <child>LARM_LINK7</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_WristR_J6' type='revolute'>
+      <parent>LARM_LINK5</parent>
+      <child>LARM_LINK6</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LArm_WristY_J5' type='revolute'>
+      <parent>LARM_LINK4</parent>
+      <child>LARM_LINK5</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_AnkleP_J5' type='revolute'>
+      <parent>LLeg_Hip_Shank_Link</parent>
+      <child>LLeg_Ankle_Uni_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_AnkleR_J6' type='revolute'>
+      <parent>LLeg_Ankle_Uni_Link</parent>
+      <child>LLeg_Foot_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_HipP_J3' type='revolute'>
+      <parent>LLeg_Hip_Uni_Link</parent>
+      <child>LLeg_Hip_Thigh_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_HipR_J2' type='revolute'>
+      <parent>LLeg_HipY_Link</parent>
+      <child>LLeg_Hip_Uni_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_HipY_J1' type='revolute'>
+      <parent>pelvis</parent>
+      <child>LLeg_HipY_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='LLeg_KneeP_J4' type='revolute'>
+      <parent>LLeg_Hip_Thigh_Link</parent>
+      <child>LLeg_Hip_Shank_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_ElbowP_J4' type='revolute'>
+      <parent>RARM_LINK3</parent>
+      <child>RARM_LINK4</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_ShoulderP_J1' type='revolute'>
+      <parent>WAIST_LINK2</parent>
+      <child>RARM_LINK1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_ShoulderR_J2' type='revolute'>
+      <parent>RARM_LINK1</parent>
+      <child>RARM_LINK2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_ShoulderY_J3' type='revolute'>
+      <parent>RARM_LINK2</parent>
+      <child>RARM_LINK3</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_WristP_J7' type='revolute'>
+      <parent>RARM_LINK6</parent>
+      <child>RARM_LINK7</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_WristR_J6' type='revolute'>
+      <parent>RARM_LINK5</parent>
+      <child>RARM_LINK6</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RArm_WristY_J5' type='revolute'>
+      <parent>RARM_LINK4</parent>
+      <child>RARM_LINK5</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_AnkleP_J5' type='revolute'>
+      <parent>RLeg_Hip_Shank_Link</parent>
+      <child>RLeg_Ankle_Uni_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_AnkleR_J6' type='revolute'>
+      <parent>RLeg_Ankle_Uni_Link</parent>
+      <child>RLeg_Foot_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_HipP_J3' type='revolute'>
+      <parent>RLeg_Hip_Uni_Link</parent>
+      <child>RLeg_Hip_Thigh_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_HipR_J2' type='revolute'>
+      <parent>RLeg_HipY_Link</parent>
+      <child>RLeg_Hip_Uni_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_HipY_J1' type='revolute'>
+      <parent>pelvis</parent>
+      <child>RLeg_HipY_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='RLeg_KneeP_J4' type='revolute'>
+      <parent>RLeg_Hip_Thigh_Link</parent>
+      <child>RLeg_Hip_Shank_Link</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='Waist_Y_J1' type='revolute'>
+      <parent>pelvis</parent>
+      <child>WAIST_LINK1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='Waist_Y_J2' type='revolute'>
+      <parent>WAIST_LINK1</parent>
+      <child>WAIST_LINK2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>1</use_parent_model_frame>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <static>0</static>
+    <allow_auto_disable>1</allow_auto_disable>
+    <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+      <robotNamespace>/rrbot</robotNamespace>
+    </plugin>
+  </model>
+</sdf>
