@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 {
    ROS_INFO("usb conneted error!");
  }
- ros::Subscriber sub = nh.subscribe("join_data/qc", 1000, SendDataToMotors);
+ ros::Subscriber sub = nh.subscribe("jointdata/qc", 1000, SendDataToMotors);
  ros::ServiceServer activeCSPService = nh.advertiseService("ActiveCSP", ActiveCSP);
  ros::ServiceServer resetNodeService = nh.advertiseService("ResetNode", ResetNode);
  ros::ServiceServer homeService = nh.advertiseService("Home", Home);

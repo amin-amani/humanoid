@@ -198,6 +198,7 @@ void  SendGazebo(double t){
     if (data.data>maximum){data.data=maximum;}
     pub12.publish(data);
 
+
     //    double maximum=.5;
     //        data.data=teta;
     //        if (data.data<-maximum){data.data=-maximum;}
@@ -216,13 +217,17 @@ bool imuok=false;
 void RecievIMULeft(const sensor_msgs::Imu & msg)
 {
     imuok=true;
-    ROS_INFO("Left:[%f] [%f] [%f] [%f]",  msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-
+    //ROS_INFO("Left:[%f] [%f] [%f] [%f]",  msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+    //teta= quaternion2ankle_pitch( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+   // phi=quaternion2ankle_roll( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+    teta= msg.orientation.y;
+    phi=msg.orientation.x;
+ROS_INFO("Theta:[%f] Phi:[%f]",  teta*180/3.141592,phi*180/3.141592);
     //time_=time_+timestep;
 
     //if (IMULeft.getTopic()=="\0"){ time=0; }
 
-    SendGazebo(time_);
+    //SendGazebo(time_);
 
     //DoController(teta,phi);
     //  ROS_INFO("I heard");
@@ -268,9 +273,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "footControllerNode");
 
     ros::NodeHandle nh;
-    //ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",10);
+    ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",10);
 
-    //ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
+    ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
 
     ros::Subscriber  time_sub = nh.subscribe("/clock", 1, RecievTime);
     ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
@@ -316,8 +321,8 @@ int main(int argc, char **argv)
     rate=100.0;
     ros::Rate loop_rate(rate);
     dt=1/rate;
-    p_teta=0.12;
-    p_phi=0.12;
+    p_teta=0.03;
+    p_phi=0.03;
     i_teta=0;i_phi=0;
     d_teta=0;d_phi=0;
     teta_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
@@ -337,18 +342,53 @@ int main(int argc, char **argv)
     //sensor imu----------------------------------------------sensor imu
     //sensor imu----------------------------------------------sensor imu
 
-    SendGazebo(0);
+    //SendGazebo(0);
     std_msgs::Float64 data0;
 
     data0.data=0;
-    pub11.publish(data0);
-    pub12.publish(data0);
+    //pub11.publish(data0);
+    //pub12.publish(data0);
     //ROS_INFO("Worked!!! %i",IMULeft.getNumPublishers());
     while (ros::ok())
     {//time=timestep+time;
         //if (IMULeft.getTopic()=="\0"){ time=0; }
         //ROS_INFO("In loop %i",IMULeft.getNumPublishers());
-        SendGazebo(time_);
+        //SendGazebo(time_);
+
+
+        teta_motor=teta_motor+teta_pid.Calculate(0,teta);
+        phi_motor=phi_motor+phi_pid.Calculate(0,phi);
+        double maximum_d=.5;
+
+        if (teta_motor<-maximum_d){teta_motor=-maximum_d;}
+        if (teta_motor>maximum_d){teta_motor=maximum_d;}
+        if (phi_motor<-maximum_d){phi_motor=-maximum_d;}
+        if (phi_motor>maximum_d){phi_motor=maximum_d;}
+
+
+        int qref[12];
+        for (int i = 0; i < 12; ++i) {
+            qref[i]=0;
+        }
+        qref[4]=int(teta_motor*2304*100/2/3.141592);
+        qref[5]=int(phi_motor*2304*100/2/3.141592);
+        int maximum=8000;
+
+        if (qref[4]<-maximum){qref[4]=-maximum;}
+        if (qref[4]>maximum){qref[4]=maximum;}
+        if (qref[5]<-maximum){qref[5]=-maximum;}
+        if (qref[5]>maximum){qref[5]=maximum;}
+ ROS_INFO("teta_motor_QC:[%f] phi_motor_QC:[%f] ", qref[4],qref[5]);
+msg.data.clear();
+
+        for(int  i = 1;i < 13;i++)
+        {
+
+          //  cout << qref[i-1] <<" , "<<flush;
+          msg.data.push_back(qref[i-1]);
+
+        }
+          chatter_pub.publish(msg);
         ros::spinOnce();
         loop_rate.sleep();
         ++count;

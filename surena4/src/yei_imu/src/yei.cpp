@@ -19,10 +19,22 @@ bool TareSensor(std_srvs::Empty::Request& request, std_srvs::Empty::Response& re
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
-
-
+QString command=":1\n";
     _comport.setBaudRate(115200);
     _comport.setPortName(argv[1]);
+    qDebug()<<"argv2 "<<argv[2];
+
+    if(QString::fromLatin1( argv[2])=="q")
+    {
+      qDebug()<< "set to quartenion ";
+      command=":0\n";
+    }
+    else
+       { command=":1\n";
+          qDebug()<< "set to rol pitch yaw ";
+    }
+
+
     //_comport.setPortName("ttyUSB0");
     if(!_comport.open(QSerialPort::ReadWrite))
     {
@@ -42,17 +54,51 @@ int main(int argc, char **argv)
     sensor_msgs::Imu imuMsg;
 
     ros::Rate loop_rate(1000);
+//    while (ros::ok())
+//    {
+//        _comport.write(":0\n");
+//        _comport.flush();
+//        _comport.waitForReadyRead(2);
+
+//        QString str= _comport.readLine().trimmed();
+//        QStringList list=str.split(',');
+//               //   qDebug()<< str;
+//        if(list.count()==4){
+
+//            imuMsg.orientation.x=list[0].toDouble();
+//            imuMsg.orientation.y=list[1].toDouble();
+//            imuMsg.orientation.z=list[2].toDouble();
+//            imuMsg.orientation.w=list[3].toDouble();
+//            sensorPub.publish(imuMsg);
+//        }
+
+////357097060826653/01
+
+//         //ROS_INFO("ans");
+//        ros::spinOnce();
+
+//      //  loop_rate.sleep();
+//    }
+    qDebug()<<command;
     while (ros::ok())
     {
-        _comport.write(":0\n");
+        _comport.write(command.toLatin1());
         _comport.flush();
         _comport.waitForReadyRead(2);
 
         QString str= _comport.readLine().trimmed();
         QStringList list=str.split(',');
-               //   qDebug()<< str;
-        if(list.count()==4){
 
+                  if(list.count()== 3 && command==":1\n"){
+ //qDebug()<< "euler"<<str;
+                      imuMsg.orientation.x=list[2].toDouble();//*180/3.14159236;
+                      imuMsg.orientation.y=-1*list[0].toDouble();//*180/3.14159236;
+                      imuMsg.orientation.z=-1*list[1].toDouble();//*180/3.14159236;
+                      imuMsg.orientation.w=0;
+                      sensorPub.publish(imuMsg);
+                  }
+        else if(list.count()==4  && command==":0\n"){
+ //qDebug()<< "qua"<<str;
             imuMsg.orientation.x=list[0].toDouble();
             imuMsg.orientation.y=list[1].toDouble();
             imuMsg.orientation.z=list[2].toDouble();
