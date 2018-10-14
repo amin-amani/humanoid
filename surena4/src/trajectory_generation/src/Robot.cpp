@@ -419,6 +419,21 @@ MatrixXd Robot::CalcJacobian(MatrixXi route )
 }
 
 
+MatrixXd Robot::RPY2R(Matrix3d rpy){
+    MatrixXd rot(3,3);
+
+    double roll = rpy(0,0);
+    double pitch = rpy(1,0);
+    double yaw = rpy(2,0);
+    double Cphi = cos(roll);
+    double Sphi = sin(roll);
+    double Cthe = cos(pitch);
+    double Sthe = sin(pitch);
+    double Cpsi = cos(yaw);
+    double Spsi = sin(yaw);
+    rot<<Cpsi*Cthe ,-Spsi*Cphi+Cpsi*Sthe*Sphi,Spsi*Sphi+Cpsi*Sthe*Cphi,Spsi*Cthe,Cpsi*Cphi+Spsi*Sthe*Sphi,-Cpsi*Sphi+Spsi*Sthe*Cphi,-Sthe,Cthe*Sphi,Cthe*Cphi  ;
+    return rot;
+}
 
 
 double Robot::IKLevenbergMarquardt(LinkM Target, QString current)
@@ -579,5 +594,47 @@ void Robot::doIK(QString link,MatrixXd PoseLink,QString root,MatrixXd PoseRoot){
     SetJointAngle(LegAngle,Route);
 
 //qDebug()<<2;
+
+}
+
+
+void Robot::doIKhipRollModify(QString link,MatrixXd PoseLink,QString root,MatrixXd PoseRoot,double rollAngle){//modifying hip roll for pelvis deflection compensation
+
+    LinkM foot=Links[MapingName2ID.value(link)-1];
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(0)=PoseRoot(0,0);
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(1)=PoseRoot(1,0);
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(2)=PoseRoot(2,0);
+    //    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate(0)=PoseRoot(4,0);
+    //    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate(1)=PoseRoot(4,0);
+    // Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate=PoseRoot(5,0);
+
+
+
+    foot.PositionInWorldCoordinate(0)=PoseLink(0,0);
+    foot.PositionInWorldCoordinate(1)=PoseLink(1,0);
+    foot.PositionInWorldCoordinate(2)=PoseLink(2,0);//just specify X
+    MatrixXd mm(3,1);
+    mm<<PoseLink(3,0),PoseLink(4,0),PoseLink(5,0);
+    foot.AttitudeInWorldCoordinate=RPY2R(mm);
+    //foot.AttitudeInWorldCoordinate(0)=PoseLink(4,0);
+    //foot.AttitudeInWorldCoordinate(0)=PoseLink(5,0);
+    //qDebug()<<x(var);
+    //double milad=IKLevenbergMarquardt(foot,link);
+    MatrixXi Route;
+    double D;
+    if (link=="LLeg_AnkleR_J6") {
+        D=0.115;
+        Route= GetLeftLegRoute();
+    }
+    else if(link=="RLeg_AnkleR_J6") {
+        D=-1*0.115;
+        Route= GetRightLegRoute();
+    }
+    MatrixXd Q= IKAnalytical(Links[MapingName2ID.value(root)-1],D,-0.109,0.37,0.36,foot);
+    MatrixXd LegAngle(1,6);
+    LegAngle<<Q(0,0) ,Q(1,0)-rollAngle ,Q(2,0),Q(3,0), Q(4,0), Q(5,0);
+    SetJointAngle(LegAngle,Route);
+
+    //qDebug()<<2;
 
 }

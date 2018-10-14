@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <link.h>
 #include "Eigen/eiquadprog.h"
-
 #include "Eigen/Core"
 #include "Eigen/Cholesky"
 #include "Eigen/LU"
@@ -27,8 +26,15 @@ class TaskSpaceOffline
     double _lenghtOfAnkle;
     double _lengthOfHip;
     double _pelvisLength;
+    double _heelLength;
+    double _toeLength;
 public:
     TaskSpaceOffline();
+    bool LeftSupport;
+    bool RightSupport;
+    bool DoubleSupport;
+    double HeelLandingAnglePitch;
+    double ToeOffAnglePitch;
     double TStart;
     double TEnd;
     double timeStepT;
@@ -36,6 +42,7 @@ public:
     double TGait;
     double T_beta;
     double TSS;
+    double YOffsetOfAnkletrajectory;
 
     double xa_st_m;
     double er;
@@ -128,7 +135,8 @@ double time;
 double _timeStep;
     QVector<double> timeVector;
 
-
+bool toeOff;
+ bool HipRollModification;
 
     QVector<double> RightFootXTrajectory;
     QVector<double> RightFootYTrajectory;
@@ -167,10 +175,22 @@ double _timeStep;
     MatrixXd Cz_st;
     MatrixXd Cx_end;
     MatrixXd Cz_end;
+    MatrixXd C_st_pitch_al;
+    MatrixXd C_Ds_pitch_al;
+    MatrixXd C_Ds_pitch_ar;
+    MatrixXd C_Ds2_pitch_ar;
+    MatrixXd C_Ds2_pitch_al;
+    MatrixXd C_ss_pitch_ar;
+    MatrixXd C_end_pitch_ar;
+    MatrixXd C_Dsf_pitch_ar;
     MatrixXd C_st_x_al;
     MatrixXd C_st_z_al;
     MatrixXd C_cy_x_al;
     MatrixXd C_cy_z_ar;
+    MatrixXd C_cy_y_ar;
+    MatrixXd C_cy_y_al;
+    MatrixXd C_st_y_al;
+    MatrixXd C_end_y_ar;
     MatrixXd C_end_z_ar;
     MatrixXd C_end_x_ar;
     MatrixXd C_cy_x_ar;
@@ -209,6 +229,7 @@ double _timeStep;
     void CoeffArrayAnkle();
     void CoeffArrayPelvis();
     MatrixXd PelvisTrajectory(double time);
+    void CoeffArrayFootAngle();
 };
 
 #endif // TASKSPACEOFFLINE_H

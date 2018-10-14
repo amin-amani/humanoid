@@ -33,6 +33,7 @@
 #include <gazebo_msgs/GetLinkState.h>
 #include<gazebo_msgs/LinkStates.h>
 #include <nav_msgs/Odometry.h>
+#include "std_srvs/Empty.h"
 
 using namespace  std;
 using namespace  Eigen;
@@ -67,8 +68,14 @@ ros::Publisher pub27 ;
 ros::Publisher pub28 ;
 
 //ros::Subscriber quaternions;
-double teta=0;
-double phi=0;
+double teta_L=0;
+double phi_L=0;
+
+double teta_R=0;
+double phi_R=0;
+
+
+
 
 double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
     double R11,R32,R33,R31,theta;
@@ -92,11 +99,16 @@ double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
     return phi;
 }
 
-PIDController teta_pid;
-PIDController phi_pid;
+PIDController teta_pid_L;
+PIDController phi_pid_L;
+PIDController teta_pid_R;
+PIDController phi_pid_R;
+
 double p_teta,i_teta,d_teta,p_phi,i_phi,d_phi,dt,rate;
-double teta_motor=0;
-double phi_motor=0;
+double teta_motor_L=0;
+double teta_motor_R=0;
+double phi_motor_L=0;
+double phi_motor_R=0;
 double timestep=.01;
 double time_=0;
 
@@ -128,11 +140,11 @@ void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
     //const std::vector<geometry_msgs::Pose> psitions = msg->pose;
     //  double distance=0;
 
-    geometry_msgs::Pose parentPosition=GetLinkPosition("robot::LLeg_Foot_Link",msg);
+    //geometry_msgs::Pose parentPosition=GetLinkPosition("robot::LLeg_Foot_Link",msg);
     //qDebug()<<"we are here:"<< parentPosition.orientation.x<<parentPosition.orientation.y<<parentPosition.orientation.z<<parentPosition.orientation.w;
-    teta= quaternion2ankle_pitch( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-    phi=quaternion2ankle_roll( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-    qDebug()<<"teta:"<< teta*180/3.141592<<", Phi="<<phi*180/3.141592;
+//    teta= quaternion2ankle_pitch( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
+//    phi=quaternion2ankle_roll( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
+//    qDebug()<<"teta:"<< teta*180/3.141592<<", Phi="<<phi*180/3.141592;
     //qDebug()<<QString::fromStdString( names[9])<<psitions[9].position.x<<psitions[9].position.y<<psitions[9].position.z;
     //ROS_INFO("I heard");
 
@@ -144,93 +156,83 @@ void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
 //teta_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
 //phi_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
 
-void  SendGazebo(double t){
+//void  SendGazebo(double t){
 
-    std_msgs::Float64 data;
+//    std_msgs::Float64 data;
 
-    //ros::Time time = ros::Time::now();
+//    //ros::Time time = ros::Time::now();
 
-    data.data=0;
-    pub1.publish(data);
-    pub2.publish(data);
-    pub3.publish(data);
-    pub4.publish(data);
-    pub5.publish(data);
-    pub6.publish(data);
-    pub7.publish(data);
-    pub8.publish(data);
-
-
-
-    pub13.publish(data);
-    pub14.publish(data);
-    pub15.publish(data);
-    pub16.publish(data);
-    pub17.publish(data);
-    pub18.publish(data);
-    pub19.publish(data);
-    pub20.publish(data);
-    pub21.publish(data);
-    pub22.publish(data);
-    pub23.publish(data);
-    pub24.publish(data);
-    pub25.publish(data);
-    pub26.publish(data);
-    pub27.publish(data);
-    pub28.publish(data);
-
-
-    data.data=min(0.8*sin(t)*sin(t),1.0);
-    pub10.publish(data);
-
-    data.data=-data.data/2;
-    pub9.publish(data);
-
-    double maximum=.5;
-    teta_motor=teta_motor+teta_pid.Calculate(0,teta);
-    data.data=teta_motor;
-    if (data.data<-maximum){data.data=-maximum;}
-    if (data.data>maximum){data.data=maximum;}
-    pub11.publish(data);
-    phi_motor=phi_motor+phi_pid.Calculate(0,phi);
-    data.data=phi_motor;
-    if (data.data<-maximum){data.data=-maximum;}
-    if (data.data>maximum){data.data=maximum;}
-    pub12.publish(data);
-
-
-    //    double maximum=.5;
-    //        data.data=teta;
-    //        if (data.data<-maximum){data.data=-maximum;}
-    //        if (data.data>maximum){data.data=maximum;}
-    //        pub11.publish(data);
-    //        data.data=phi;
-    //        if (data.data<-maximum){data.data=-maximum;}
-    //        if (data.data>maximum){data.data=maximum;}
-    //        pub12.publish(daos::spinOnce();ta);
-}
+//    data.data=0;
+//    pub1.publish(data);
+//    pub2.publish(data);
+//    pub3.publish(data);
+//    pub4.publish(data);
+//    pub5.publish(data);
+//    pub6.publish(data);
+//    pub7.publish(data);
+//    pub8.publish(data);
 
 
 
+//    pub13.publish(data);
+//    pub14.publish(data);
+//    pub15.publish(data);
+//    pub16.publish(data);
+//    pub17.publish(data);
+//    pub18.publish(data);
+//    pub19.publish(data);
+//    pub20.publish(data);
+//    pub21.publish(data);
+//    pub22.publish(data);
+//    pub23.publish(data);
+//    pub24.publish(data);
+//    pub25.publish(data);
+//    pub26.publish(data);
+//    pub27.publish(data);
+//    pub28.publish(data);
 
-bool imuok=false;
+
+//    data.data=min(0.8*sin(t)*sin(t),1.0);
+//    pub10.publish(data);
+
+//    data.data=-data.data/2;
+//    pub9.publish(data);
+
+//    double maximum=.5;
+//    teta_motor=teta_motor+teta_pid.Calculate(0,teta);
+//    data.data=teta_motor;
+//    if (data.data<-maximum){data.data=-maximum;}
+//    if (data.data>maximum){data.data=maximum;}
+//    pub11.publish(data);
+//    phi_motor=phi_motor+phi_pid.Calculate(0,phi);
+//    data.data=phi_motor;
+//    if (data.data<-maximum){data.data=-maximum;}
+//    if (data.data>maximum){data.data=maximum;}
+//    pub12.publish(data);
+
+
+//    //    double maximum=.5;
+//    //        data.data=teta;
+//    //        if (data.data<-maximum){data.data=-maximum;}
+//    //        if (data.data>maximum){data.data=maximum;}
+//    //        pub11.publish(data);
+//    //        data.data=phi;
+//    //        if (data.data<-maximum){data.data=-maximum;}
+//    //        if (data.data>maximum){data.data=maximum;}
+//    //        pub12.publish(daos::spinOnce();ta);
+//}
+
+
+
+
+
 void RecievIMULeft(const sensor_msgs::Imu & msg)
 {
-    imuok=true;
-    //ROS_INFO("Left:[%f] [%f] [%f] [%f]",  msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    //teta= quaternion2ankle_pitch( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-   // phi=quaternion2ankle_roll( msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    teta= msg.orientation.y;
-    phi=msg.orientation.x;
-ROS_INFO("Theta:[%f] Phi:[%f]",  teta*180/3.141592,phi*180/3.141592);
-    //time_=time_+timestep;
 
-    //if (IMULeft.getTopic()=="\0"){ time=0; }
+    teta_L= msg.orientation.y;
+    phi_L=msg.orientation.x;
+//ROS_INFO("Theta_L:[%f] Phi_L:[%f]",  teta_L*180/3.141592,phi_L*180/3.141592);
 
-    //SendGazebo(time_);
-
-    //DoController(teta,phi);
-    //  ROS_INFO("I heard");
 }
 
 void RecievTime(const rosgraph_msgs::Clock & msg)
@@ -241,8 +243,9 @@ void RecievTime(const rosgraph_msgs::Clock & msg)
 
 void RecievIMURight(const sensor_msgs::Imu & msg)
 {
-    ROS_INFO("Right:[%f] [%f] [%f] [%f]", msg.orientation.w, msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    //  ROS_INFO("I heard");
+    teta_R= msg.orientation.y;
+    phi_R=msg.orientation.x;
+//ROS_INFO("Theta_R:[%f] Phi_R:[%f]",  teta_R*180/3.141592,phi_R*180/3.141592);
 }
 
 void RecievIMUCenter(const sensor_msgs::Imu & msg)
@@ -251,14 +254,6 @@ void RecievIMUCenter(const sensor_msgs::Imu & msg)
     //  ROS_INFO("I heard");
 }
 
-//QVector<double> get_quaternions(const sensor_msgs::Imu & msg){
-//    QVector<double> q(4);
-//    q(0)=msg.orientation.w;
-//    q(1)=msg.orientation.x;
-//    q(2)=msg.orientation.y;
-//    q(3)=msg.orientation.z;
-//    return q;
-//}
 
 
 
@@ -266,7 +261,7 @@ int main(int argc, char **argv)
 {
     //check _timesteps
 
-
+    std_srvs::Empty emptyCall;
     //*******************This part of code is for initialization of joints of the robot for walking**********************************
     int count = 0;
 
@@ -276,10 +271,11 @@ int main(int argc, char **argv)
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",10);
 
     ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
-
+    ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 1, RecievIMURight);
     ros::Subscriber  time_sub = nh.subscribe("/clock", 1, RecievTime);
     ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
-
+    ros::ServiceClient tareLeft= nh.serviceClient<std_srvs::Empty>("/Tareyei2000154");
+    ros::ServiceClient tareRight= nh.serviceClient<std_srvs::Empty>("/Tareyei200015B");
     //ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 100, RecievIMURight);
     //ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCenter);
 
@@ -325,8 +321,10 @@ int main(int argc, char **argv)
     p_phi=0.03;
     i_teta=0;i_phi=0;
     d_teta=0;d_phi=0;
-    teta_pid.Init(dt,1,-1,p_teta,i_teta,d_teta);
-    phi_pid.Init(dt,1,-1,p_phi,i_phi,d_phi);
+    teta_pid_L.Init(dt,1,-1,p_teta,i_teta,d_teta);
+    phi_pid_L.Init(dt,1,-1,p_phi,i_phi,d_phi);
+    teta_pid_R.Init(dt,1,-1,p_teta,i_teta,d_teta);
+    phi_pid_R.Init(dt,1,-1,p_phi,i_phi,d_phi);
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -349,6 +347,9 @@ int main(int argc, char **argv)
     //pub11.publish(data0);
     //pub12.publish(data0);
     //ROS_INFO("Worked!!! %i",IMULeft.getNumPublishers());
+
+    tareLeft.call(emptyCall);
+    tareRight.call(emptyCall);
     while (ros::ok())
     {//time=timestep+time;
         //if (IMULeft.getTopic()=="\0"){ time=0; }
@@ -356,36 +357,54 @@ int main(int argc, char **argv)
         //SendGazebo(time_);
 
 
-        teta_motor=teta_motor+teta_pid.Calculate(0,teta);
-        phi_motor=phi_motor+phi_pid.Calculate(0,phi);
+        teta_motor_L=teta_motor_L+teta_pid_L.Calculate(0,teta_L);
+        phi_motor_L=phi_motor_L+phi_pid_L.Calculate(0,phi_L);
+
+        teta_motor_R=teta_motor_R+teta_pid_R.Calculate(0,teta_R);
+        phi_motor_R=phi_motor_R+phi_pid_R.Calculate(0,phi_R);
         double maximum_d=.5;
 
-        if (teta_motor<-maximum_d){teta_motor=-maximum_d;}
-        if (teta_motor>maximum_d){teta_motor=maximum_d;}
-        if (phi_motor<-maximum_d){phi_motor=-maximum_d;}
-        if (phi_motor>maximum_d){phi_motor=maximum_d;}
+        if (teta_motor_L<-maximum_d){teta_motor_L=-maximum_d;}
+        if (teta_motor_L>maximum_d){teta_motor_L=maximum_d;}
+        if (phi_motor_L<-maximum_d){phi_motor_L=-maximum_d;}
+        if (phi_motor_L>maximum_d){phi_motor_L=maximum_d;}
 
+        if (teta_motor_R<-maximum_d){teta_motor_R=-maximum_d;}
+        if (teta_motor_R>maximum_d){teta_motor_R=maximum_d;}
+        if (phi_motor_R<-maximum_d){phi_motor_R=-maximum_d;}
+        if (phi_motor_R>maximum_d){phi_motor_R=maximum_d;}
 
         int qref[12];
         for (int i = 0; i < 12; ++i) {
             qref[i]=0;
         }
-        qref[4]=int(teta_motor*2304*100/2/3.141592);
-        qref[5]=int(phi_motor*2304*100/2/3.141592);
+
+
+        qref[4]=int(teta_motor_L*2304*100/2/3.141592);
+       // qref[4]=int(phi_motor_L*2304*100/2/3.141592);
+        qref[5]=int(phi_motor_L*2304*100/2/3.141592);
+        qref[1]=int(-teta_motor_R*2304*100/2/3.141592);
+        qref[0]=int(phi_motor_R*2304*100/2/3.141592);
         int maximum=8000;
 
         if (qref[4]<-maximum){qref[4]=-maximum;}
         if (qref[4]>maximum){qref[4]=maximum;}
         if (qref[5]<-maximum){qref[5]=-maximum;}
         if (qref[5]>maximum){qref[5]=maximum;}
- ROS_INFO("teta_motor_QC:[%f] phi_motor_QC:[%f] ", qref[4],qref[5]);
+
+        if (qref[0]<-maximum){qref[0]=-maximum;}
+        if (qref[0]>maximum){qref[0]=maximum;}
+        if (qref[1]<-maximum){qref[1]=-maximum;}
+        if (qref[1]>maximum){qref[1]=maximum;}
+ //ROS_INFO("teta_motor_L_QC:[%i] phi_motor_L_QC:[%i] teta_motor_R_QC:[%i] phi_motor_R_QC:[%i] ", qref[4],qref[5], qref[1],qref[0]);
+        ROS_INFO("phi_motor_L_QC:[%d] phi_IMU : [%f]",qref[5],phi_L);
 msg.data.clear();
 
-        for(int  i = 1;i < 13;i++)
+        for(int  i = 0;i < 12;i++)
         {
 
           //  cout << qref[i-1] <<" , "<<flush;
-          msg.data.push_back(qref[i-1]);
+          msg.data.push_back(qref[i]);
 
         }
           chatter_pub.publish(msg);

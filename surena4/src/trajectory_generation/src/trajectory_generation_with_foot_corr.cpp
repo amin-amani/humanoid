@@ -23,12 +23,16 @@
 #include<math.h>
 #include<sensor_msgs/Imu.h>
 #include<std_msgs/Float64.h>
+#include "pidcontroller.h"
+#include<rosgraph_msgs/Clock.h>
+#include <std_msgs/Empty.h>
+#include "std_srvs/Empty.h"
 
 using namespace  std;
 using namespace  Eigen;
 
 //sensor imu----------------------------------------------sensor imu
-//sensor imu----------------------------------------------sensor imu
+//sensor imu-----------------------------------------------sensor imu
 //void chatterCallback(const sensor_msgs::Imu::ConstPtr& msg)
 //{
 //  ROS_INFO("I heard: [%f]", msg->orientation.x);
@@ -66,30 +70,28 @@ ros::Publisher pub26 ;
 ros::Publisher pub27 ;
 ros::Publisher pub28 ;
 
-ros::Subscriber orintation;
+double teta_L=0;
+double phi_L=0;
 
-void RecievIMULeft(const sensor_msgs::Imu & msg)
-{
-  ROS_INFO("Left:[%f] [%f] [%f] [%f]",  msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w);
- //  ROS_INFO("I heard");
-}
+double teta_R=0;
+double phi_R=0;
 
-void RecievIMURight(const sensor_msgs::Imu & msg)
-{
-  ROS_INFO("Right:[%f] [%f] [%f] [%f]",  msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w);
- //  ROS_INFO("I heard");
-}
+PIDController teta_pid_L;
+PIDController phi_pid_L;
+PIDController teta_pid_R;
+PIDController phi_pid_R;
 
-void RecievIMUCenter(const sensor_msgs::Imu & msg)
-{
-  ROS_INFO("Center:[%f] [%f] [%f] [%f]", msg.orientation.x,msg.orientation.y,msg.orientation.z,msg.orientation.w);
- //  ROS_INFO("I heard");
-}
+double p_teta,i_teta,d_teta,p_phi,i_phi,d_phi,dt,rate;
+double teta_motor_L=0;
+double teta_motor_R=0;
+double phi_motor_L=0;
+double phi_motor_R=0;
+double timestep=.01;
+double time_=0;
 
 void  SendGazebo(QList<LinkM> links){
 if(links.count()<28){qDebug()<<"index err";return;}
     std_msgs::Float64 data;
-
 data.data=links[1].JointAngle;
 pub1.publish(data);
 data.data=links[2].JointAngle;
@@ -150,11 +152,35 @@ pub28.publish(data);
 
 
 }
+
+void RecievIMULeft(const sensor_msgs::Imu & msg)
+{
+
+    teta_L= msg.orientation.y;
+    phi_L=msg.orientation.x;
+ROS_INFO("Theta_L:[%f] Phi_L:[%f]",  teta_L*180/3.141592,phi_L*180/3.141592);
+
+}
+
+void RecievTime(const rosgraph_msgs::Clock & msg)
+{
+    time_ =double(msg.clock.nsec)*1e-9 + double(msg.clock.sec);
+}
+
+
+void RecievIMURight(const sensor_msgs::Imu & msg)
+{
+    teta_R= msg.orientation.y;
+    phi_R=msg.orientation.x;
+ROS_INFO("Theta_R:[%f] Phi_R:[%f]",  teta_R*180/3.141592,phi_R*180/3.141592);
+}
+
 int main(int argc, char **argv)
 {
   //check _timesteps
+    std_srvs::Empty emptyCall;
     QElapsedTimer timer;
-  vector<double> qref(12);
+  vector<int> qref(12);
   Robot SURENA;
   TaskSpaceOffline SURENAOffilneTaskSpace;
   QList<LinkM> links;
@@ -162,8 +188,9 @@ int main(int argc, char **argv)
   MatrixXd PoseRFoot;
   MatrixXd PoseLFoot;
   double dt;
-
+  double hipRoll=0;
   double StartTime=0;
+  double RollTime=0;
   double WalkTime=0;
   double  DurationOfStartPhase=6;
  double  DurationOfendPhase=6;
@@ -179,12 +206,12 @@ int count = 0;
 
   ros::init(argc, argv, "myNode");
 
-  ros::NodeHandle nh;
+ros::NodeHandle nh;
 ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
-
-ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 100, RecievIMULeft);
-ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 100, RecievIMURight);
-ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCenter);
+ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
+ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 1, RecievIMURight);
+ros::ServiceClient tareLeft= nh.serviceClient<std_srvs::Empty>("/Tareyei2000154");
+ros::ServiceClient tareRight= nh.serviceClient<std_srvs::Empty>("/Tareyei200015B");
 
  pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
  pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -220,6 +247,15 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
   std_msgs::Int32MultiArray msg;
   std_msgs::MultiArrayDimension msg_dim;
 
+  p_teta=0.03;
+  p_phi=0.03;
+  i_teta=0;i_phi=0;
+  d_teta=0;d_phi=0;
+  teta_pid_L.Init(dt,0.5,-.5,p_teta,i_teta,d_teta);
+  phi_pid_L.Init(dt,.5,-.5,p_phi,i_phi,d_phi);
+  teta_pid_R.Init(dt,.5,-.5,p_teta,i_teta,d_teta);
+  phi_pid_R.Init(dt,.5,-.5,p_phi,i_phi,d_phi);
+
   msg_dim.label = "joint_position";
   msg_dim.size = 1;
   msg.layout.dim.clear();
@@ -231,6 +267,19 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
 //  ros::Subscriber sub = nh.subscribe("/mti/sensor/imu", 1000, chatterCallback);
 //sensor imu----------------------------------------------sensor imu
 //sensor imu----------------------------------------------sensor imu
+
+  tareLeft.call(emptyCall);
+  tareRight.call(emptyCall);
+  msg.data.clear();
+  for(int  i = 0;i < 12;i++)
+  {
+    qref[i] = 0;
+    //  cout << qref[i-1] <<" , "<<flush;
+    msg.data.push_back(qref[i]);
+  }
+  chatter_pub.publish(msg);
+
+
 
   while (ros::ok())
   {
@@ -307,6 +356,8 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
         double m4;
         double m5;
         double m6;
+        double m7;
+        double m8;
         StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
         //qDebug()<<StartTime;
         MatrixXd P;
@@ -318,6 +369,8 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
             m4=m(3,0);
             m5=m(4,0);
             m6=m(5,0);
+            m7=m(6,0);
+            m8=m(7,0);
 
             P=SURENAOffilneTaskSpace.PelvisTrajectory (SURENAOffilneTaskSpace.globalTime);
 
@@ -331,6 +384,45 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
             SURENAOffilneTaskSpace.globalTime=SURENAOffilneTaskSpace.globalTime+SURENAOffilneTaskSpace._timeStep;
 
             if (round(SURENAOffilneTaskSpace.globalTime)<=round(SURENAOffilneTaskSpace.MotionTime)){
+
+
+                if (SURENAOffilneTaskSpace.DoubleSupport!=true) {
+                    //For modifying the angle of roll during single support
+                    RollTime=RollTime+SURENAOffilneTaskSpace._timeStep;
+                    MinimumJerkInterpolation Coef;
+                    MatrixXd RollAngle(1,3);
+                    RollAngle<<0,0.1,0;
+                    MatrixXd RollAngleVelocity(1,3);
+                    RollAngleVelocity<<0.000,INFINITY,0.000;
+                    MatrixXd RollAngleAcceleration(1,3);
+                    RollAngleAcceleration<<0,INFINITY,0;
+
+
+                    MatrixXd Time22(1,3);
+                    Time22<<0,(SURENAOffilneTaskSpace.TSS/2),SURENAOffilneTaskSpace.TSS;
+                    MatrixXd CoefRoll =Coef.Coefficient(Time22,RollAngle,RollAngleVelocity,RollAngleAcceleration);
+
+
+                    //StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
+
+                    MatrixXd outputRollAngle;
+                    if (RollTime<=(SURENAOffilneTaskSpace.TSS/2)) {
+                       outputRollAngle= SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(0),RollTime,0,5);
+                        hipRoll=outputRollAngle(0,0);
+                    }
+                    else {
+                       outputRollAngle =SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(1),RollTime,SURENAOffilneTaskSpace.TSS/2,5);
+                        hipRoll=outputRollAngle(0,0);
+                    }
+
+
+                }
+                else {
+                    hipRoll=0;
+                    RollTime=0;
+                }
+
+
                 PoseRoot<<P(0,0),
                         P(1,0),
                         P(2,0),
@@ -338,22 +430,37 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
                         0,
                         0;
 
-                PoseRFoot<<m4,
-                        m5,
+                PoseRFoot<<m5,
                         m6,
+                        m7,
                         0,
-                        0,
+                        -1*m8*(M_PI/180),
                         0;
 
                 PoseLFoot<<m1,
                         m2,
                         m3,
                         0,
-                        0,
+                        -1*m4*(M_PI/180),
                         0;
 
+                //// hip roll modification
+                if (SURENAOffilneTaskSpace.LeftSupport==true && SURENAOffilneTaskSpace.HipRollModification==true){
+
+                    SURENA.doIKhipRollModify("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot,-1*hipRoll);
+                    SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,0);
+
+                }
+
+                else if (SURENAOffilneTaskSpace.HipRollModification==true && SURENAOffilneTaskSpace.LeftSupport!=true )  {
+                    SURENA.doIKhipRollModify("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot,0);
+                    SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,1*hipRoll);
+                }
+
+
+
                 SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
-                SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+               SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
                 //R1=AnkleRollRight
                 //R2=AnklePitchRight
                 //R3=KneePitchRight
@@ -417,23 +524,44 @@ ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCente
         SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
     }
     links = SURENA.GetLinks();
-    msg.data.clear();
+
     MatrixXi mappingJoints(12,1);
     //R6=0*(1/2Pi)*(2304)*100  R5=1*-1*(1/2Pi)*(2304)*100   R4=2*(1/2Pi)*(2304)*50   R3=3*-1(1/2Pi)*(2304)*80  R2=9*(1/2Pi)*(2304)*120  R1=8*-1*(1/2Pi)*(2304)*120
     //  L6=5*(1/2Pi)*(2304)*100   L5=4*(1/2Pi)*(2304)*100   L4=6*-1*(1/2Pi)*(2304)*50     L3=7*(1/2Pi)*(2304)*80  L2=10*(1/2Pi)*(2304)*120   L1=11*-1*(1/2Pi)*(2304)*120
-mappingJoints<<links[6].JointAngle*(1/(2*M_PI))*(2304)*100,
-    links[5].JointAngle*(-1)*(1/(2*M_PI))*(2304)*100,
+
+//    teta_motor_L=teta_motor_L+teta_pid_L.Calculate(0,teta_L);
+//    phi_motor_L=phi_motor_L+phi_pid_L.Calculate(0,phi_L);
+
+//    teta_motor_R=teta_motor_R+teta_pid_R.Calculate(0,teta_R);
+//    phi_motor_R=phi_motor_R+phi_pid_R.Calculate(0,phi_R);
+//    double maximum_d=.5;
+
+//    if (teta_motor_L<-maximum_d){teta_motor_L=-maximum_d;}
+//    if (teta_motor_L>maximum_d){teta_motor_L=maximum_d;}
+//    if (phi_motor_L<-maximum_d){phi_motor_L=-maximum_d;}
+//    if (phi_motor_L>maximum_d){phi_motor_L=maximum_d;}
+
+//    if (teta_motor_R<-maximum_d){teta_motor_R=-maximum_d;}
+//    if (teta_motor_R>maximum_d){teta_motor_R=maximum_d;}
+//    if (phi_motor_R<-maximum_d){phi_motor_R=-maximum_d;}
+//    if (phi_motor_R>maximum_d){phi_motor_R=maximum_d;}
+
+
+
+
+mappingJoints<<links[6].JointAngle*(1/(2*M_PI))*(2304)*100+(phi_pid_R.Calculate(0,phi_R)*2304*100/2/3.141592),
+    links[5].JointAngle*(-1)*(1/(2*M_PI))*(2304)*100+(-teta_pid_R.Calculate(0,teta_R)*2304*100/2/3.141592),
     links[4].JointAngle*(1/(2*M_PI))*(2304)*50,
     links[3].JointAngle*-1*(1/(2*M_PI))*(2304)*80,
-    links[11].JointAngle*(1/(2*M_PI))*(2304)*100,
-    links[12].JointAngle*(1/(2*M_PI))*(2304)*100,
+    links[11].JointAngle*(1/(2*M_PI))*(2304)*100+(teta_pid_L.Calculate(0,teta_L)*2304*100/2/3.141592),
+    links[12].JointAngle*(1/(2*M_PI))*(2304)*100+(phi_pid_L.Calculate(0,phi_L)*2304*100/2/3.141592),
     links[10].JointAngle*-1*(1/(2*M_PI))*(2304)*50,
     links[9].JointAngle*(1/(2*M_PI))*(2304)*80,
     links[1].JointAngle*(-1)*(1/(2*M_PI))*(2304)*120,
     links[2].JointAngle*(1/(2*M_PI))*(2304)*120,
     links[8].JointAngle*(1/(2*M_PI))*(2304)*120,
     links[7].JointAngle*-1*(1/(2*M_PI))*(2304)*120;
-
+msg.data.clear();
     for(int  i = 1;i < 13;i++)
     {
       qref[i-1] = mappingJoints(i-1,0);
@@ -444,8 +572,8 @@ mappingJoints<<links[6].JointAngle*(1/(2*M_PI))*(2304)*100,
     // std::string varAsString = std::to_string(qref[i-1]);
     // msg.data =varAsString;
     //SendGazebo(links);
- // chatter_pub.publish(msg);
-   // ROS_INFO("t1={%d} c={%d}",timer.elapsed(),count);
+  chatter_pub.publish(msg);
+    ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
     //
     //    std_msgs::String msg;
     // msg.data = "milad";

@@ -9,6 +9,7 @@
 #include"surena_usb/active_csp.h"
 #include "surena_usb/reset_node.h"
 #include "surena_usb/home.h"
+#include <std_msgs/Empty.h>
 
 // =================================note=========================================================
 //echo "source  /home/amin/Desktop/catkin_ws/devel/setup.sh" >> ~/.bashrc

@@ -46,10 +46,11 @@ QString command=":1\n";
     _comport.flush();
     _comport.waitForReadyRead(1000);
     QString sn= "yei"+_comport.readLine().trimmed();
+    QString tareName = "Tare" + sn;
 
     ros::init(argc, argv, sn.toStdString());
     ros::NodeHandle nh;
-    ros::ServiceServer tareService = nh.advertiseService("Tare", TareSensor);
+    ros::ServiceServer tareService = nh.advertiseService(tareName.toStdString(), TareSensor);
     ros::Publisher sensorPub = nh.advertise<sensor_msgs::Imu>(sn.toStdString(), 100);
     sensor_msgs::Imu imuMsg;
 
