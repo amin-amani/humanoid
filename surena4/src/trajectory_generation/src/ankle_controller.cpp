@@ -34,6 +34,7 @@
 #include<gazebo_msgs/LinkStates.h>
 #include <nav_msgs/Odometry.h>
 #include "std_srvs/Empty.h"
+#include "qcgenerator.h"
 
 using namespace  std;
 using namespace  Eigen;
@@ -77,27 +78,27 @@ double phi_R=0;
 
 
 
-double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
-    double R11,R32,R33,R31,theta;
-    //    R11=q0*q0+q1*q1-q2*q2-q3*q3;
-    R31=2*(q1*q3-q0*q2);
-    //    theta=atan2(-R31,R11);
-    R32=2*(q0*q1+q2*q3);
-    R33=q0*q0-q1*q1-q2*q2+q3*q3;
-    theta=atan2(-R31,sqrt(R32*R32+R33*R33));
+//double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
+//    double R11,R32,R33,R31,theta;
+//    //    R11=q0*q0+q1*q1-q2*q2-q3*q3;
+//    R31=2*(q1*q3-q0*q2);
+//    //    theta=atan2(-R31,R11);
+//    R32=2*(q0*q1+q2*q3);
+//    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+//    theta=atan2(-R31,sqrt(R32*R32+R33*R33));
 
-    return theta;
-}
-double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
-    double R23,R22,phi,R33,R32;
-    //R23=2*(q2*q3-q0*q1);
-    //R22=q0*q0-q1*q1+q2*q2-q3*q3;
-    //phi=atan2(-R23,R22);
-    R32=2*(q0*q1+q2*q3);
-    R33=q0*q0-q1*q1-q2*q2+q3*q3;
-    phi=atan2(R32,R33);
-    return phi;
-}
+//    return theta;
+//}
+//double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
+//    double R23,R22,phi,R33,R32;
+//    //R23=2*(q2*q3-q0*q1);
+//    //R22=q0*q0-q1*q1+q2*q2-q3*q3;
+//    //phi=atan2(-R23,R22);
+//    R32=2*(q0*q1+q2*q3);
+//    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+//    phi=atan2(R32,R33);
+//    return phi;
+//}
 
 PIDController teta_pid_L;
 PIDController phi_pid_L;
@@ -149,6 +150,7 @@ void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
     //ROS_INFO("I heard");
 
 }
+
 
 
 
@@ -261,6 +263,7 @@ int main(int argc, char **argv)
 {
     //check _timesteps
 
+
     std_srvs::Empty emptyCall;
     //*******************This part of code is for initialization of joints of the robot for walking**********************************
     int count = 0;
@@ -317,14 +320,14 @@ int main(int argc, char **argv)
     rate=100.0;
     ros::Rate loop_rate(rate);
     dt=1/rate;
-    p_teta=0.03;
-    p_phi=0.03;
+    p_teta=0.05;
+    p_phi=0.05;
     i_teta=0;i_phi=0;
     d_teta=0;d_phi=0;
-    teta_pid_L.Init(dt,1,-1,p_teta,i_teta,d_teta);
-    phi_pid_L.Init(dt,1,-1,p_phi,i_phi,d_phi);
-    teta_pid_R.Init(dt,1,-1,p_teta,i_teta,d_teta);
-    phi_pid_R.Init(dt,1,-1,p_phi,i_phi,d_phi);
+    teta_pid_L.Init(dt,.15,-.15,p_teta,i_teta,d_teta);
+    phi_pid_L.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
+    teta_pid_R.Init(dt,.15,-.15,p_teta,i_teta,d_teta);
+    phi_pid_R.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -362,7 +365,7 @@ int main(int argc, char **argv)
 
         teta_motor_R=teta_motor_R+teta_pid_R.Calculate(0,teta_R);
         phi_motor_R=phi_motor_R+phi_pid_R.Calculate(0,phi_R);
-        double maximum_d=.5;
+        double maximum_d=.15;
 
         if (teta_motor_L<-maximum_d){teta_motor_L=-maximum_d;}
         if (teta_motor_L>maximum_d){teta_motor_L=maximum_d;}
@@ -374,31 +377,54 @@ int main(int argc, char **argv)
         if (phi_motor_R<-maximum_d){phi_motor_R=-maximum_d;}
         if (phi_motor_R>maximum_d){phi_motor_R=maximum_d;}
 
-        int qref[12];
-        for (int i = 0; i < 12; ++i) {
-            qref[i]=0;
-        }
+       //int qref(12);
+//        for (int i = 0; i < 12; ++i) {
+//            qref[i]=0;
+//        }
 
 
-        qref[4]=int(teta_motor_L*2304*100/2/3.141592);
-       // qref[4]=int(phi_motor_L*2304*100/2/3.141592);
-        qref[5]=int(phi_motor_L*2304*100/2/3.141592);
-        qref[1]=int(-teta_motor_R*2304*100/2/3.141592);
-        qref[0]=int(phi_motor_R*2304*100/2/3.141592);
-        int maximum=8000;
+//        qref[4]=int(teta_motor_L*2304*100/2/3.141592);
+//       // qref[4]=int(phi_motor_L*2304*100/2/3.141592);
+//        qref[5]=int(phi_motor_L*2304*100/2/3.141592);
+//        qref[1]=int(-teta_motor_R*2304*100/2/3.141592);
+//        qref[0]=int(phi_motor_R*2304*100/2/3.141592);
+//        int maximum=8000;
 
-        if (qref[4]<-maximum){qref[4]=-maximum;}
-        if (qref[4]>maximum){qref[4]=maximum;}
-        if (qref[5]<-maximum){qref[5]=-maximum;}
-        if (qref[5]>maximum){qref[5]=maximum;}
+//        if (qref[4]<-maximum){qref[4]=-maximum;}
+//        if (qref[4]>maximum){qref[4]=maximum;}
+//        if (qref[5]<-maximum){qref[5]=-maximum;}
+//        if (qref[5]>maximum){qref[5]=maximum;}
 
-        if (qref[0]<-maximum){qref[0]=-maximum;}
-        if (qref[0]>maximum){qref[0]=maximum;}
-        if (qref[1]<-maximum){qref[1]=-maximum;}
-        if (qref[1]>maximum){qref[1]=maximum;}
- //ROS_INFO("teta_motor_L_QC:[%i] phi_motor_L_QC:[%i] teta_motor_R_QC:[%i] phi_motor_R_QC:[%i] ", qref[4],qref[5], qref[1],qref[0]);
-        ROS_INFO("phi_motor_L_QC:[%d] phi_IMU : [%f]",qref[5],phi_L);
+//        if (qref[0]<-maximum){qref[0]=-maximum;}
+//        if (qref[0]>maximum){qref[0]=maximum;}
+//        if (qref[1]<-maximum){qref[1]=-maximum;}
+//        if (qref[1]>maximum){qref[1]=maximum;}
+
+        vector<double> cntrl(13);
+        cntrl[0]=0.0;
+        cntrl[1]=0;
+        cntrl[2]=0;
+        cntrl[3]=0;
+        cntrl[4]=0;
+        cntrl[5]=teta_motor_R;
+        cntrl[6]=phi_motor_R;
+        cntrl[7]=0;
+        cntrl[8]=0;
+        cntrl[9]=0;
+        cntrl[10]=0;
+        cntrl[11]=teta_motor_L;
+        cntrl[12]=phi_motor_L;
+
+
 msg.data.clear();
+vector<int> qref(12);
+        QCgenerator QC;
+        qref=QC.ctrldata2qc(cntrl);
+ ROS_INFO("teta_motor_L_QC:[%d] phi_motor_L_QC:[%d] teta_motor_R_QC:[%d] phi_motor_R_QC:[%d] ", qref[4],qref[5], qref[1],qref[0]);
+       // ROS_INFO("phi_motor_L_QC:[%d] phi_IMU : [%f]",qref[5],phi_L);
+       // ROS_INFO("teta_l_IMU={%f} phi_l_IMU={%f} teta_l={%f} phi_l={%f}",teta_L,phi_L,teta_motor_L,phi_motor_L);
+
+
 
         for(int  i = 0;i < 12;i++)
         {

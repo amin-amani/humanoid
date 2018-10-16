@@ -226,6 +226,7 @@ set( QT_SOURCES
     src/Robot.cpp
     src/TaskSpace.cpp
     src/pidcontroller.cpp
+    src/qcgenerator.cpp
     )
 add_executable(trajectory_generation src/trajectory_generation.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(trajectory_generation
