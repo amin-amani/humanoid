@@ -49,7 +49,7 @@ TaskSpaceOffline::TaskSpaceOffline()
     CoeffArrayPelvis();
         CoeffArrayFootAngle();///////////////////////////////
     bool _walkstate=true;
-
+DoubleSupport=true;
 
 //    while (_walkstate==true) {
 

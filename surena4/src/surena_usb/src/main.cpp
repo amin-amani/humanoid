@@ -228,15 +228,15 @@ void Init(){
         MotorOffset[MotorNames["R1"]]=-1384;
         MotorOffset[MotorNames["R2"]]=810;
         MotorOffset[MotorNames["R3"]]=-1352;
-        MotorOffset[MotorNames["R4"]]=-1169;//-482;
-        MotorOffset[MotorNames["R5"]]=-673;//-1393;
-        MotorOffset[MotorNames["R6"]]=-1042;
+        MotorOffset[MotorNames["R4"]]=-1176;//-1169;//-482;
+        MotorOffset[MotorNames["R5"]]=-2034;//-673;//-1393;
+        MotorOffset[MotorNames["R6"]]=-140;//-1042;
         MotorOffset[MotorNames["L1"]]=1607;
         MotorOffset[MotorNames["L2"]]=1488;
         MotorOffset[MotorNames["L3"]]=-1548;
-        MotorOffset[MotorNames["L4"]]=-523;
-        MotorOffset[MotorNames["L5"]]=-387;//1683;
-        MotorOffset[MotorNames["L6"]]=-1164;
+        MotorOffset[MotorNames["L4"]]=-1846;//-523;
+        MotorOffset[MotorNames["L5"]]=1067;//-387;//1683;
+        MotorOffset[MotorNames["L6"]]=-1904;//-1164;
 
 }
 /// ==========================================================================================

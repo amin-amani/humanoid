@@ -126,10 +126,8 @@ data.data=links[27].JointAngle;
 pub27.publish(data);
 data.data=links[28].JointAngle;
 pub28.publish(data);
-
-
-
 }
+
 int main(int argc, char **argv)
 {
   //check _timesteps
@@ -161,36 +159,36 @@ int count = 0;
   ros::init(argc, argv, "myNode");
 
 ros::NodeHandle nh;
-ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
+ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1);
 
- pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
- pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
- pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
- pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
- pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
- pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
- pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
- pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
- pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
- pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
- pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
- pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
- pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
- pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
- pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
- pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
- pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
- pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
- pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
- pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
- pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
- pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
- pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
- pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
- pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
- pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
- pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
- pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+ pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1);
+ pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1);
+ pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1);
+ pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1);
+ pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1);
+ pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1);
+ pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1);
+ pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1);
+ pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1);
+ pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1);
+ pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1);
+ pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1);
+ pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1);
+ pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1);
+ pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1);
+ pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1);
+ pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1);
+ pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1);
+ pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1);
+ pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1);
+ pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1);
+ pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1);
+ pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1);
+ pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1);
+ pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1);
+ pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1);
+ pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1);
+ pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1);
 
 
   ros::Rate loop_rate(100);

@@ -35,6 +35,7 @@
 #include <nav_msgs/Odometry.h>
 #include "std_srvs/Empty.h"
 #include "qcgenerator.h"
+#include "xsens_msgs/orientationEstimate.h"
 
 using namespace  std;
 using namespace  Eigen;
@@ -75,41 +76,50 @@ double phi_L=0;
 double teta_R=0;
 double phi_R=0;
 
+double teta_center=0;
+double phi_center=0;
 
 
+double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
+    double R11,R32,R33,R31,theta;
+    //    R11=q0*q0+q1*q1-q2*q2-q3*q3;
+    R31=2*(q1*q3-q0*q2);
+    //    theta=atan2(-R31,R11);
+    R32=2*(q0*q1+q2*q3);
+    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+    theta=atan2(-R31,sqrt(R32*R32+R33*R33));
 
-//double quaternion2ankle_pitch(double q0,double q1,double q2,double q3){
-//    double R11,R32,R33,R31,theta;
-//    //    R11=q0*q0+q1*q1-q2*q2-q3*q3;
-//    R31=2*(q1*q3-q0*q2);
-//    //    theta=atan2(-R31,R11);
-//    R32=2*(q0*q1+q2*q3);
-//    R33=q0*q0-q1*q1-q2*q2+q3*q3;
-//    theta=atan2(-R31,sqrt(R32*R32+R33*R33));
-
-//    return theta;
-//}
-//double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
-//    double R23,R22,phi,R33,R32;
-//    //R23=2*(q2*q3-q0*q1);
-//    //R22=q0*q0-q1*q1+q2*q2-q3*q3;
-//    //phi=atan2(-R23,R22);
-//    R32=2*(q0*q1+q2*q3);
-//    R33=q0*q0-q1*q1-q2*q2+q3*q3;
-//    phi=atan2(R32,R33);
-//    return phi;
-//}
+    return theta;
+}
+double quaternion2ankle_roll(double q0,double q1,double q2,double q3){
+    double R23,R22,phi,R33,R32;
+    //R23=2*(q2*q3-q0*q1);
+    //R22=q0*q0-q1*q1+q2*q2-q3*q3;
+    //phi=atan2(-R23,R22);
+    R32=2*(q0*q1+q2*q3);
+    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+    phi=atan2(R32,R33);
+    return phi;
+}
 
 PIDController teta_pid_L;
 PIDController phi_pid_L;
 PIDController teta_pid_R;
 PIDController phi_pid_R;
 
+PIDController teta_pid_center;
+PIDController phi_pid_center;
+
+
 double p_teta,i_teta,d_teta,p_phi,i_phi,d_phi,dt,rate;
+double p_teta_center,i_teta_center,d_teta_center,p_phi_center,i_phi_center,d_phi_center;
+
 double teta_motor_L=0;
 double teta_motor_R=0;
 double phi_motor_L=0;
 double phi_motor_R=0;
+double teta_motor_center=0;
+double phi_motor_center=0;
 double timestep=.01;
 double time_=0;
 
@@ -137,17 +147,30 @@ geometry_msgs::Pose GetLinkPosition(QString linkName ,const gazebo_msgs::LinkSta
 }
 void chatterCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
 {
-    //const std::vector<std::string> &names = msg->name;
+    const std::vector<std::string> &names = msg->name;
     //const std::vector<geometry_msgs::Pose> psitions = msg->pose;
     //  double distance=0;
 
-    //geometry_msgs::Pose parentPosition=GetLinkPosition("robot::LLeg_Foot_Link",msg);
-    //qDebug()<<"we are here:"<< parentPosition.orientation.x<<parentPosition.orientation.y<<parentPosition.orientation.z<<parentPosition.orientation.w;
-//    teta= quaternion2ankle_pitch( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-//    phi=quaternion2ankle_roll( parentPosition.orientation.w,parentPosition.orientation.x,parentPosition.orientation.y,parentPosition.orientation.z);
-//    qDebug()<<"teta:"<< teta*180/3.141592<<", Phi="<<phi*180/3.141592;
+    geometry_msgs::Pose parentPosition_L=GetLinkPosition("robot::LLeg_Foot_Link",msg);
+//    qDebug()<<"we are here:"<< parentPosition.orientation.x<<parentPosition.orientation.y<<parentPosition.orientation.z<<parentPosition.orientation.w;
+   teta_L= quaternion2ankle_pitch( parentPosition_L.orientation.w,parentPosition_L.orientation.x,parentPosition_L.orientation.y,parentPosition_L.orientation.z);
+   phi_L=quaternion2ankle_roll( parentPosition_L.orientation.w,parentPosition_L.orientation.x,parentPosition_L.orientation.y,parentPosition_L.orientation.z);
+
+   geometry_msgs::Pose parentPosition_R=GetLinkPosition("robot::LLeg_Foot_Link",msg);
+//    qDebug()<<"we are here:"<< parentPosition_R.orientation.x<<parentPosition_R.orientation.y<<parentPosition_R.orientation.z<<parentPosition_R.orientation.w;
+  teta_R= quaternion2ankle_pitch( parentPosition_R.orientation.w,parentPosition_R.orientation.x,parentPosition_R.orientation.y,parentPosition_R.orientation.z);
+  phi_R=quaternion2ankle_roll( parentPosition_R.orientation.w,parentPosition_R.orientation.x,parentPosition_R.orientation.y,parentPosition_R.orientation.z);
+
+  geometry_msgs::Pose parentPosition_center=GetLinkPosition("robot::Pelvis",msg);
+//    qDebug()<<"we are here:"<< parentPosition_center.orientation.x<<parentPosition_center.orientation.y<<parentPosition_center.orientation.z<<parentPosition_center.orientation.w;
+ teta_center= quaternion2ankle_pitch( parentPosition_center.orientation.w,parentPosition_center.orientation.x,parentPosition_center.orientation.y,parentPosition_center.orientation.z);
+ phi_center=quaternion2ankle_roll( parentPosition_center.orientation.w,parentPosition_center.orientation.x,parentPosition_center.orientation.y,parentPosition_center.orientation.z);
+
+
+   qDebug()<<"teta_L:"<< teta_L*180/M_PI<<", Phi_L="<<phi_L*180/M_PI<<"teta_R:"<< teta_R*180/M_PI<<", Phi_R="<<phi_R*180/M_PI<<"teta_center:"<< teta_center*180/M_PI<<", Phi_center="<<phi_center*180/M_PI;
     //qDebug()<<QString::fromStdString( names[9])<<psitions[9].position.x<<psitions[9].position.y<<psitions[9].position.z;
     //ROS_INFO("I heard");
+
 
 }
 
@@ -250,12 +273,12 @@ void RecievIMURight(const sensor_msgs::Imu & msg)
 //ROS_INFO("Theta_R:[%f] Phi_R:[%f]",  teta_R*180/3.141592,phi_R*180/3.141592);
 }
 
-void RecievIMUCenter(const sensor_msgs::Imu & msg)
+void RecievIMUCenter(const xsens_msgs::orientationEstimate & msg)
 {
-    ROS_INFO("Center:[%f] [%f] [%f] [%f]", msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
-    //  ROS_INFO("I heard");
+    teta_center= msg.pitch;
+   phi_center=msg.roll;
+    //ROS_INFO("Theta_R:[%f] Phi_R:[%f]",  teta_R*180/3.141592,phi_R*180/3.141592);
 }
-
 
 
 
@@ -275,6 +298,8 @@ int main(int argc, char **argv)
 
     ros::Subscriber  IMULeft = nh.subscribe("/yei2000154", 1, RecievIMULeft);
     ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 1, RecievIMURight);
+    ros::Subscriber  IMULCenter = nh.subscribe("/mti/filter/orientation", 1, RecievIMUCenter);
+
     ros::Subscriber  time_sub = nh.subscribe("/clock", 1, RecievTime);
     ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
     ros::ServiceClient tareLeft= nh.serviceClient<std_srvs::Empty>("/Tareyei2000154");
@@ -328,6 +353,15 @@ int main(int argc, char **argv)
     phi_pid_L.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
     teta_pid_R.Init(dt,.15,-.15,p_teta,i_teta,d_teta);
     phi_pid_R.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
+
+    p_teta_center=0.00009;
+    p_phi_center=0.00009;
+    i_teta_center=0;i_phi_center=0;
+    d_teta_center=0;d_phi_center=0;
+    teta_pid_center.Init(dt,0.15,-.15,p_teta_center,i_teta_center,d_teta_center);
+    phi_pid_center.Init(dt,.15,-.15,p_phi_center,i_phi_center,d_phi_center);
+
+
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -365,6 +399,10 @@ int main(int argc, char **argv)
 
         teta_motor_R=teta_motor_R+teta_pid_R.Calculate(0,teta_R);
         phi_motor_R=phi_motor_R+phi_pid_R.Calculate(0,phi_R);
+
+        teta_motor_center=teta_motor_center+teta_pid_center.Calculate(0,teta_center);
+        phi_motor_center=phi_motor_center+phi_pid_center.Calculate(0,phi_center);
+
         double maximum_d=.15;
 
         if (teta_motor_L<-maximum_d){teta_motor_L=-maximum_d;}
@@ -403,13 +441,13 @@ int main(int argc, char **argv)
         vector<double> cntrl(13);
         cntrl[0]=0.0;
         cntrl[1]=0;
-        cntrl[2]=0;
+        cntrl[2]=-phi_motor_center;
         cntrl[3]=0;
         cntrl[4]=0;
         cntrl[5]=teta_motor_R;
         cntrl[6]=phi_motor_R;
         cntrl[7]=0;
-        cntrl[8]=0;
+        cntrl[8]=-phi_motor_center;
         cntrl[9]=0;
         cntrl[10]=0;
         cntrl[11]=teta_motor_L;
@@ -420,9 +458,10 @@ msg.data.clear();
 vector<int> qref(12);
         QCgenerator QC;
         qref=QC.ctrldata2qc(cntrl);
- ROS_INFO("teta_motor_L_QC:[%d] phi_motor_L_QC:[%d] teta_motor_R_QC:[%d] phi_motor_R_QC:[%d] ", qref[4],qref[5], qref[1],qref[0]);
+// ROS_INFO("teta_motor_L_QC:[%d] phi_motor_L_QC:[%d] teta_motor_R_QC:[%d] phi_motor_R_QC:[%d] ", qref[4],qref[5], qref[1],qref[0]);
        // ROS_INFO("phi_motor_L_QC:[%d] phi_IMU : [%f]",qref[5],phi_L);
        // ROS_INFO("teta_l_IMU={%f} phi_l_IMU={%f} teta_l={%f} phi_l={%f}",teta_L,phi_L,teta_motor_L,phi_motor_L);
+        ROS_INFO(" phi_c_IMU={%f}}",phi_center);
 
 
 

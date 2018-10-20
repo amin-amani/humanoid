@@ -11,6 +11,10 @@ project(trajectory_generation)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_msgs
+     std_msgs message_generation
+     sensor_msgs
+     geometry_msgs
+
   )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -120,6 +124,7 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS}
 /opt/ros/kinetic/include
+/home/milad/humanoid/surena4/devel/include
 
 )
 ## Declare a C++ library

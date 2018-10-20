@@ -22,13 +22,13 @@ odr: 10
 # MTi-20/200 [VRU_general: 43]
 # MTi-30/300 [General:39, High_map_dep:40, Dynamic:41, Low_mag_dep:42, VRU_general:43]
 # MTi-G-710 [General:1, GeneralNoBaro:2, GeneralMag:3, Automotive:4 HighPerformanceEDR:5)
-xkf_scenario: 53
+xkf_scenario: 50
 
 # Output data mode
 # 1: sensor data
 # 2. sensor data w/ rate quantities
 # 3: filter estimates
-output_mode: 3
+output_mode: 1
 
 # Use rostime for IMU stamp instead of sensor reported time
 use_rostime: true
