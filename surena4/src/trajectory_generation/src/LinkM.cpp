@@ -114,4 +114,3 @@ LinkM::LinkM(QString name, int IDofLink, int IDofSyster, int IDofChild, int IDof
     _jointPositionRelative2Parent=PositionRelative2ParentOfJoint;
 }
 
-

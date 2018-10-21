@@ -381,34 +381,34 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub = nh.subscribe("/gazebo/link_states", 1, &chatterCallback);
 
-    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",10);
-    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",10);
-    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",10);
-    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",10);
-    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",10);
-    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",10);
-    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",10);
-    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",10);
-    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",10);
-    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",10);
-    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",10);
-    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",10);
-    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",10);
-    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",10);
-    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",10);
-    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",10);
-    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",10);
-    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",10);
-    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",10);
-    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",10);
-    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",10);
-    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",10);
-    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",10);
-    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",10);
-    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",10);
-    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",10);
-    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",10);
-    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",10);
+    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1);
+    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1);
+    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1);
+    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1);
+    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1);
+    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1);
+    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1);
+    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1);
+    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1);
+    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1);
+    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1);
+    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1);
+    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1);
+    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1);
+    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1);
+    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1);
+    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1);
+    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1);
+    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1);
+    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1);
+    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1);
+    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1);
+    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1);
+    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1);
+    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1);
+    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1);
+    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1);
+    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1);
 
     rate=100;
     ros::Rate loop_rate(rate);
@@ -419,10 +419,10 @@ int main(int argc, char **argv)
     p_phi=0.03;
     i_teta=0;i_phi=0;
     d_teta=0;d_phi=0;
-    teta_pid_L.Init(dt,1.15,-1.15,p_teta,i_teta,d_teta);
-    phi_pid_L.Init(dt,1.15,-1.15,p_phi,i_phi,d_phi);
-    teta_pid_R.Init(dt,1.15,-1.15,p_teta,i_teta,d_teta);
-    phi_pid_R.Init(dt,1.15,-1.15,p_phi,i_phi,d_phi);
+    teta_pid_L.Init(dt,0.15,-.15,p_teta,i_teta,d_teta);
+    phi_pid_L.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
+    teta_pid_R.Init(dt,.15,-.15,p_teta,i_teta,d_teta);
+    phi_pid_R.Init(dt,.15,-.15,p_phi,i_phi,d_phi);
 
 
     p_teta_center=0.00009;
@@ -444,17 +444,17 @@ int main(int argc, char **argv)
     //  ros::Subscriber sub = nh.subscribe("/mti/sensor/imu", 1000, chatterCallback);
     //sensor imu----------------------------------------------sensor imu
     //sensor imu----------------------------------------------sensor imu
-    msg.data.clear();
-    for(int  i = 0;i < 12;i++)
-    {
-        qref[i] = 0;
-        //  cout << qref[i-1] <<" , "<<flush;
-        msg.data.push_back(qref[i]);
-    }
-    chatter_pub.publish(msg);
-    tareLeft.call(emptyCall);
-    tareRight.call(emptyCall);
-    QThread::msleep(500);
+//    msg.data.clear();
+//    for(int  i = 0;i < 12;i++)
+//    {
+//        qref[i] = 0;
+//        //  cout << qref[i-1] <<" , "<<flush;
+//        msg.data.push_back(qref[i]);
+//    }
+//    chatter_pub.publish(msg);
+//    tareLeft.call(emptyCall);
+//    tareRight.call(emptyCall);
+//    QThread::msleep(500);
 
 
 
@@ -535,8 +535,6 @@ int main(int argc, char **argv)
             double m4;
             double m5;
             double m6;
-            double m7;
-            double m8;
             StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
             //qDebug()<<StartTime;
             MatrixXd P;
@@ -548,8 +546,7 @@ int main(int argc, char **argv)
                 m4=m(3,0);
                 m5=m(4,0);
                 m6=m(5,0);
-                m7=m(6,0);
-                m8=m(7,0);
+
 
                 P=SURENAOffilneTaskSpace.PelvisTrajectory (SURENAOffilneTaskSpace.globalTime);
 
@@ -564,44 +561,6 @@ int main(int argc, char **argv)
 
                 if (round(SURENAOffilneTaskSpace.globalTime)<=round(SURENAOffilneTaskSpace.MotionTime)){
 
-
-                    //                    if (SURENAOffilneTaskSpace.DoubleSupport!=true) {
-                    //                        //For modifying the angle of roll during single support
-                    //                        RollTime=RollTime+SURENAOffilneTaskSpace._timeStep;
-                    //                        MinimumJerkInterpolation Coef;
-                    //                        MatrixXd RollAngle(1,3);
-                    //                        RollAngle<<0,0.1,0;
-                    //                        MatrixXd RollAngleVelocity(1,3);
-                    //                        RollAngleVelocity<<0.000,INFINITY,0.000;
-                    //                        MatrixXd RollAngleAcceleration(1,3);
-                    //                        RollAngleAcceleration<<0,INFINITY,0;
-
-
-                    //                        MatrixXd Time22(1,3);
-                    //                        Time22<<0,(SURENAOffilneTaskSpace.TSS/2),SURENAOffilneTaskSpace.TSS;
-                    //                        MatrixXd CoefRoll =Coef.Coefficient(Time22,RollAngle,RollAngleVelocity,RollAngleAcceleration);
-
-
-                    //                        //StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
-
-                    //                        MatrixXd outputRollAngle;
-                    //                        if (RollTime<=(SURENAOffilneTaskSpace.TSS/2)) {
-                    //                            outputRollAngle= SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(0),RollTime,0,5);
-                    //                            hipRoll=outputRollAngle(0,0);
-                    //                        }
-                    //                        else {
-                    //                            outputRollAngle =SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(1),RollTime,SURENAOffilneTaskSpace.TSS/2,5);
-                    //                            hipRoll=outputRollAngle(0,0);
-                    //                        }
-
-
-                    //                    }
-                    //                    else {
-                    //                        hipRoll=0;
-                    //                        RollTime=0;
-                    //                    }
-
-
                     PoseRoot<<P(0,0),
                             P(1,0),
                             P(2,0),
@@ -609,18 +568,18 @@ int main(int argc, char **argv)
                             0,
                             0;
 
-                    PoseRFoot<<m5,
+                    PoseRFoot<<m4,
+                            m5,
                             m6,
-                            m7,
                             0,
-                            -1*m8*(M_PI/180),
+                            0,
                             0;
 
                     PoseLFoot<<m1,
                             m2,
                             m3,
                             0,
-                            -1*m4*(M_PI/180),
+                            0,
                             0;
 
                     //// hip roll modification
@@ -749,7 +708,8 @@ int main(int argc, char **argv)
 
         vector<double> cntrl(13);
 
-        if (SURENAOffilneTaskSpace.DoubleSupport) {
+        //if (SURENAOffilneTaskSpace.DoubleSupport) {
+        if(true) {
             cntrl[0]=0.0;
             cntrl[1]=0;
             cntrl[2]=0;
@@ -772,50 +732,50 @@ int main(int argc, char **argv)
 
            // ROS_INFO("t={%d} : double_support",timer.elapsed());
         }
-        else{
-            if (SURENAOffilneTaskSpace.LeftSupport) {
-                cntrl[0]=0.0;
-                cntrl[1]=0;
-                cntrl[2]=0;
-                cntrl[3]=0;
-                cntrl[4]=0;
-                cntrl[5]=1*teta_motor_R;
-                cntrl[6]=1*phi_motor_R;
-                cntrl[7]=0;
-                cntrl[8]=0*phi_motor_center;
-                cntrl[9]=0;
-                cntrl[10]=0;
-                cntrl[11]=0;
-                cntrl[12]=0;
-                teta_motor_L=0;
-                phi_motor_L=0;
-                teta_motor_center=0;
+//        else{
+//            if (SURENAOffilneTaskSpace.LeftSupport) {
+//                cntrl[0]=0.0;
+//                cntrl[1]=0;
+//                cntrl[2]=0;
+//                cntrl[3]=0;
+//                cntrl[4]=0;
+//                cntrl[5]=0*teta_motor_R;
+//                cntrl[6]=0*phi_motor_R;
+//                cntrl[7]=0;
+//                cntrl[8]=0*phi_motor_center;
+//                cntrl[9]=0;
+//                cntrl[10]=0;
+//                cntrl[11]=0;
+//                cntrl[12]=0;
+//                teta_motor_L=0;
+//                phi_motor_L=0;
+//                teta_motor_center=0;
 
 
-               // ROS_INFO("t={%d} : left_support",timer.elapsed());
-            }
-            else{
-                cntrl[0]=0;
-                cntrl[1]=0;
-                cntrl[2]=-0*phi_motor_center;
-                cntrl[3]=0;
-                cntrl[4]=0;
-                cntrl[5]=0;
-                cntrl[6]=0;
-                cntrl[5]=0;
-                cntrl[6]=0;
-                cntrl[7]=0;
-                cntrl[8]=0;
-                cntrl[9]=0;
-                cntrl[10]=0;
-                cntrl[11]=1*teta_motor_L;
-                cntrl[12]=1*phi_motor_L;
-                teta_motor_R=0;
-                phi_motor_R=0;
-                teta_motor_center=0;
-              //  ROS_INFO("t={%d} : right_support",timer.elapsed());
-            }
-        }
+//               // ROS_INFO("t={%d} : left_support",timer.elapsed());
+//            }
+//            else{
+//                cntrl[0]=0;
+//                cntrl[1]=0;
+//                cntrl[2]=-0*phi_motor_center;
+//                cntrl[3]=0;
+//                cntrl[4]=0;
+//                cntrl[5]=0;
+//                cntrl[6]=0;
+//                cntrl[5]=0;
+//                cntrl[6]=0;
+//                cntrl[7]=0;
+//                cntrl[8]=0;
+//                cntrl[9]=0;
+//                cntrl[10]=0;
+//                cntrl[11]=0*teta_motor_L;
+//                cntrl[12]=0*phi_motor_L;
+//                teta_motor_R=0;
+//                phi_motor_R=0;
+//                teta_motor_center=0;
+//              //  ROS_INFO("t={%d} : right_support",timer.elapsed());
+//            }
+//        }
 
         QCgenerator QC;
         qref=QC.data2qc(links,cntrl);
@@ -831,7 +791,7 @@ int main(int argc, char **argv)
         // msg.data =varAsString;
         SendGazebo_with_control(links,cntrl);
         chatter_pub.publish(msg);
-        // ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
+         ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
 
         //ROS_INFO("teta_r={%f} phi_r={%f} teta_l={%f} phi_l={%f}",teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);
 //        ROS_INFO("teta_l_IMU={%f} phi_l_IMU={%f} teta_l={%f} phi_l={%f}",teta_L,phi_L,teta_motor_L,phi_motor_L);

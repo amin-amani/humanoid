@@ -66,6 +66,11 @@ ros::Publisher pub26 ;
 ros::Publisher pub27 ;
 ros::Publisher pub28 ;
 
+//ros::Publisher pid1 ;
+
+
+
+
 
 void  SendGazebo(QList<LinkM> links){
 if(links.count()<28){qDebug()<<"index err";return;}
@@ -130,11 +135,19 @@ pub28.publish(data);
 
 
 }
+
+//void  SendGazeboPID(){
+//    std_msgs::Float64 data;
+//    data.data=666;
+//    pid1.publish(data);
+//}
+
+
 int main(int argc, char **argv)
 {
   //check _timesteps
     QElapsedTimer timer;
-  vector<int> qref(12);
+  vector<double> qref(12);
   Robot SURENA;
   TaskSpaceOffline SURENAOffilneTaskSpace;
   QList<LinkM> links;
@@ -142,9 +155,8 @@ int main(int argc, char **argv)
   MatrixXd PoseRFoot;
   MatrixXd PoseLFoot;
   double dt;
-  double hipRoll=0;
+
   double StartTime=0;
-  double RollTime=0;
   double WalkTime=0;
   double  DurationOfStartPhase=6;
  double  DurationOfendPhase=6;
@@ -191,6 +203,11 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
  pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
  pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
  pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+
+ //pid1= nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/pid/parameter_updates",1000);
+
+
+
 
 
   ros::Rate loop_rate(100);
@@ -284,8 +301,6 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
         double m4;
         double m5;
         double m6;
-        double m7;
-        double m8;
         StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
         //qDebug()<<StartTime;
         MatrixXd P;
@@ -297,8 +312,6 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
             m4=m(3,0);
             m5=m(4,0);
             m6=m(5,0);
-            m7=m(6,0);
-            m8=m(7,0);
 
             P=SURENAOffilneTaskSpace.PelvisTrajectory (SURENAOffilneTaskSpace.globalTime);
 
@@ -312,45 +325,6 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
             SURENAOffilneTaskSpace.globalTime=SURENAOffilneTaskSpace.globalTime+SURENAOffilneTaskSpace._timeStep;
 
             if (round(SURENAOffilneTaskSpace.globalTime)<=round(SURENAOffilneTaskSpace.MotionTime)){
-
-
-//                if (false) {
-//                    //For modifying the angle of roll during single support
-//                    RollTime=RollTime+SURENAOffilneTaskSpace._timeStep;
-//                    MinimumJerkInterpolation Coef;
-//                    MatrixXd RollAngle(1,3);
-//                    RollAngle<<0,0.1,0;
-//                    MatrixXd RollAngleVelocity(1,3);
-//                    RollAngleVelocity<<0.000,INFINITY,0.000;
-//                    MatrixXd RollAngleAcceleration(1,3);
-//                    RollAngleAcceleration<<0,INFINITY,0;
-
-
-//                    MatrixXd Time22(1,3);
-//                    Time22<<0,(SURENAOffilneTaskSpace.TSS/2),SURENAOffilneTaskSpace.TSS;
-//                    MatrixXd CoefRoll =Coef.Coefficient(Time22,RollAngle,RollAngleVelocity,RollAngleAcceleration);
-
-
-//                    //StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
-
-//                    MatrixXd outputRollAngle;
-//                    if (RollTime<=(SURENAOffilneTaskSpace.TSS/2)) {
-//                       outputRollAngle= SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(0),RollTime,0,5);
-//                        hipRoll=outputRollAngle(0,0);
-//                    }
-//                    else {
-//                       outputRollAngle =SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(1),RollTime,SURENAOffilneTaskSpace.TSS/2,5);
-//                        hipRoll=outputRollAngle(0,0);
-//                    }
-
-
-//                }
-//                else {
-//                    hipRoll=0;
-//                    RollTime=0;
-//                }
-
-
                 PoseRoot<<P(0,0),
                         P(1,0),
                         P(2,0),
@@ -358,37 +332,22 @@ ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdat
                         0,
                         0;
 
-                PoseRFoot<<m5,
+                PoseRFoot<<m4,
+                        m5,
                         m6,
-                        m7,
                         0,
-                        -1*m8*(M_PI/180),
+                        0,
                         0;
 
                 PoseLFoot<<m1,
                         m2,
                         m3,
                         0,
-                        -1*m4*(M_PI/180),
+                        0,
                         0;
 
-                //// hip roll modification
-//                if (SURENAOffilneTaskSpace.LeftSupport==true && SURENAOffilneTaskSpace.HipRollModification==true){
-
-//                    SURENA.doIKhipRollModify("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot,-1*hipRoll);
-//                    SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,0);
-
-//                }
-
-//                else if (SURENAOffilneTaskSpace.HipRollModification==true && SURENAOffilneTaskSpace.LeftSupport!=true )  {
-//                    SURENA.doIKhipRollModify("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot,0);
-//                    SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,1*hipRoll);
-//                }
-
-
-
-               SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
-               SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+                SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
+                SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
                 //R1=AnkleRollRight
                 //R2=AnklePitchRight
                 //R3=KneePitchRight
@@ -479,6 +438,7 @@ mappingJoints<<links[6].JointAngle*(1/(2*M_PI))*(2304)*100,
     // std::string varAsString = std::to_string(qref[i-1]);
     // msg.data =varAsString;
     SendGazebo(links);
+   // SendGazeboPID();
   chatter_pub.publish(msg);
     ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
     //

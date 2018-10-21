@@ -52,8 +52,6 @@ public:
     MatrixXd IKAnalytical(LinkM Body, double D, double E, double A, double B, LinkM Foot);
     MatrixXd RPitch(double theta);
     MatrixXd RRoll(double phi);
-    void doIKhipRollModify(QString link, MatrixXd PoseLink, QString root, MatrixXd PoseRoot, double rollAngle);
-    MatrixXd RPY2R(Matrix3d rpy);
 private:
     int Sign(double v);
     void ForwardKinematicPrimary(int input);
