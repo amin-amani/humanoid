@@ -59,7 +59,7 @@ globalTime=0;
 }
 
 void TaskSpaceOffline::SetParameters(){
-YOffsetOfAnkletrajectory=0.00;
+YOffsetOfAnkletrajectory=0.03;
     er=0.001;
     Rqa=0.95;
     Ra_i=0;
@@ -131,8 +131,8 @@ YOffsetOfAnkletrajectory=0.00;
     MaxHeightPelvis=MinHeightPelvis+Delta;
     if (true) {
         Xe=1*Sc*StepLength/(Rse+1);
-        Xs=0.95*Rse*Xe;
-        YpMax=0.85*Rm*0.5*_pelvisLength;
+        Xs=1.05*Rse*Xe;
+        YpMax=1.0*Rm*0.5*_pelvisLength;
         Yd=1*Rd*YpMax;
         YStMax=1.0*YpMax;
         YEndMax=1.0*YpMax;
@@ -713,6 +713,7 @@ MatrixXd TaskSpaceOffline::PelvisTrajectory(double time){
         xp=0;
         dxp=0;
         ddxp=0;
+         DoubleSupport=true;
 
     }
     else if (t>T_st_p_sx  && t<=TStart){
@@ -720,47 +721,55 @@ MatrixXd TaskSpaceOffline::PelvisTrajectory(double time){
         xp=output(0,0);
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=true;
     }
     else if (t>TStart &&  t<=(TDs+TStart)){
         MatrixXd output=GetAccVelPos(Cx_p_i.row(0),t-TStart,0,5);
         xp=output(0,0);
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=true;
     }
     else if (t>(TDs+TStart) && t<=(Tc+TStart)){
         MatrixXd output=GetAccVelPos(Cx_p_i.row(1),t-TStart,0,5);
         xp=output(0,0);
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=false;
     }
     else if (t>(Tc+TStart) && t<=(Tc+TDs+TStart)){
         MatrixXd output=GetAccVelPos(Cx_p_i.row(0),t-Tc-TStart,0,5);
         xp=output(0,0)+StepLength;
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=true;
     }
     else if (t>(Tc+TDs+TStart) && t<=(2*Tc+TStart)){
         MatrixXd output=GetAccVelPos(Cx_p_i.row(1),t-Tc-TStart,0,5);
         xp=output(0,0)+StepLength;
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=false;
     }
     else if (t>TGait && t<(TGait+TDs)){
         MatrixXd output=GetAccVelPos(Cx_p_i.row(0),t-TGait,0,5);
         xp=output(0,0)+2*NStride*StepLength;
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=true;
     }
     else if (t>=(TGait+TDs) && t<T_end_p_sx){
         MatrixXd output=GetAccVelPos(Cx_end_p,t,(TGait+TDs),5);
         xp=output(0,0);
         dxp=output(0,1);
         ddxp=output(0,2);
+        DoubleSupport=true;
     }
     else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
         xp=(2*NStride+1)*StepLength;
         dxp=0;
         ddxp=0;
+        DoubleSupport=true;
     }
 
     if (TStart==0 && t==0){
@@ -1051,12 +1060,14 @@ MatrixXd TaskSpaceOffline::AnkleTrajectory(double time){
 
                 MatrixXd output1=GetAccVelPos(C_st_y_al.row(0),time,T_s_st,5);
                 y_al=output1(0,0);
+                LeftSupport=false;
             }
             else{
                 MatrixXd output=GetAccVelPos(C_st_z_al.row(1),time,TStart-T_s_st/2,5);
                 z_al=output(0,0);
                 MatrixXd output2=GetAccVelPos(C_st_y_al.row(1),time,TStart-T_s_st/2,5);
                 y_al=output2(0,0);
+                LeftSupport=false;
 
             }
         }
@@ -1100,7 +1111,7 @@ MatrixXd TaskSpaceOffline::AnkleTrajectory(double time){
             y_ar=output3(0,0);
             x_al=(2*N+1)*StepLength;
             z_al=_lenghtOfAnkle;
-
+            LeftSupport=true;
 
             if (tt<TDs+TSS/2){
 
@@ -1134,6 +1145,8 @@ MatrixXd TaskSpaceOffline::AnkleTrajectory(double time){
             x_ar=(2*N+2)*StepLength;
             z_ar=_lenghtOfAnkle;
 
+
+             LeftSupport=false;
             MatrixXd output2=GetAccVelPos(C_cy_x_ar.topRows(1),tt-(Tc+TDs),0,5);
             double temp=output2(0,0);
             x_al=(2*N+1)*StepLength+temp;

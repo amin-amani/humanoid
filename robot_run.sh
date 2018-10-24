@@ -7,7 +7,7 @@ exit 0
 else
 echo "yei port exist"
 fi
-sudo -s 
+
 OUTPUT=$(hostname -I) 
 echo "${OUTPUT}" 
  

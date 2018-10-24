@@ -225,13 +225,13 @@ void Init(){
         GearRatio[MotorNames["L6"]]=67.5;
 
 
-        MotorOffset[MotorNames["R1"]]=-1384;
+        MotorOffset[MotorNames["R1"]]=-1205;//-1384;
         MotorOffset[MotorNames["R2"]]=810;
         MotorOffset[MotorNames["R3"]]=-1352;
         MotorOffset[MotorNames["R4"]]=-1176;//-1169;//-482;
-        MotorOffset[MotorNames["R5"]]=-2034;//-673;//-1393;
+        MotorOffset[MotorNames["R5"]]=-2041;//-673;//-1393;
         MotorOffset[MotorNames["R6"]]=-140;//-1042;
-        MotorOffset[MotorNames["L1"]]=1607;
+        MotorOffset[MotorNames["L1"]]=1040;//1607;
         MotorOffset[MotorNames["L2"]]=1488;
         MotorOffset[MotorNames["L3"]]=-1548;
         MotorOffset[MotorNames["L4"]]=-1846;//-523;

@@ -29,6 +29,10 @@ class TaskSpaceOffline
     double _pelvisLength;
 public:
     TaskSpaceOffline();
+    bool LeftSupport;
+    bool RightSupport;
+    bool DoubleSupport;
+    bool HipRollModification;
      double YOffsetOfAnkletrajectory;
     double TStart;
     double TEnd;
