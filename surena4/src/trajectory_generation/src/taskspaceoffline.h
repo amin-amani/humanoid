@@ -27,13 +27,17 @@ class TaskSpaceOffline
     double _lenghtOfAnkle;
     double _lengthOfHip;
     double _pelvisLength;
+    double _heelLength;
+    double _toeLength;
 public:
     TaskSpaceOffline();
+    bool toeOff;
     bool LeftSupport;
     bool RightSupport;
     bool DoubleSupport;
     bool HipRollModification;
-     double YOffsetOfAnkletrajectory;
+    double HeelLandingAnglePitch;
+    double ToeOffAnglePitch
     double TStart;
     double TEnd;
     double timeStepT;
@@ -41,6 +45,7 @@ public:
     double TGait;
     double T_beta;
     double TSS;
+    double YOffsetOfAnkletrajectory;
 
     double xa_st_m;
     double er;
@@ -172,6 +177,14 @@ double _timeStep;
     MatrixXd Cz_st;
     MatrixXd Cx_end;
     MatrixXd Cz_end;
+    MatrixXd C_st_pitch_al;
+    MatrixXd C_Ds_pitch_al;
+    MatrixXd C_Ds_pitch_ar;
+    MatrixXd C_Ds2_pitch_ar;
+    MatrixXd C_Ds2_pitch_al;
+    MatrixXd C_ss_pitch_ar;
+    MatrixXd C_end_pitch_ar;
+    MatrixXd C_Dsf_pitch_ar;
     MatrixXd C_st_x_al;
     MatrixXd C_st_z_al;
     MatrixXd C_cy_x_al;
@@ -218,6 +231,7 @@ double _timeStep;
     void CoeffArrayAnkle();
     void CoeffArrayPelvis();
     MatrixXd PelvisTrajectory(double time);
+    void CoeffArrayFootAngle();
 };
 
 #endif // TASKSPACEOFFLINE_H
