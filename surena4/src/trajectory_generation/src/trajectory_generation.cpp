@@ -6,7 +6,7 @@
 #include <QString>
 #include <QList>
 #include "Robot.h"
-#include"TaskSpace.h"
+//#include"TaskSpace.h"
 #include"taskspaceoffline.h"
 #include <qmath.h>
 #include <cstring>

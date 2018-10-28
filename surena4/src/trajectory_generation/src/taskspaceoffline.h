@@ -37,7 +37,7 @@ public:
     bool DoubleSupport;
     bool HipRollModification;
     double HeelLandingAnglePitch;
-    double ToeOffAnglePitch
+    double ToeOffAnglePitch;
     double TStart;
     double TEnd;
     double timeStepT;

@@ -374,111 +374,10 @@ Vector3d Robot::Rot2omega(Matrix3d rotation)
 }
 
 
-MatrixXd Robot::CalcTaskSpaceError(LinkM Target, QString current)
-{
-    Vector3d PositionError;
-    PositionError.fill(0);
-    Matrix3d RotationError;
-    RotationError.fill(0);
-    Vector3d AttitudeError;
-    AttitudeError.fill(0);
-    MatrixXd TaskSpaceError;
-    TaskSpaceError.resize(6,1);
-    TaskSpaceError.fill(0);
-    PositionError=Target.PositionInWorldCoordinate-Links[MapingName2ID.value(current)-1].PositionInWorldCoordinate;
-    RotationError=Links[MapingName2ID.value(current)-1].AttitudeInWorldCoordinate.transpose()*Target.AttitudeInWorldCoordinate;
-    AttitudeError=Links[MapingName2ID.value(current)-1].AttitudeInWorldCoordinate*Rot2omega(RotationError);
-
-
-    TaskSpaceError<<PositionError,AttitudeError;
-
-    return TaskSpaceError;
-}
-
-MatrixXd Robot::CalcJacobian(MatrixXi route )
-{
-    MatrixXd Jacobian;
-    Vector3d target;
-        Jacobian.fill(0);
-        target.fill(0);
-    Vector3d JointAxisInWorldFrame;
-    JointAxisInWorldFrame.fill(0);
-    int JacobianColumnSize;
-    JacobianColumnSize=0;
-    target=Links[route(route.cols()-1)-1].PositionInWorldCoordinate;
-    JacobianColumnSize=route.cols();
-    Jacobian= MatrixXd::Zero(6,JacobianColumnSize);
-    for (int var = 0; var < JacobianColumnSize; var++) {
-        //note var starts from 0
-        int mother=Links[route(var)-1].GetMotherID();
-        JointAxisInWorldFrame=Links[mother-1].AttitudeInWorldCoordinate*Links[route(var)-1].GetJointAxisVectorLocal();
-        Jacobian.col(var)<<JointAxisInWorldFrame.cross(target-Links[route(var)-1].PositionInWorldCoordinate),JointAxisInWorldFrame;
-    }
-
-    return Jacobian;
-}
 
 
 
 
-double Robot::IKLevenbergMarquardt(LinkM Target, QString current)
-{
-    MatrixXd error;
-    error.fill(0);
-    MatrixXd gerr;
-    gerr.fill(0);
-    MatrixXd dq;
-    dq.fill(0);
-    MatrixXd Jh;
-    Jh.fill(0);
-    MatrixXd J;
-    J.fill(0);
-    MatrixXd EK2;
-    EK2.fill(0);
-    MatrixXd EK;
-    EK.fill(0);
-    double Ek=0;
-    double Ek2=0;
-    MatrixXi route=FindRoutfromRoot2Destination(current);
-    double wn_position =1/0.3;
-    double wn_angle = 1/(2*M_PI);
-    MatrixXd we(6,6);
-    we.fill(0);
-    MatrixXd wn;
-    we.diagonal()<<wn_position,wn_position,wn_position,wn_angle,wn_angle,wn_angle;
-    wn=MatrixXd::Identity(route.cols(),route.cols());
-    ForwardKinematic(1);
-    error=CalcTaskSpaceError(Target,current);
-    EK=error.transpose()*we*error;
-    Ek=EK(0);
-    for (int var = 0; var < 10; ++var) {
-        J=CalcJacobian(route);
-
-        Jh=J.transpose()*we*J+wn*(Ek+0.02);
-        gerr=J.transpose()*we*error;
-        dq=Jh.lu().solve(gerr);
-        MoveJoints(route,dq);
-        ForwardKinematic(1);
-        error=CalcTaskSpaceError(Target,current);
-        EK2=error.transpose()*we*error;
-        Ek2=EK2(0);
-        if (Ek2<(1e-12)) {
-            return error.norm();
-        } else if (Ek2 < Ek) {
-            Ek = Ek2;
-        }
-
-        else {
-            MoveJoints(route,-dq);
-            ForwardKinematic(1);
-            return error.norm();
-        }
-
-    }
-
-    return error.norm();
-
-}
 
 MatrixXd Robot::IKAnalytical(LinkM Body, double D, double E, double A, double B, LinkM Foot)
 {
@@ -530,16 +429,6 @@ MatrixXd Robot::IKAnalytical(LinkM Body, double D, double E, double A, double B,
 }
 
 
-void Robot::doIK1(int var,QString link){
-    VectorXd x;
-    x.setLinSpaced(161,0,0.4);
-    LinkM Rfoot=Links[MapingName2ID.value(link)-1];
-    Rfoot.PositionInWorldCoordinate(0)=x(var);//just specify X
-    //qDebug()<<x(var);
-   double milad= IKLevenbergMarquardt(Rfoot,link);
-//qDebug()<<2;
-    //qDebug()<<Links[1].JointAngle<<Links[2].JointAngle<<Links[3].JointAngle<<Links[4].JointAngle<<Links[5].JointAngle<<Links[6].JointAngle<<Links[7].JointAngle<<Links[8].JointAngle<<Links[9].JointAngle<<Links[10].JointAngle<<Links[11].JointAngle<<Links[12].JointAngle;
-}
 
 void Robot::doIK(QString link,MatrixXd PoseLink,QString root,MatrixXd PoseRoot){
 

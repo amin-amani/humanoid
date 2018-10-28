@@ -229,7 +229,7 @@ set( QT_SOURCES
     src/taskspaceoffline.cpp
     src/LinkM.cpp
     src/Robot.cpp
-    src/TaskSpace.cpp
+   # src/TaskSpace.cpp
     src/pidcontroller.cpp
     src/qcgenerator.cpp
     )
