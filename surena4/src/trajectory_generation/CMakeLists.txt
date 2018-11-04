@@ -258,6 +258,15 @@ target_link_libraries(ankle_controller
     Qt5::PrintSupport
 )
 install(TARGETS ankle_controller RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(bumpsensor src/bumpsensor.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(bumpsensor
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS bumpsensor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #add_executable(random_driver src/myNode.cpp )
 #target_link_libraries(random_driver ${catkin_LIBRARIES})
 

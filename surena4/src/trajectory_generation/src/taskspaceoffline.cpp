@@ -103,9 +103,9 @@ YOffsetOfAnkletrajectory=0.03;//for compensating the clearance of the hip roll i
     _pelvisLength=0.23;
 
     Delta=0.02;// Domain of pelvis movemevt in z direction
-    NStride=1;
+    NStride=2;
     DesiredVelocity=0.2;
-    StepLength=0.15;
+    StepLength=0.2;
 
     Tc=StepLength*3.6/DesiredVelocity;
     //timeStepT=0.01;
@@ -1146,9 +1146,9 @@ MatrixXd TaskSpaceOffline::AnkleTrajectory(double time){
     }
 
     else if (time<=MotionTime-TEnd){
-        double tt=time-TStart;
+        double tt=time-TStart;//subtraction of first step time
         double N=floor(tt/(2*Tc));
-        tt=fmod(tt,(2*Tc));
+        tt=fmod(tt,(2*Tc));//tt will be reset for every stride
         if (tt<TDs){//first double support of cyclic walking
 
             pitch_al=0;

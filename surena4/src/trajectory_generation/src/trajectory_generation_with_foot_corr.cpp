@@ -29,7 +29,7 @@
 #include "std_srvs/Empty.h"
 #include "qcgenerator.h"
 #include <qthread.h>
-#include "xsens_msgs/orientationEstimate.h"
+#include "/home/milad/software/Rostools/humanoid/surena4/devel/include/xsens_msgs/orientationEstimate.h"
 
 #include<gazebo_msgs/ApplyBodyWrenchRequest.h>
 #include <gazebo_msgs/GetLinkState.h>

@@ -64,98 +64,294 @@ res.result=epos.ActiveCSP(req.nodeID);
 /// ==========================================================================================
 bool Home(surena_usb::home::Request  &req,surena_usb::home::Response &res)
 {
+
+
     int32_t incEncoder[12];
-    int32_t AbsEncoder[12];
-    int32_t diffs[12];
-
-ROS_INFO("request: home");
-if(true!=epos.ActivePPM(1,255))
-{
-    qDebug()<<"ppm init error";
-
-    return false ;
-}
-WaitMs(1000);
-qDebug()<<"read all  positions";
-for(int i=0;i<12;i++)
-{
-    //if(i==7)continue;///uncomment to enable
-    if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
-    {
-        qDebug()<<"error read enc from:"<<i;return false;
-
-    }
-    qDebug()<<"inc value:"<<incEncoder[i];
-    if( !epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
-    {
-        qDebug()<<"error read abs from:"<<i;return false;
-
-    }
-    qDebug()<<"abs value:"<<AbsEncoder[i]<< " target:"<<MotorOffset[i];
-
-    diffs[i]=(incEncoder[i]+(MotorOffset[i]-AbsEncoder[i])*GearRatio[i]);
-    qDebug()<<"id:"<<i<<" diff="<<diffs[i]<<" Gear:"<<GearRatio[i];
+       int32_t AbsEncoder[12];
+       int32_t diffs[12];
+            int diff=0;
+       ///init driver
+       ///
 
 
+            for (int var = 0; var < 12; ++var) {
+                if(var!=9){
 
-}
-///========================moves all motors
+       if(true!=epos.ActivePPM(1,var))
+       {
+           qDebug()<<"ppm init error";
+           //ui->statusBar->showMessage("ppm init error!");
+           return 0;
+       }
+   }
+   }
 
-        WaitMs(100);
-        epos.SetPosition(1,req.nodeID,diffs[req.nodeID],50);
-        WaitMs(100);
-        epos.SetPosition(1,req.nodeID,diffs[req.nodeID],50);
-        WaitMs(100);
+   //         if(true!=epos.ActivePPM(1,255))
+   //         {
+   //                 qDebug()<<"ppm init error";
+   //                 ui->statusBar->showMessage("ppm init error!");
+   //                 return;
+   //             }
 
-    for(int i=0;i<4;i++){
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-}
-for(int i=8;i<10;i++){
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-}
-for(int i=5;i>3;i--){
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-}
-for(int i=6;i<8;i++){
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-}
-for(int i=10;i<12;i++){
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-    epos.SetPosition(1,i,diffs[i],50);
-    WaitMs(100);
-}
-///========================moves all motors
-qDebug()<<"wait move complete";
-WaitMs(2000);
-for(int i=0;i<12;i++)
-{
-    //if(i==7)continue;
-    if( !epos.GetAbsPosition(i,AbsEncoder[i]))//read inc enc
-    {
-        qDebug()<<"error read enc from:"<<i;return false;
+   //    while (true) {
+   //        if( !epos.GetIncPosition(8,incEncoder[8]))//read inc enc
+   //        {
+   //            qDebug()<<"error read enc from";continue;
 
-    }
+   //        }
+   //         qDebug()<<"inc pos="<<incEncoder[8];
+   //    //incEncoder[7];
+   //        if( epos.GetAbsPosition(8,AbsEncoder[8]))//read abs enc
+   //        {
+   //            //qDebug()<<"error read abs from:"<<i;return;
+   //            int kp=10;
+   //           diff+= (-AbsEncoder[8]+MotorOffset[8])*kp;
+   //           qDebug()<<"i="<<8<<"ABS="<<AbsEncoder[8]<<" offset="<<MotorOffset[8]<<" command="<<diff;
+   //         //epos.SetPosition(1,9,diff,50);
+   //        }
+   //        QThread::msleep(400);
+   //    }
+   //return;
 
-    qDebug()<<"id:"<<i<<" pos abs:"<<AbsEncoder[i]<<" "<<MotorOffset[i]<<" diff="<<MotorOffset[i]-AbsEncoder[i];
-}
+
+
+
+
+
+
+   int max=500;
+   int kp=5;
+   int d=5;
+            for (int i = 0; i < 4; ++i) {
+         diff= 0;//incEncoder[i] ;
+
+
+       while (abs(-AbsEncoder[i]+MotorOffset[i])>0) {
+           if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+           {
+               qDebug()<<"error read enc from";continue;
+
+           }
+            qDebug()<<"inc pos="<<incEncoder[i];
+       //incEncoder[7];
+           if( epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+           {
+               //qDebug()<<"error read abs from:"<<i;return;
+
+               if(abs((-AbsEncoder[i]+MotorOffset[i])*kp)<=max){diff+= (-AbsEncoder[i]+MotorOffset[i])*kp;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)<-max){diff+=-max;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)>max){diff+=max;}
+              qDebug()<<"i="<<i<<"ABS="<<AbsEncoder[i]<<" offset="<<MotorOffset[i]<<" command="<<diff;
+            epos.SetPosition(1,i,diff,50);
+           }
+           QThread::msleep(d);
+       }
+   }
+            for (int i = 8; i < 9; ++i) {
+         diff= 0 ;
+
+
+       while (abs(-AbsEncoder[i]+MotorOffset[i])>0) {
+   //        if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+   //        {
+   //            qDebug()<<"error read enc from";continue;
+
+   //        }
+   //         qDebug()<<"inc pos="<<incEncoder[i];
+       //incEncoder[7];
+           if( epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+           {
+               //qDebug()<<"error read abs from:"<<i;return;
+
+               if(abs((-AbsEncoder[i]+MotorOffset[i])*kp)<=max){diff+= (-AbsEncoder[i]+MotorOffset[i])*kp;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)<-max){diff+=-max;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)>max){diff+=max;}
+              qDebug()<<"i="<<i<<"ABS="<<AbsEncoder[i]<<" offset="<<MotorOffset[i]<<" command="<<diff;
+            epos.SetPosition(1,i,diff,50);
+           }
+           QThread::msleep(d);
+       }
+   }
+            for (int i = 5; i > 3; --i) {
+         diff= 0 ;
+
+
+       while (abs(-AbsEncoder[i]+MotorOffset[i])>0) {
+           if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+           {
+               qDebug()<<"error read enc from";continue;
+
+           }
+            qDebug()<<"inc pos="<<incEncoder[i];
+       //incEncoder[7];
+           if( epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+           {
+               //qDebug()<<"error read abs from:"<<i;return;
+
+               if(abs((-AbsEncoder[i]+MotorOffset[i])*kp)<=max){diff+= (-AbsEncoder[i]+MotorOffset[i])*kp;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)<-max){diff+=-max;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)>max){diff+=max;}
+              qDebug()<<"i="<<i<<"ABS="<<AbsEncoder[i]<<" offset="<<MotorOffset[i]<<" command="<<diff;
+            epos.SetPosition(1,i,diff,50);
+           }
+           QThread::msleep(d);
+       }
+   }
+            for (int i = 6; i < 8; ++i) {
+         diff= 0 ;
+
+
+       while (abs(-AbsEncoder[i]+MotorOffset[i])>0) {
+           if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+           {
+               qDebug()<<"error read enc from";continue;
+
+           }
+            qDebug()<<"inc pos="<<incEncoder[i];
+       //incEncoder[7];
+           if( epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+           {
+               //qDebug()<<"error read abs from:"<<i;return;
+
+               if(abs((-AbsEncoder[i]+MotorOffset[i])*kp)<=max){diff+= (-AbsEncoder[i]+MotorOffset[i])*kp;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)<-max){diff+=-max;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)>max){diff+=max;}
+              qDebug()<<"i="<<i<<"ABS="<<AbsEncoder[i]<<" offset="<<MotorOffset[i]<<" command="<<diff;
+            epos.SetPosition(1,i,diff,50);
+           }
+           QThread::msleep(d);
+       }
+   }
+            for (int i = 10; i < 12; ++i) {
+         diff= 0 ;
+
+       while (abs(-AbsEncoder[i]+MotorOffset[i])>0) {
+           if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+           {
+               qDebug()<<"error read enc from";continue;
+
+           }
+            qDebug()<<"inc pos="<<incEncoder[i];
+       //incEncoder[7];
+           if( epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+           {
+               //qDebug()<<"error read abs from:"<<i;return;
+
+               if(abs((-AbsEncoder[i]+MotorOffset[i])*kp)<=max){diff+= (-AbsEncoder[i]+MotorOffset[i])*kp;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)<-max){diff+=-max;}
+              if(((-AbsEncoder[i]+MotorOffset[i])*kp)>max){diff+=max;}
+              qDebug()<<"i="<<i<<"ABS="<<AbsEncoder[i]<<" offset="<<MotorOffset[i]<<" command="<<diff;
+            epos.SetPosition(1,i,diff,50);
+           }
+           QThread::msleep(d);
+       }
+   }
+   //         qDebug()<<"reset node";
+   //         epos.ResetNode(255);
+   //         QThread::msleep(5000);
+   //          if(true!=epos.ActivePPM(1,255))
+   //          {
+   //              qDebug()<<"ppm init error";
+   //              ui->statusBar->showMessage("ppm init error!");
+   //              return;
+   //          }
+
+       return 1;
+
+
+
+//    int32_t incEncoder[12];
+//    int32_t AbsEncoder[12];
+//    int32_t diffs[12];
+
+//ROS_INFO("request: home");
+//if(true!=epos.ActivePPM(1,255))
+//{
+//    qDebug()<<"ppm init error";
+
+//    return false ;
+//}
+//WaitMs(1000);
+//qDebug()<<"read all  positions";
+//for(int i=0;i<12;i++)
+//{
+//    //if(i==7)continue;///uncomment to enable
+//    if( !epos.GetIncPosition(i,incEncoder[i]))//read inc enc
+//    {
+//        qDebug()<<"error read enc from:"<<i;return false;
+
+//    }
+//    qDebug()<<"inc value:"<<incEncoder[i];
+//    if( !epos.GetAbsPosition(i,AbsEncoder[i]))//read abs enc
+//    {
+//        qDebug()<<"error read abs from:"<<i;return false;
+
+//    }
+//    qDebug()<<"abs value:"<<AbsEncoder[i]<< " target:"<<MotorOffset[i];
+
+//    diffs[i]=(incEncoder[i]+(MotorOffset[i]-AbsEncoder[i])*GearRatio[i]);
+//    qDebug()<<"id:"<<i<<" diff="<<diffs[i]<<" Gear:"<<GearRatio[i];
+
+
+
+//}
+/////========================moves all motors
+
+//        WaitMs(100);
+//        epos.SetPosition(1,req.nodeID,diffs[req.nodeID],50);
+//        WaitMs(100);
+//        epos.SetPosition(1,req.nodeID,diffs[req.nodeID],50);
+//        WaitMs(100);
+
+//    for(int i=0;i<4;i++){
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//}
+//for(int i=8;i<10;i++){
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//}
+//for(int i=5;i>3;i--){
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//}
+//for(int i=6;i<8;i++){
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//}
+//for(int i=10;i<12;i++){
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//    epos.SetPosition(1,i,diffs[i],50);
+//    WaitMs(100);
+//}
+/////========================moves all motors
+//qDebug()<<"wait move complete";
+//WaitMs(2000);
+//for(int i=0;i<12;i++)
+//{
+//    //if(i==7)continue;
+//    if( !epos.GetAbsPosition(i,AbsEncoder[i]))//read inc enc
+//    {
+//        qDebug()<<"error read enc from:"<<i;return false;
+
+//    }
+
+//    qDebug()<<"id:"<<i<<" pos abs:"<<AbsEncoder[i]<<" "<<MotorOffset[i]<<" diff="<<MotorOffset[i]-AbsEncoder[i];
+//}
 
 
 }
@@ -225,18 +421,18 @@ void Init(){
         GearRatio[MotorNames["L6"]]=67.5;
 
 
-        MotorOffset[MotorNames["R1"]]=-1205;//-1384;
-        MotorOffset[MotorNames["R2"]]=810;
-        MotorOffset[MotorNames["R3"]]=-1352;
-        MotorOffset[MotorNames["R4"]]=-1176;//-1169;//-482;
-        MotorOffset[MotorNames["R5"]]=-2041;//-673;//-1393;
-        MotorOffset[MotorNames["R6"]]=-140;//-1042;
-        MotorOffset[MotorNames["L1"]]=1040;//1607;
-        MotorOffset[MotorNames["L2"]]=1488;
-        MotorOffset[MotorNames["L3"]]=-1548;
-        MotorOffset[MotorNames["L4"]]=-1846;//-523;
-        MotorOffset[MotorNames["L5"]]=1067;//-387;//1683;
-        MotorOffset[MotorNames["L6"]]=-1904;//-1164;
+        MotorOffset[MotorNames["R1"]]=-42;//-1205;//-1384;
+        MotorOffset[MotorNames["R2"]]=-77;///810;
+        MotorOffset[MotorNames["R3"]]=156;//-1352;
+        MotorOffset[MotorNames["R4"]]=183;//-1176;//-1169;//-482;
+        MotorOffset[MotorNames["R5"]]=12;//-2041;//-673;//-1393;
+        MotorOffset[MotorNames["R6"]]=-149;//-140;//-1042;
+        MotorOffset[MotorNames["L1"]]=-127;//1607;
+        MotorOffset[MotorNames["L2"]]=337;
+        MotorOffset[MotorNames["L3"]]=-1;//1548;
+        MotorOffset[MotorNames["L4"]]=203;//-523;
+        MotorOffset[MotorNames["L5"]]=-970;//-387;//1683;
+        MotorOffset[MotorNames["L6"]]=143;//-1164;
 
 }
 /// ==========================================================================================

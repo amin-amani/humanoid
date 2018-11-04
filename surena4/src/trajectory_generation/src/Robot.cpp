@@ -7,7 +7,7 @@ Robot::Robot()
     QString address;//= QDir::currentPath();
     //QStringList addressList = address.split("/bin");
     //address = addressList.value(0);
-    address += "/home/milad/humanoid/surena4/src/trajectory_generation/src/test.txt";
+    address += "/home/milad/software/Rostools/humanoid/surena4/src/trajectory_generation/src/test.txt";
    // cout << address.toStdString() <<endl<<flush;
 
     if (!FileExists(address))
