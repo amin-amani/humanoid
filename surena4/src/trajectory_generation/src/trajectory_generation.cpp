@@ -65,6 +65,7 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     b=tempInt[1];
     c=tempInt[2];
     d=tempInt[3];
+    //deleting data with negative sign
     if (a<0) {
         a=0;
 
