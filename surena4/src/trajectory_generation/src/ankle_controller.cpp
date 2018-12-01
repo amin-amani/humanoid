@@ -35,7 +35,7 @@
 #include <nav_msgs/Odometry.h>
 #include "std_srvs/Empty.h"
 #include "qcgenerator.h"
-#include "/home/milad/software/Rostools/humanoid/surena4/devel/include/xsens_msgs/orientationEstimate.h"
+#include "/home/milad/humanoid/surena4/devel/include/xsens_msgs/orientationEstimate.h"
 
 using namespace  std;
 using namespace  Eigen;
@@ -305,7 +305,7 @@ int main(int argc, char **argv)
     ros::ServiceClient tareLeft= nh.serviceClient<std_srvs::Empty>("/Tareyei2000154");
     ros::ServiceClient tareRight= nh.serviceClient<std_srvs::Empty>("/Tareyei200015B");
     //ros::Subscriber  IMURight = nh.subscribe("/yei200015B", 100, RecievIMURight);
-    //ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCenter);
+    ros::Subscriber  IMUCenter = nh.subscribe("/mti/sensor/imu", 100, RecievIMUCenter);
 
 
 

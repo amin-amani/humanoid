@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+
+
+<link name="pelvis">
+<inertial>
+      <origin
+        xyz="-0.0517 0 0.9727 "
+        rpy="0 0 0" />
+      <mass
+        value="2.3" />
+      <inertia
+        ixx="0.001365"
+        ixy="0.000068"
+        ixz="-0.000361"
+        iyy="0.006717"
+        iyz="-0.000089"
+        izz="0.001752" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.942" rpy="0 0 0" />
+      <geometry>
+      <geometry>
+        <cylinder radius="0.08" length="0.23"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+
+  </link>
+

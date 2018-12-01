@@ -60,7 +60,7 @@ TaskSpaceOffline::TaskSpaceOffline()
 }
 
 void TaskSpaceOffline::SetParameters(){
-YOffsetOfAnkletrajectory=0.03;//for compensating the clearance of the hip roll in experiment
+YOffsetOfAnkletrajectory=0.0;//for compensating the clearance of the hip roll in experiment
     er=0.000;
     Rqa=0.95;
     Ra_i=0;

@@ -12,7 +12,7 @@ OUTPUT=$(hostname -I)
 echo "${OUTPUT}" 
  
 export ROS_IP=`hostname -I`
- . /home/milad/software/Rostools/humanoid/surena4/devel/setup.sh
+ . /home/milad/humanoid/surena4/devel/setup.sh
 rosrun yei_imu yei_imu ttyACM0 &
 rosrun yei_imu yei_imu ttyACM1 &
 rosrun yei_imu yei_imu ttyACM2 &
