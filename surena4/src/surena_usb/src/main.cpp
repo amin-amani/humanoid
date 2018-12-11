@@ -6,9 +6,9 @@
 #include<std_msgs/Int32.h>
 #include <stdlib.h>
 #include "epose.h"
-#include"surena_usb/active_csp.h"
-#include "surena_usb/reset_node.h"
-#include "surena_usb/home.h"
+#include "surena_eth/active_csp.h"
+#include "surena_eth/reset_node.h"
+#include "surena_eth/home.h"
 #include <std_msgs/Empty.h>
 
 // =================================note=========================================================
@@ -49,7 +49,7 @@
  /// \return
   /// ==========================================================================================
 
-bool ActiveCSP(surena_usb::active_csp::Request  &req,surena_usb::active_csp::Response &res)
+bool ActiveCSP(surena_eth::active_csp::Request  &req,surena_eth::active_csp::Response &res)
 {
 
 ROS_INFO("request: ipm init");
@@ -62,7 +62,7 @@ res.result=epos.ActiveCSP(req.nodeID);
 /// \param res
 /// \return
 /// ==========================================================================================
-bool Home(surena_usb::home::Request  &req,surena_usb::home::Response &res)
+bool Home(surena_eth::home::Request  &req,surena_eth::home::Response &res)
 {
     int32_t incEncoder[12];
     int32_t AbsEncoder[12];
@@ -165,7 +165,7 @@ for(int i=0;i<12;i++)
 /// \param res
 /// \return
 /// ==========================================================================================
-bool ResetNode(surena_usb::reset_node::Request  &req,surena_usb::reset_node::Response &res)
+bool ResetNode(surena_eth::reset_node::Request  &req,surena_eth::reset_node::Response &res)
 {
 epos.ResetNode(req.nodeID);
   ROS_INFO("request: reset node");

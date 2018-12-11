@@ -3,28 +3,28 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(offlinepublisher)
+project(foot_sensor)
 
 ##############################################################################
 # Catkin
 ##############################################################################
 
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
-find_package(catkin REQUIRED COMPONENTS  roscpp sensor_msgs interactive_markers  visualization_msgs  tf  message_generation message_runtime)
-
+find_package(catkin REQUIRED COMPONENTS  roscpp sensor_msgs    message_generation message_runtime)
+set(LIBUSB_1_LIBRARIES "/usr/lib/x86_64-linux-gnu/libusb-1.0.so")
 include_directories(include ${catkin_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything.
 
-add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES num.msg)
-add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES srv1.srv)
-
+#add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES num.msg)
+#add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES active_csp.srv)
+#add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES reset_node.srv)
 ### Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 
 
@@ -38,7 +38,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 #SET(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport)
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Qt5SerialPort)
 
 ##############################################################################
 # Sections
@@ -56,6 +56,7 @@ include_directories(
     ${Qt5Gui_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5PrintSupport_INCLUDE_DIRS}
+    ${QtSerialPort_INCLUDE_DIRS}
     )
 
 add_definitions( -std=c++11 -fPIC)
@@ -64,26 +65,36 @@ add_definitions( -std=c++11 -fPIC)
 ##############################################################################
 
 set( QT_SOURCES
-    src/offlinepublisher.cpp
-    src/mainwindow.cpp
-    src/datareader.cpp
+    src/foot_sensor.cpp
     )
 ##############################################################################
 # Binaries
 ##############################################################################
 
-add_executable(offlinepublisher ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(offlinepublisher
+add_executable(foot_sensor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+qt5_use_modules(foot_sensor Core SerialPort)
+target_link_libraries(foot_sensor
     ${catkin_LIBRARIES}
     Qt5::Core
     Qt5::Widgets
     Qt5::PrintSupport
+    Qt5::SerialPort
+    ${LIBUSB_1_LIBRARIES}
 )
-install(TARGETS offlinepublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS foot_sensor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+#add_executable(yei src/yei.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#target_link_libraries(yei
+#    ${catkin_LIBRARIES}
+#    Qt5::Core
+#    Qt5::Widgets
+#    Qt5::PrintSupport
+#)
+#install(TARGETS yei RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 #cmake_minimum_required(VERSION 2.8.3)
-#project(offlinePublisher)
+#project(surena_usb)
 
 ### Compile as C++11, supported in ROS Kinetic and newer
 ## add_compile_options(-std=c++11)
@@ -181,7 +192,7 @@ install(TARGETS offlinepublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTIN
 ### DEPENDS: system dependencies of this project that dependent projects also need
 #catkin_package(
 ##  INCLUDE_DIRS include
-##  LIBRARIES offlinePublisher
+##  LIBRARIES surena_usb
 ##  CATKIN_DEPENDS other_catkin_pkg
 ##  DEPENDS system_lib
 #)
@@ -199,7 +210,7 @@ install(TARGETS offlinepublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTIN
 
 ### Declare a C++ library
 ## add_library(${PROJECT_NAME}
-##   src/${PROJECT_NAME}/offlinePublisher.cpp
+##   src/${PROJECT_NAME}/surena_usb.cpp
 ## )
 
 ### Add cmake target dependencies of the library
@@ -210,7 +221,7 @@ install(TARGETS offlinepublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTIN
 ### Declare a C++ executable
 ### With catkin_make all packages are built within a single CMake context
 ### The recommended prefix ensures that target names across packages don't collide
-## add_executable(${PROJECT_NAME}_node src/offlinePublisher_node.cpp)
+## add_executable(${PROJECT_NAME}_node src/surena_usb_node.cpp)
 
 ### Rename C++ executable without prefix
 ### The above recommended prefix causes long target names, the following renames the
@@ -267,7 +278,7 @@ install(TARGETS offlinepublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTIN
 ##############
 
 ### Add gtest based cpp test target and link libraries
-## catkin_add_gtest(${PROJECT_NAME}-test test/test_offlinePublisher.cpp)
+## catkin_add_gtest(${PROJECT_NAME}-test test/test_surena_usb.cpp)
 ## if(TARGET ${PROJECT_NAME}-test)
 ##   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 ## endif()

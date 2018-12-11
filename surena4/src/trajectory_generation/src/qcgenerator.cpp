@@ -212,3 +212,20 @@ vector<int> qref(12);
 
     return qref;
 }
+
+
+vector<double> QCgenerator::qc2rad(vector<int> qc){
+    vector<double> rad(13);
+    rad[6]=double((qc[0])/((1/(2*M_PI))*(2304)*100));
+    rad[5]=double((qc[1])/((-1)*(1/(2*M_PI))*(2304)*100));
+    rad[4]=double((qc[2])/((1/(2*M_PI))*(2304)*50));
+    rad[3]=double((qc[3])/(-1*(1/(2*M_PI))*(2304)*80));
+    rad[11]=double((qc[4])/((1/(2*M_PI))*(2304)*100));
+    rad[12]=double((qc[5])/((1/(2*M_PI))*(2304)*100));
+    rad[10]=double((qc[6])/(-1*(1/(2*M_PI))*(2304)*50));
+    rad[9]=double((qc[7])/((1/(2*M_PI))*(2304)*80));
+    rad[1]=double((qc[8])/((-1)*(1/(2*M_PI))*(2304)*120));
+    rad[2]=double((qc[9])/((1/(2*M_PI))*(2304)*120));
+    rad[8]=double((qc[10])/((1/(2*M_PI))*(2304)*120));
+    rad[7]=double((qc[11])/(-1*(1/(2*M_PI))*(2304)*120));
+}

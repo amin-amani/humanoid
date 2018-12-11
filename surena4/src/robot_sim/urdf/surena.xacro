@@ -9,7 +9,7 @@
   <xacro:include filename="$(find robot_sim)/urdf/macros.xacro" />-->
 
 
-<link name="pelvis">
+<link name="base_link">
 <inertial>
       <origin
         xyz="0 0.0 0.0 "
@@ -811,15 +811,15 @@
 
 <joint name="RLeg_HipY_J1" type="continuous">
    <origin xyz="0 -0.115 0.942 " rpy="0 0 0"/>
-   <parent link="pelvis"/>
+   <parent link="base_link"/>
    <child link="RLeg_HipY_Link"/>
    <axis xyz="0 0 1"/>
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J1t">
+<transmission name="RLeg_HipY_J1">
    <type>transmission_interface/SimpleTransmission</type>
-   <actuator name="motor1">
+   <actuator name="RLeg_HipY_J1">
      <mechanicalReduction>1</mechanicalReduction>
    </actuator>
    <joint name="RLeg_HipY_J1">
@@ -835,7 +835,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
   </joint>
 
-<transmission name="J2t">
+<transmission name="RLeg_HipR_J2">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor2">
      <mechanicalReduction>1</mechanicalReduction>
@@ -853,7 +853,7 @@
       <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
    </joint>
 
-<transmission name="J3t">
+<transmission name="RLeg_HipP_J3">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor3">
      <mechanicalReduction>1</mechanicalReduction>
@@ -871,7 +871,7 @@
      <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
   </joint>
 
-<transmission name="J4t">
+<transmission name="RLeg_KneeP_J4">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor4">
      <mechanicalReduction>1</mechanicalReduction>
@@ -889,7 +889,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J5t">
+<transmission name="RLeg_AnkleP_J5">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor5">
      <mechanicalReduction>1</mechanicalReduction>
@@ -907,7 +907,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J6t">
+<transmission name="RLeg_AnkleR_J6">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor6">
      <mechanicalReduction>1</mechanicalReduction>
@@ -919,13 +919,13 @@
 
 <joint name="LLeg_HipY_J1" type="continuous">
    <origin xyz="0 +0.115 0.942 " rpy="0 0 0"/>
-   <parent link="pelvis"/>
+   <parent link="base_link"/>
    <child link="LLeg_HipY_Link"/>
    <axis xyz="0 0 1"/>
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J7t">
+<transmission name="LLeg_HipY_J1">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor7">
      <mechanicalReduction>1</mechanicalReduction>
@@ -944,7 +944,7 @@
      <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
   </joint>
 
-<transmission name="J8t">
+<transmission name="LLeg_HipR_J2">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor8">
      <mechanicalReduction>1</mechanicalReduction>
@@ -963,7 +963,7 @@
       <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
    </joint>
 
-<transmission name="J9t">
+<transmission name="LLeg_HipP_J3">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor9">
      <mechanicalReduction>1</mechanicalReduction>
@@ -982,7 +982,7 @@
      <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
   </joint>
 
-<transmission name="J10t">
+<transmission name="LLeg_KneeP_J4">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor10">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1001,7 +1001,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J11t">
+<transmission name="LLeg_AnkleP_J5">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor11">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1020,7 +1020,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J12t">
+<transmission name="LLeg_AnkleR_J6">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor12">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1032,13 +1032,13 @@
 
 <joint name="Waist_Y_J1" type="continuous">
    <origin xyz="0 0.0 1.071" rpy="0 0 0"/>
-   <parent link="pelvis"/>
+   <parent link="base_link"/>
    <child link="WAIST_LINK1"/>
    <axis xyz="0 0 1"/>
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J13t">
+<transmission name="Waist_Y_J1">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor13">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1056,7 +1056,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J14t">
+<transmission name="Waist_Y_J2">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor14">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1075,7 +1075,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J15t">
+<transmission name="RArm_ShoulderP_J1">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor15">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1094,7 +1094,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J16t">
+<transmission name="RArm_ShoulderR_J2">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor16">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1113,7 +1113,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J17t">
+<transmission name="RArm_ShoulderY_J3">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor17">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1131,7 +1131,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J18t">
+<transmission name="RArm_ElbowP_J4">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor18">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1150,7 +1150,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J19t">
+<transmission name="RArm_WristY_J5">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor19">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1168,7 +1168,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J20t">
+<transmission name="RArm_WristR_J6">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor20">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1186,7 +1186,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J21t">
+<transmission name="RArm_WristP_J7">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor21">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1208,7 +1208,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J22t">
+<transmission name="LArm_ShoulderP_J1">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor22">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1227,7 +1227,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J23t">
+<transmission name="LArm_ShoulderR_J2">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor23">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1246,7 +1246,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J24t">
+<transmission name="LArm_ShoulderY_J3">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor24">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1264,7 +1264,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J25t">
+<transmission name="LArm_ElbowP_J4">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor25">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1283,7 +1283,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J26t">
+<transmission name="LArm_WristY_J5">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor26">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1301,7 +1301,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J27t">
+<transmission name="LArm_WristR_J6">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor27">
      <mechanicalReduction>1</mechanicalReduction>
@@ -1319,7 +1319,7 @@
     <limit effort="300.0" lower="-1000" upper="-1000" velocity="0.5"/>
  </joint>
 
-<transmission name="J28t">
+<transmission name="LArm_WristP_J7">
    <type>transmission_interface/SimpleTransmission</type>
    <actuator name="motor28">
      <mechanicalReduction>1</mechanicalReduction>

@@ -38,6 +38,7 @@ public:
     vector<int> data2qc(QList<LinkM> links, vector<double> cntrl);
     vector<int> ctrldata2qc(vector<double> cntrl);
     vector<int> trajdata2qc(QList<LinkM> links);
+    vector<double> qc2rad(vector<int> qc);
 };
 
 #endif // QCGENERATOR_H
