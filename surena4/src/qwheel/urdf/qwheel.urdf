@@ -1,0 +1,325 @@
+<?xml version="1.0"?>
+<robot  name="qwheel">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.0120915047855306 -0.0071318281457593 0.05"
+        rpy="0 0 0" />
+      <mass
+        value="10" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="L1">
+    <inertial>
+      <origin
+        xyz="0 0 -0.00499999999999999"
+        rpy="0 0 0" />
+      <mass
+        value="0.1" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="J1"
+    type="revolute">
+    <origin
+      xyz="-0.0720915047855305 -0.0571318281457593 0.05"
+      rpy="1.5707963267949 0.578709634858063 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="L1" />
+    <axis
+      xyz="0 0 1" />
+      <limit effort="1.0" lower="-1000" upper="1000" velocity="10"/>
+  </joint>
+  <link
+    name="L2">
+    <inertial>
+      <origin
+        xyz="1.38777878078145E-17 3.46944695195361E-18 -0.00499999999999999"
+        rpy="0 0 0" />
+      <mass
+        value="0.1" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="J2"
+    type="continuous">
+    <origin
+      xyz="0.0479084952144694 -0.0571318281457593 0.05"
+      rpy="1.5707963267949 0.578709634858063 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="L2" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="L3">
+    <inertial>
+      <origin
+        xyz="0 6.93889390390723E-18 -0.005"
+        rpy="0 0 0" />
+      <mass
+        value="0.1" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="J3"
+    type="continuous">
+    <origin
+      xyz="0.0479084952144694 0.0428681718542407 0.05"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="L3" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="L4">
+    <inertial>
+      <origin
+        xyz="1.38777878078145E-17 0 -0.005"
+        rpy="0 0 0" />
+      <mass
+        value="0.1" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://qwheel/meshes/L4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="J4"
+    type="continuous">
+    <origin
+      xyz="-0.0720915047855306 0.0428681718542407 0.05"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="L4" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+
+<transmission name="J1t">
+   <type>transmission_interface/SimpleTransmission</type>
+   <actuator name="motor1">
+     <mechanicalReduction>1</mechanicalReduction>
+   </actuator>
+   <joint name="J1">
+     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+   </joint>
+ </transmission>
+
+ <transmission name="J2t">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="motor1">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="J2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
+  <transmission name="J3t">
+     <type>transmission_interface/SimpleTransmission</type>
+     <actuator name="motor1">
+       <mechanicalReduction>1</mechanicalReduction>
+     </actuator>
+     <joint name="J3">
+       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+     </joint>
+   </transmission>
+
+    <transmission name="J4t">
+        <type>transmission_interface/SimpleTransmission</type>
+        <actuator name="motor1">
+        <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+        <joint name="J4">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+    </transmission>
+
+<gazebo reference="L1">
+        <mu1>1</mu1>
+        <mu2>1</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
+<gazebo reference="L2">
+        <mu1>1</mu1>
+        <mu2>1</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
+<gazebo reference="L3">
+        <mu1>1</mu1>
+        <mu2>1</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
+<gazebo reference="L4">
+        <mu1>1</mu1>
+        <mu2>1</mu2>
+        <kp>2000000.0</kp>
+</gazebo>
+
+ <!-- Gazebo plugin for ROS Control -->
+ <gazebo>
+   <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+     <robotNamespace>/qwheel</robotNamespace>
+   </plugin>
+</gazebo>
+
+</robot>

@@ -1,0 +1,2 @@
+type: "position_controllers/JointPositionController"
+joint: RLeg_Hip_Shank_Link

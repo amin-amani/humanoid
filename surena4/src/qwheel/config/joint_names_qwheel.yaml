@@ -1,0 +1,31 @@
+qwheel:
+    # Publish all joint states -----------------------------------
+    joint_state_controller:
+        type: joint_state_controller/JointStateController
+        publish_rate: 50
+
+    # Position Controllers ---------------------------------------
+    joint1_position_controller:
+        type: effort_controllers/JointPositionController
+        joint: J1
+        pid: {p: 200.0, i: 0.00, d: 1.0}
+        setpoint : 0
+        # Position Controllers ---------------------------------------
+    joint2_position_controller:
+        type: effort_controllers/JointPositionController
+        joint: J2
+        pid: {p: 000.0, i: 0.00, d: 0.0}
+        setpoint : 0
+
+# Position Controllers ---------------------------------------
+    joint3_position_controller:
+        type: effort_controllers/JointPositionController
+        joint: J3
+        pid: {p: 0.0, i: 0.00, d: 0.0}
+        setpoint : 0
+    # Position Controllers ---------------------------------------
+    joint4_position_controller:
+        type: effort_controllers/JointPositionController
+        joint: J4
+        pid: {p: 0.0, i: 0.00, d: 0.0}
+        setpoint : 0
