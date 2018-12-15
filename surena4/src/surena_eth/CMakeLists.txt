@@ -77,8 +77,6 @@ set( QT_SOURCES
     src/epos.h
     src/tcphandler.cpp
     src/tcphandler.h
-    src/robotcontroller.cpp
-    src/robotcontroller.h
     src/robot.cpp
     src/robot.h
     src/qnode.h

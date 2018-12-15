@@ -87,11 +87,10 @@ QList<double> IncPositions;
 	void myCallback(const std_msgs::Float64& message_holder);
     //=================================================================================================
 
-
 //=================================================================================================
 	QStringListModel* loggingModel() { return &logging_model; }
     //=================================================================================================
-	void log( const LogLevel &level, const std_msgs::Float64 &msg);
+	void Log( const LogLevel &level, const std_msgs::Float64 &msg);
     //=================================================================================================
     void SendDataToMotors(const std_msgs::Int32MultiArray &msg);
     //=================================================================================================

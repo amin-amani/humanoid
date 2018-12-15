@@ -157,18 +157,19 @@ void QNode::run() {
 }
 //================================================================================================================================================================
 
+
 void QNode::myCallback(const std_msgs::Float64& message_holder)
 {
 	//std::stringstream ss;
 	//ss << message_holder.data;
-	log(Info, message_holder);
+    Log(Info, message_holder);
 	ROS_INFO("=============received value is: %f===========",message_holder.data); 
     //Q_EMIT NewDataReceived();
   //really could do something interesting here with the received data...but all we do is print it 
 } 
 
 //================================================================================================================================================================
-void QNode::log( const LogLevel &level, const std_msgs::Float64 &msg) {
+void QNode::Log( const LogLevel &level, const std_msgs::Float64 &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);
 	std::stringstream logging_model_msg;
 	switch ( level ) {

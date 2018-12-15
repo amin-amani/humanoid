@@ -7,10 +7,11 @@
 #include <qlist.h>
 #include "can.h"
 #include "pingmodel.h"
+
 //#include "tcphandler.h"
 #define USE_NET
 
-enum EPOSErrors { OK=0,USB_ERROR, BOARD_ERROR, CAN_ERROR,SDO_REJECT,SDO_BAD_REPLAY,NO_ANSER,NETWOR_ERROR};
+enum EPOSErrors { OK=0,USB_ERROR, BOARD_ERROR, CAN_ERROR,SDO_REJECT,SDO_BAD_REPLAY,NO_ANSER,NETWOR_ERROR,EPOS_ERROR};
 enum EPOSOperationMode {PPM=1,PVM=3,HMM=6,CSP=8,CST=10};
 
 class Epos : public QObject
@@ -21,8 +22,8 @@ class Epos : public QObject
 public:
 	Can can;
     explicit Epos(QObject *parent = 0);
-
-    EPOSErrors Init();
+/// use -1 for infinit wait
+    EPOSErrors Init(int tryCount);
     EPOSErrors EnableDevice(int devID,EPOSOperationMode mode);
     void SetPreoperationalMode(int devID);
     void ResetComunication(int devID);
@@ -35,7 +36,8 @@ public:
     unsigned char GetSDOCODE(int len);
     EPOSErrors SDOWriteCommand(int id, unsigned long input, int index, unsigned char sub_index, unsigned char len, char devID);
     void SDOReadCommand(int id, int index, unsigned char subIndex, char devID);
-    EPOSErrors ReadRegister(int index, int subIndex, int canID, int devID, int32_t &value);
+    EPOSErrors ReadRegisterValue(int index, int subIndex, int canID, int devID, int32_t &value, int timeout);
+    EPOSErrors ReadRegister(int index, int subIndex, int canID, int devID, int32_t &value, int timeout, int trycount);
     EPOSErrors WriteRegister(int index, int subIndex, int canID, int devID, int32_t value, int len=4);
 
     EPOSErrors ActivePPM(int canID, int devId);
@@ -70,6 +72,8 @@ public:
 
         bool StartFeedBack();
         bool ActiveAllCSP();
+
+
 signals:
 
     void NewDataReady();

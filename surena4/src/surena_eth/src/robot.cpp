@@ -5,32 +5,96 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     _rosNode=new QNode(argc,argv);
     if(!_rosNode->init())exit(0);
 
-        if(Epos4.Init()==OK)
-          //  if(true)
-             {
-            qDebug()<<"Device connected.";
-            connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)));
-            connect(&timer,SIGNAL(timeout()),this,SLOT(Timeout()));
+    connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
+
+//_statusCheckTimer.start(1000);
 
 
-            Epos4.StartFeedBack();
-            timer.start(5);
-             }
-             else
-             {
-            qDebug()<<"Device does not exist!";
-
-             }
-
-
+    pos=0;
     connect(_rosNode,SIGNAL(rosShutdown()),this,SLOT(CleanAndExit()));
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
     connect(_rosNode,SIGNAL(SetActiveCSP()),this,SLOT(ActiveCSP()));
     connect(_rosNode,SIGNAL(DoResetAllNodes()),this,SLOT(ResetAllNodes()));
-      connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
+    connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
+    connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)));
 
-    pos=0;
+    connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
+          _initialTimer.start(2000);
+         return;
+
+
+
+
+
+
+
 }
+
+//=================================================================================================
+
+void Robot::Initialize()
+{
+qDebug()<<"init...";
+if(Epos4.Init(2)!=OK)return;
+if(! ReadAllInitialPositions())
+{return; }
+_initialTimer.stop();
+qDebug()<<"init...OK";
+
+connect(&timer,SIGNAL(timeout()),this,SLOT(Timeout()));
+Initialized=true;
+Epos4.StartFeedBack();
+timer.start(5);
+
+
+}
+//=================================================================================================
+bool Robot::ReadAllInitialPositions()
+{
+    int numberOfSuccess=0;
+    for(int i=0;i<12;i++){
+        int32_t result=0;
+    if(Epos4.ReadRegister(0x60e4,1,1,i,result,10,3)==OK)
+    {
+CurrentIncPositions[i]=result;
+      //  positionInc.append(result);
+      numberOfSuccess++;
+        //qDebug()<<"OK " << result;
+    }
+    else
+    {
+     qDebug()<<"error num=" << i;
+    }
+
+    }
+    for(int i=0;i<12;i++){
+        int32_t result=0;
+    if(Epos4.ReadRegisterValue(0x60e4,2,1,i,result,10)==OK)
+    {
+CurrentAbsPositions[i]=result;
+      //  positionInc.append(result);
+      numberOfSuccess++;
+      //  qDebug()<<"OK " << result;
+    }
+    else
+    {
+     qDebug()<<"error read pos=" << i;
+    }
+                            }
+
+
+    if(numberOfSuccess!=24)
+    return false;
+
+    return true;
+
+}
+//=================================================================================================
+void Robot::StatusCheck()
+{
+    qDebug()<<"init :"<<Initialized;
+}
+
 //=================================================================================================
 void Robot::NewjointDataReceived()
 {
@@ -52,13 +116,6 @@ CurrentIncPositions[i]=positionInc[i];
   //  _rosNode->IncJointState.position.push_back(positionInc[i]);
     }
 
-//    qDebug()<<"pose="   <<positionAbs[0]<<positionAbs[1]<<positionAbs[2]<<positionAbs[3]
-//                        <<positionAbs[4]<<positionAbs[5]<<positionAbs[6]<<positionAbs[7]
-//                        <<positionAbs[8]<<positionAbs[9]<<positionAbs[10]<<positionAbs[11];
-
-////    qDebug()<<"pose="<<positionInc[0]<<positionInc[1]<<positionInc[2]<<positionInc[3]
-//                <<positionInc[4]<<positionInc[5]<<positionInc[6]<<positionInc[7]
-//                  <<positionInc[8]<<positionInc[9]<<positionInc[10]<<positionInc[11];
 
 }
 //=================================================================================================
@@ -90,7 +147,8 @@ void Robot::ResetAllNodes()
 void Robot::Home()
 {
    timer.stop();
-   pid.Init(5,10,-10,.1,0,0);
+   //void PIDController::Init(double dt, double max, double min, double Kp, double Kd, double Ki)
+   pid.Init(5,10,-10,1.5,0,0.0);
    _hommingTimer.disconnect();
   connect(&_hommingTimer,SIGNAL(timeout()),this,SLOT(HommingLoop()));
    Epos4.ActiveAllCSP();

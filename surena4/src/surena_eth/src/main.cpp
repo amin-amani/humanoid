@@ -1,14 +1,15 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "surena_eth//active_csp.h"
-#include "surena_eth/reset_node.h"
-#include "surena_eth/home.h"
+
 #include <std_msgs/Empty.h>
 #include <sensor_msgs/JointState.h>
 #include <tf/transform_broadcaster.h>
 #include <QEventLoop>
 #include <qdebug.h>
 #include <QTimer>
+#include "surena_eth/active_csp.h"
+#include "surena_eth/reset_node.h"
+#include "surena_eth/home.h"
 #include <QApplication>
 #include <std_msgs/Int32MultiArray.h>
 #include <interactive_markers/interactive_marker_server.h>
@@ -16,7 +17,7 @@
 #include "visualize.h"
 #include "VisualizeControl.h"
 #include <tf/transform_datatypes.h>
-#include "robotcontroller.h"
+
 #include "qnode.h"
 #include "robot.h"
 
@@ -123,8 +124,9 @@ int main(int argc, char **argv)
 
    Robot w(nullptr,argc,argv);
    // w.show();
-   //app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
-    return app.exec();
+//   app.connect(&w, SIGNAL(, &app, SLOT(quit()));
+
+   return app.exec();
 
     //return result;
 

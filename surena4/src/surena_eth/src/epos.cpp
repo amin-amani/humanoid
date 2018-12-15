@@ -10,17 +10,44 @@ Epos::Epos(QObject *parent) : QObject(parent)
 
 }
 //========================================================================
-EPOSErrors Epos::Init()
+EPOSErrors Epos::Init(int tryCount)
 {
     PingModel ping;
-
-    if(! ping.Start("192.168.1.10"))
-        return NETWOR_ERROR;
-    if(can.Init())
+    int numberOfSuccess=0;
+    int pingCount=0;
+       qDebug()<<"ping";
+    while(! ping.Start("192.168.1.10") && pingCount>tryCount )
     {
-        return OK;
+        QThread::msleep(500);
+            qDebug()<<"waiting zynq ethernet..";
+        pingCount++;
     }
-    return CAN_ERROR;
+    if(! ping.Start("192.168.1.10"))
+    {
+      qDebug()<<"OK";
+        return NETWOR_ERROR;
+    }
+
+      qDebug()<<"Ping OK";
+    ///seems useless
+    if(!can.Init())
+    {
+        return CAN_ERROR;
+    }
+for(int i=0;i<12;i++){
+    int32_t val=0;
+    if(ReadRegister(0x1000,0,1,i,val,10,3)==OK && val==0x20192){
+      numberOfSuccess++;
+        qDebug()<<"OK";
+    }
+qDebug()<<"read val "<<QString::number(i)<<"="<<QString::number(val,16);
+    }
+if(numberOfSuccess!=12)
+{
+return EPOS_ERROR;
+}
+    return OK;
+
 }
 //========================================================================
 EPOSErrors Epos::ResetNode(int devID) // if devID=255 -> reset all nodes
@@ -285,7 +312,18 @@ void Epos::SDOReadCommand( int id,int index,unsigned char subIndex,char devID)
     can.WriteMessage(id,devID,data);
 }
 //========================================================================
-EPOSErrors Epos::ReadRegister(int index,int subIndex,int canID, int devID,int32_t &value)
+EPOSErrors Epos::ReadRegister(int index,int subIndex,int canID, int devID,int32_t &value,int timeout,int trycount)
+{
+    int tryCounter=0;
+    EPOSErrors status=EPOS_ERROR;
+    while (status!=OK && tryCounter<trycount) {
+     status=   ReadRegisterValue(index,subIndex,canID,devID,value,timeout);
+    tryCounter++;
+    }
+ return status;
+}
+
+EPOSErrors Epos::ReadRegisterValue(int index,int subIndex,int canID, int devID,int32_t &value,int timeout)
 {
     uint16_t inpid;
     QByteArray replay;
@@ -293,7 +331,7 @@ EPOSErrors Epos::ReadRegister(int index,int subIndex,int canID, int devID,int32_
     can.ReadMessage(devID, replay);
     can.ReadMessage(devID, replay);
     SDOReadCommand(canID+0x600,index,subIndex,devID);
-    QThread::msleep(5);
+    QThread::msleep(timeout);
 
     can.ReadMessage(devID,replay);
 
@@ -350,7 +388,7 @@ QString Epos::ReadCurrentError(int canID,int devID)
     EPOSErrors status;
     int value=0;
     // status= ReadRegister(0x1001,0,canID,devID,value);
-    status= ReadRegister(0x603f,0,canID,devID,value);
+    status= ReadRegister(0x603f,0,canID,devID,value,10,3);
     if(status!=OK){ return "read error";}
     qDebug()<<"error="<<QString::number( value,16);
     return "ok";
