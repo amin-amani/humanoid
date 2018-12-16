@@ -24,7 +24,7 @@ EPOSErrors Epos::Init(int tryCount)
     }
     if(! ping.Start("192.168.1.10"))
     {
-      qDebug()<<"OK";
+      //qDebug()<<"OK";
         return NETWOR_ERROR;
     }
 
@@ -94,8 +94,6 @@ void Epos::SetPreoperationalMode(int devID)
     data.append((char)0x00);
     can.WriteMessage(00,devID,data);
 }
-
-
 //========================================================================
 void  Epos::ResetComunication(int devID)
 {
@@ -322,7 +320,7 @@ EPOSErrors Epos::ReadRegister(int index,int subIndex,int canID, int devID,int32_
     }
  return status;
 }
-
+//========================================================================
 EPOSErrors Epos::ReadRegisterValue(int index,int subIndex,int canID, int devID,int32_t &value,int timeout)
 {
     uint16_t inpid;
@@ -367,7 +365,7 @@ EPOSErrors Epos::WriteRegister(int index,int subIndex,int canID, int devID,int32
     QThread::msleep(5);
     return SDOWriteCommand(canID,value,index,subIndex,len,devID);
 }
-
+//========================================================================
 EPOSErrors Epos::ActivePPM(int canID,int devId){
 
     qDebug()<<"pvt";
@@ -507,33 +505,87 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
      }
 
     for(i=0; i< 4; i++)  // send 4 data can(each can 8 byte) (40 byte)
-    {
-        data.append(0x04); // can id high byte   0401
-        data.append(0x01); // can id low byte    0401
+        {
+            switch (i) {
+            case 0:                 // CS = 12  ==> Right Hand
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                break;
 
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-        data.append(0x01);
-     }
+            case 1:               // CS = 13  ==> Left Hand
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                break;
 
-    for(i = (6*motor_num)+44 ; i < 252; i++)
+            case 2:               // CS = 14  ==>  Neck and Other
+
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                break;
+
+            case 3:  // 2 sensor Pa
+                data.append(0x03); // can id high byte   0401
+                if (flag_sensor_pa==1)
+                {
+                    data.append(0x82); // can id low byte    0401
+                    flag_sensor_pa = 0;
+                }
+                else
+                {
+                    data.append(0x83); // can id low byte    0401
+                    flag_sensor_pa =1 ;
+                }
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x20);  // command to sensor pa
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                data.append(0x01);
+                break;
+
+            default:
+                break;
+            }
+
+         }
+
+
+    for(i = (6*motor_num)+44 ; i < 296; i++)
     {
         data.append(0x01);  // fill data packet with 01 byte
     }
-    for(int i=data.count();i<300-4;i++)
-        data.append(1);
+
     data.append(0xFF);  // Parity | 0xFF
     data.append(0xCC);  // Tailer
     data.append(0x33);  // Tailer
     data.append(0xCC);  // Tailer
 
-//QByteArray reponse=tcp.SendCommand(data);
-//qDebug()<<"this is len:"<<data.length();
     tcp.WriteData(data);  // send 128 Byte Packet
 
     // just for test
@@ -555,17 +607,48 @@ QByteArray Epos::EposReceiveData()
      return buffer;
 }
 //========================================================================
+float Epos::QByteArrayToFloat(QByteArray arr)
+{
+    float output;
+    char* point_char = (char*)&output;
+    *point_char = (arr[3] & 0xff );
+    point_char++;
+    *point_char = (arr[2] & 0xff );
+    point_char++;
+    *point_char = (arr[1] & 0xff );
+    point_char++;
+    *point_char = (arr[0] & 0xff );
+    point_char++;
+    return output;
+}
+//========================================================================
 void Epos::DataReceived(QByteArray data)
 {
 
+
+    QList<uint16_t> bump_sensor_list;
     QList<int32_t> positions;
     QList<int32_t> positionsInc;
     QList<int16_t> ft;
+    QList<int16_t> footSensor;
     int id_can_read[16];
-        int32_t pos_inc_value=0;
+    int32_t pos_inc_value=0;
     int32_t pos_value=0;
     int can_id =0;
-//qDebug()<<"tick tick";
+    uint32_t euler_angle_temp;
+    uint32_t acc_temp;
+    uint32_t free_acc_temp;
+    uint32_t rate_turn_temp;
+    uint32_t magnetic_temp;
+    float euler_angle[3];
+    float acc[3];
+    float free_acc[3];
+    float rate_turn[3];
+    float magnetic[3];
+    uint32_t imu_data_temp32;
+    float imu_data[15];
+    QList<float> imu_data_list;
+    int imu_index = 188;
 
     if ( (data[0]&0xff)== 0x01 && (data[1]&0xff)== 0x55 && (data[2]&0xff)== 0xAA && (data[3]&0xff)== 0x55 )
     {
@@ -601,28 +684,110 @@ void Epos::DataReceived(QByteArray data)
     positionsInc.append(pos_inc_value);
     id_can_read[i] = can_id;
         }
-       //qDebug()<<data_can_read[0]<<" "<<data_can_read[1]<<" "<<data_can_read[2]<<" "<<data_can_read[3]<<" "<<data_can_read[4]<<" "<<data_can_read[5]<<" "<<data_can_read[6]<<" "<<data_can_read[7]<<" "<<data_can_read[8]<<" "<<data_can_read[9]<<" "<<data_can_read[10]<<" "<<data_can_read[11]<<" "<<data_can_read[12]<<" "<<data_can_read[13]<<" "<<data_can_read[14]<<" "<<data_can_read[15];
-       //qDebug()<<id_can_read[0]<<":"<<data_can_read[0]<<" "<<id_can_read[1]<<":"<<data_can_read[1]<<" "<<id_can_read[2]<<":"<<data_can_read[2]<<" "<<id_can_read[3]<<":"<<data_can_read[3]<<" "<<id_can_read[4]<<":"<<data_can_read[4]<<" "<<id_can_read[5]<<":"<<data_can_read[5]<<" "<<id_can_read[6]<<":"<<data_can_read[6]<<" "<<id_can_read[7]<<":"<<data_can_read[7]<<" "<<id_can_read[8]<<":"<<data_can_read[8]<<" "<<id_can_read[9]<<":"<<data_can_read[9]<<" "<<id_can_read[10]<<":"<<data_can_read[10]<<" "<<id_can_read[11]<<":"<<data_can_read[11]<<" "<<id_can_read[12]<<":"<<data_can_read[12]<<" "<<id_can_read[13]<<":"<<data_can_read[13]<<" "<<id_can_read[14]<<":"<<data_can_read[14]<<" "<<id_can_read[15]<<":"<<data_can_read[15];
-       //qDebug()<<QString::number(data_can_read[2]);
+
         for (int j = 0; j < 6; j++)
         {
             int16_t tempFT=(((data[(2*j)+164] & 0xFF))<<8 ) | (data[(2*j)+165] & 0xFF);
             ft.append(tempFT);
             tempFT=(((data[(2*j)+176] & 0xFF))<<8 ) | (data[(2*j)+177] & 0xFF);
             ft.append(tempFT);
-//           ft_sensor1[j] = (((data[(2*j)+163] & 0xFF))<<8 ) | (data[(2*j)+164] & 0xFF);
-//           ft_sensor2[j] = (((data[(2*j)+175] & 0xFF))<<8 ) | (data[(2*j)+176] & 0xFF);
-//           ft.append(ft_sensor1[j]);
-//           ft.append(ft_sensor2[j]);
+
        }
-        //if(id_can_read[2]==0x181){
-     //  qDebug()<<"data is 0x181"<<data.mid(24   ,10).toHex();
-            emit FeedBackReceived(ft,positions,positionsInc);
-      //  }
-       //qDebug()<<"Sensor val="<<QString::number(data[163]&0xff,16)<<QString::number(data[164]&0xff,16);
-       //qDebug()<<" ft_sensor1: " << ft_sensor1[0] << ", " << ft_sensor1[1] << ", " << ft_sensor1[2] << ", " << ft_sensor1[3] << ", " << ft_sensor1[4] << ", " << ft_sensor1[5] << ";" ;
-       //qDebug()<<" ft_sensor2: " << ft_sensor2[0] << ", " << ft_sensor2[1] << ", " << ft_sensor2[2] << ", " << ft_sensor2[3] << ", " << ft_sensor2[4] << ", " << ft_sensor2[5] << ";" ;
-    }
+
+        // -------------- Bump Sensor Data   --------------
+               int bump_sensor_index = 154;
+               can_id = (data[bump_sensor_index+1] & 0x000000FF) ;       // can id low byte
+               can_id += (data[bump_sensor_index] & 0x000000FF) << 8;    // can id high byte
+               id_can_read[15] = can_id;
+               //bump_sensor_list.append(can_id);
+               if (can_id == 0x0482)    // Right Hand
+               {
+                  bump_sensor_right[0] = (data[bump_sensor_index+3] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_right[0] += (data[bump_sensor_index+2] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_right[1] = (data[bump_sensor_index+5] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_right[1] += (data[bump_sensor_index+4] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_right[2] = (data[bump_sensor_index+7] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_right[2] += (data[bump_sensor_index+6] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_right[3] = (data[bump_sensor_index+9] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_right[3] += (data[bump_sensor_index+8] & 0x00FF) << 8;  // Sensor data high byte
+                  for (int bs_i =0; bs_i < 4; bs_i++)
+                  {
+                      bump_sensor_list.append(bump_sensor_right[bs_i]);
+                  }
+                  for (int bs_i =0; bs_i < 4; bs_i++)
+                  {
+                      bump_sensor_list.append(bump_sensor_left[bs_i]);
+                  }
+
+               }
+               else if (can_id == 0x481) // Left Hand
+               {
+                  bump_sensor_left[0] = (data[bump_sensor_index+3] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_left[0] += (data[bump_sensor_index+2] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_left[1] = (data[bump_sensor_index+5] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_left[1] += (data[bump_sensor_index+4] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_left[2] = (data[bump_sensor_index+7] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_left[2] += (data[bump_sensor_index+6] & 0x00FF) << 8;  // Sensor data high byte
+                  bump_sensor_left[3] = (data[bump_sensor_index+9] & 0x00FF) ;       // Sensor data low  byte
+                  bump_sensor_left[3] += (data[bump_sensor_index+8] & 0x00FF) << 8;  // Sensor data high byte
+
+               for (int bs_i =0; bs_i < 4; bs_i++)
+                  {
+                      bump_sensor_list.append(bump_sensor_right[bs_i]);
+                  }
+                  for (int bs_i =0; bs_i < 4; bs_i++)
+                  {
+                      bump_sensor_list.append(bump_sensor_left[bs_i]);
+                  }
+               }
+               else
+               {
+                 // qDebug()<<"Error in Bump Sensor ID: " << can_id;
+               }
+
+               // ------------- END Bump Sensor Data   -------------
+
+               // ----------------  check IMU data -----------------------
+                       imu_index = 188;
+                       if ((data[imu_index] == 0xFA) &&  (data[imu_index+1] == 0xFF) )
+                       {
+                           if ((data[imu_index+2] == 0x36) &&  (data[imu_index+3] == 0x4B) )
+                           {
+                               for (int i_index = 0; i_index < 5; ++i_index) {
+                                   //imu_data_temp32 = (data[imu_index+(i_index*15)+7] << 24) |  (data[imu_index+(i_index*15)+8] << 16) | (data[imu_index+(i_index*15)+9] << 8) |  (data[imu_index+(i_index*15)+10]) ;
+                                   QByteArray tempm=data.mid(imu_index+(i_index*15)+7,4);
+                                   imu_data[(i_index*3)] = QByteArrayToFloat(tempm);
+                                   imu_data_list.append(QByteArrayToFloat(tempm));
+                                   //imu_data_temp32 = (data[imu_index+(i_index*15)+11] << 24) |  (data[imu_index+(i_index*15)+12] << 16) | (data[imu_index+(i_index*15)+13] << 8) |  (data[imu_index+(i_index*15)+14]) ;
+                                  tempm=data.mid(imu_index+(i_index*15)+11,4);
+                                  imu_data[(i_index*3)+1] = QByteArrayToFloat(tempm) ;
+                                  imu_data_list.append(QByteArrayToFloat(tempm));
+                                  //imu_data_temp32 = (data[imu_index+(i_index*15)+15] << 24) |  (data[imu_index+(i_index*15)+16] << 16) | (data[imu_index+(i_index*15)+17] << 8) |  (data[imu_index+(i_index*15)+18]) ;
+                                  tempm=data.mid(imu_index+(i_index*15)+15,4);
+                                  imu_data[(i_index*3)+2] = QByteArrayToFloat(tempm) ;
+                                  imu_data_list.append(QByteArrayToFloat(tempm));
+                                  //qDebug()<<" imu_data: " << imu_data[(3*i_index)] << ", " << imu_data[(3*i_index)+1] << ", " << imu_data[(3*i_index)+2] << ";" ;
+                               }
+
+                           }
+
+                           else
+                           {
+                               qDebug()<<"Error in IMU Data Size !!! ";
+                           }
+                       }
+                       else
+                       {
+                           qDebug()<<"Error in IMU Data Header!!! ";
+                       }
+
+/////////
+                     //  emit FeedBackReceived(ft,positions,positionsInc);//,bump_sensor_list,imu_data_list);
+  //FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<int32_t> positionsInc,QList<int16_t> bump_sensor_list,QList<float> imu_data_list);
+
+emit FeedBackReceived(ft,positions,positionsInc,bump_sensor_list, imu_data_list);
+          //  emit FeedBackReceived(ft,positions,positionsInc);
+       }
 
     // mode 3: CAN Read
     else if ((data[0]== 0x03) && (data[1]== 0x55) && (data[2]== 0xAA) && (data[3]== 0x55) )

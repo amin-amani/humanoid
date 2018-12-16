@@ -5,7 +5,7 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     _rosNode=new QNode(argc,argv);
     if(!_rosNode->init())exit(0);
 
-    connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
+ //   connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
 
 //_statusCheckTimer.start(1000);
 
@@ -16,11 +16,11 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(SetActiveCSP()),this,SLOT(ActiveCSP()));
     connect(_rosNode,SIGNAL(DoResetAllNodes()),this,SLOT(ResetAllNodes()));
     connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
-    connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>)));
+    connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
 
     connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
           _initialTimer.start(2000);
-         return;
+//         return;
 
 
 
@@ -101,19 +101,22 @@ void Robot::NewjointDataReceived()
     qDebug()<<"get new data..."<<_rosNode->JointsData.data.at(0);
 }
 //=================================================================================================
-void Robot::FeedBackReceived(QList<int16_t>ft,QList<int32_t>positionAbs,QList<int32_t>positionInc)
+void  Robot::FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<int32_t> positionsInc,QList<uint16_t> bump_sensor_list,QList<float> imu_data_list)
 {
-
-
+    if(bump_sensor_list.count()==8)
+qDebug()<<"bump="<<bump_sensor_list[0]<<bump_sensor_list[1]<<bump_sensor_list[2]<<bump_sensor_list[3]<<bump_sensor_list[4]<<bump_sensor_list[5]<<bump_sensor_list[6]<<bump_sensor_list[7];
+ //       if(imu_data_list.count()>3)
+//qDebug()<<"imu ->"<<imu_data_list[0]<<imu_data_list[1]<<imu_data_list[2];
 //_rosNode->ActualJointState.position.clear();
 //_rosNode->IncJointState.position.clear();
     for(int i=0;i<12;i++){
-CurrentAbsPositions[i]=positionAbs[i];
-CurrentIncPositions[i]=positionInc[i];
-    _rosNode->ActualPositions[i+1]=(positionAbs[i]-offset[i])*ratio[i]*2*M_PI/4096;
-    _rosNode->IncPositions[i+1]=positionInc[i];
-  //  _rosNode->ActualJointState.position.push_back( _rosNode->ActualPositions[i+1]);
-  //  _rosNode->IncJointState.position.push_back(positionInc[i]);
+CurrentAbsPositions[i]=positions[i];
+CurrentIncPositions[i]=positionsInc[i];
+    _rosNode->ActualPositions[i+1]=(positions[i]-offset[i])*ratio[i]*2*M_PI/4096;
+    _rosNode->IncPositions[i+1]=positionsInc[i];  //  _rosNode->ActualJointState.position.push_back( _rosNode->ActualPositions[i+1]);
+
+
+    //  _rosNode->IncJointState.position.push_back(positionInc[i]);
     }
 
 

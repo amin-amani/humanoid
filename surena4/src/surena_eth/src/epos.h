@@ -18,6 +18,9 @@ class Epos : public QObject
 {
     Q_OBJECT
     TcpHandler tcp;
+ int flag_sensor_pa=0;
+ uint16_t bump_sensor_left[4];
+ uint16_t bump_sensor_right[4];
 
 public:
 	Can can;
@@ -74,11 +77,13 @@ public:
         bool ActiveAllCSP();
 
 
+        float QByteArrayToFloat(QByteArray arr);
 signals:
 
     void NewDataReady();
     void Dummy();
-    void FeedBackReceived(QList<int16_t>ft,QList<int32_t>positionAbs,QList<int32_t>positionInc);
+  void  FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<int32_t> positionsInc,QList<uint16_t> bump_sensor_list,QList<float> imu_data_list);
+
 
 public slots:
 
