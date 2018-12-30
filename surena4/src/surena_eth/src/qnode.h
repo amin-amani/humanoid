@@ -31,6 +31,8 @@
 #include <std_srvs/Empty.h>
 #include <std_srvs/SetBool.h>
 #include <sensor_msgs/JointState.h>
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Wrench.h>
 #include <tf/transform_broadcaster.h>
 #include <QEventLoop>
 #include <QTimer>
@@ -40,6 +42,7 @@
 #include <interactive_markers/menu_handler.h>
 #include "visualize.h"
 #include <tf/transform_datatypes.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 
 /*****************************************************************************
@@ -70,7 +73,10 @@ public:
 
 QList<double> ActualPositions;
 QList<double> IncPositions;
-
+  int BumpSensor[8];
+ double Imu[6];
+     sensor_msgs::Imu imuSesnsorMsg;
+     geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
      //=================================================================================================
     QNode();
     //=================================================================================================
@@ -122,7 +128,7 @@ private:
 	char** init_argv;
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
-    ros::Publisher _jointPublisher,_incJointPublisher;
+    ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
     QStringListModel logging_model;
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;

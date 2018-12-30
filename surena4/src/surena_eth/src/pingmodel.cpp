@@ -31,24 +31,23 @@ void PingModel::ReadResult(){
     running = false;
     //_result.append(ping->readLine());
     QByteArray temp=ping.readLine();
-    //qDebug() << "Res:" << temp;
+  //  qDebug() << "Res:" << temp;
     _result.append(temp);
 }
-
 
 bool PingModel::Start(QString address){
     _result.clear();
     //if(ping){
         QString command = "ping";
         QStringList args;
-        //qDebug()<<address;
+       // qDebug()<<address;
         args << "-w" <<  "1" << address;// "www.google.com";
         ping.start(command, args);
         ping.waitForStarted(7000);
         running = true;
-        ping.waitForFinished(5000);
-       // qDebug()<<"resakhar="<<_result;
-        if(_result.indexOf("64 bytes from",0)>1)
+        ping.waitForFinished(100000);
+     // qDebug()<<"resakhar="<<_result;
+        if(_result.indexOf("0% packet loss",0)>1)
         {
                   //  qDebug()<<"ping ok";
         return true;

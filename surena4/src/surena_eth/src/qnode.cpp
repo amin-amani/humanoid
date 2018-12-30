@@ -75,8 +75,12 @@ bool QNode::init() {
 	// Add your ros communications here.
     _jointsSubscriber = n.subscribe("jointdata/qc", 1000, &QNode::SendDataToMotors, this);
     chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    _rigthtFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_r_state", 1000);
+    _leftFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_l_state", 1000);
+    _imuPublisher =    n.advertise<sensor_msgs::Imu>("surena/imu_state", 1000);
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
+    _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
 
     _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
@@ -86,6 +90,7 @@ bool QNode::init() {
     for (int i = 0; i < 13; i++) {
     ActualPositions.append(0);
     IncPositions.append(0);
+
     }
 
     start();
@@ -133,18 +138,48 @@ void QNode::run() {
     ros::NodeHandle n;
     ros::Rate loop_rate(200);
     _jointsSubscriber = n.subscribe("jointdata/qc", 1000, &QNode::SendDataToMotors, this);
+    //  std_msgs::Int32MultiArray msg;
 
     while ( ros::ok() ) {
     std_msgs::String msg;
     sensor_msgs::JointState ActualJointState,IncJointState;
+    std_msgs::Int32MultiArray BumpSensorState;
+    //sensor_msgs::Imu imuSesnsorMsg;
+    //geometry_msgs::Wrench ftSensorMessage;
     msg.data = "salam";
+
+    std_msgs::MultiArrayDimension msg_dim;
+    msg_dim.label = "bump";
+    msg_dim.size = 1;
+    BumpSensorState.layout.dim.clear();
+    BumpSensorState.layout.dim.push_back(msg_dim);
+
     //chatter_publisher.publish(msg); // publish the value--of type Float64-
  ActualJointState.header.stamp = ros::Time::now();
   IncJointState.header.stamp = ros::Time::now();
+  imuSesnsorMsg.header.stamp= ros::Time::now();;
+  imuSesnsorMsg.header.frame_id="base_link";
+
   for(int i=0 ;i<13;i++){
   ActualJointState.position.push_back(ActualPositions[i]);
   IncJointState.position.push_back(IncPositions[i]);
   }
+  for(int i=0 ;i<8;i++){
+      BumpSensorState.data.push_back(BumpSensor[i]);
+  //BumpSensorState.data[i]=i;
+  }
+
+/////
+
+
+_rigthtFtPublisher.publish(RightFtSensorMessage);
+_leftFtPublisher.publish(LeftFtSensorMessage);
+
+///
+
+  _bumpPublisher.publish(BumpSensorState);
+  _imuPublisher.publish(imuSesnsorMsg);
+
     _jointPublisher.publish(ActualJointState);
     _incJointPublisher.publish(IncJointState);
     UpdateRobotModel(ActualPositions);
