@@ -3,7 +3,7 @@
  *
  * @brief Ros communication central!
  *
- * @date February 2011
+ * @date Sep 2018
  **/
 
 /*****************************************************************************
@@ -32,9 +32,7 @@ QNode::QNode()
 
 }
 //=============================================================================================================================
-QNode::QNode(int argc, char** argv ) :
-	init_argc(argc),
-	init_argv(argv)
+QNode::QNode(int argc, char** argv ) :	init_argc(argc),	init_argv(argv)
 	{}
 //=============================================================================================================================
 QNode::~QNode() {
@@ -45,7 +43,7 @@ QNode::~QNode() {
 	wait();
 }
 //=============================================================================================================================
-bool QNode::init(const std::string &master_url, const std::string &host_url) {
+bool QNode::Init(const std::string &master_url, const std::string &host_url) {
     std::map<std::string,std::string> remappings;
     remappings["__master"] = master_url;
     remappings["__hostname"] = host_url;
@@ -62,7 +60,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     return true;
 }
 //=============================================================================================================================
-bool QNode::init() {
+bool QNode::Init() {
     ros::init(init_argc,init_argv,"surena");
 	if ( ! ros::master::check() ) {
         qDebug()<<"init error!";
@@ -132,7 +130,6 @@ void QNode::SendDataToMotors(const std_msgs::Int32MultiArray & msg)
     JointsData=msg;
     Q_EMIT NewjointDataReceived();
 }
-
 //================================================================================================================================================================
 void QNode::run() {
     ros::NodeHandle n;
@@ -191,9 +188,7 @@ _leftFtPublisher.publish(LeftFtSensorMessage);
 	Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
 }
 //================================================================================================================================================================
-
-
-void QNode::myCallback(const std_msgs::Float64& message_holder)
+void QNode::Callback(const std_msgs::Float64& message_holder)
 {
 	//std::stringstream ss;
 	//ss << message_holder.data;
@@ -202,7 +197,6 @@ void QNode::myCallback(const std_msgs::Float64& message_holder)
     //Q_EMIT NewDataReceived();
   //really could do something interesting here with the received data...but all we do is print it 
 } 
-
 //================================================================================================================================================================
 void QNode::Log( const LogLevel &level, const std_msgs::Float64 &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);

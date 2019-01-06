@@ -3,7 +3,12 @@
 Robot::Robot(QObject *parent, int argc, char **argv)
 {
     _rosNode=new QNode(argc,argv);
-    if(!_rosNode->init())exit(0);
+    if(!_rosNode->Init())exit(0);
+
+    for(int ii=0; ii<12 ; ii++)
+   {
+      _motorPosition.append(0);
+   }
 
  //   connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
 
@@ -21,7 +26,8 @@ Robot::Robot(QObject *parent, int argc, char **argv)
 
 
     connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
-          _initialTimer.start(2000);
+       //   _initialTimer.start(2000);
+
          return;
 
 
@@ -193,6 +199,12 @@ void Robot::ResetAllNodes()
 //=================================================================================================
 void Robot::Home()
 {
+
+    for(int ii=0; ii<12 ; ii++)
+   {
+      _motorPosition[ii]=CurrentIncPositions[ii];
+   }
+     currentHomeIndex=0;
    timer.stop();
    //void PIDController::Init(double dt, double max, double min, double Kp, double Kd, double Ki)
    pid.Init(5,10,-10,1.5,0,0.0);
@@ -206,8 +218,9 @@ void Robot::Home()
 //=================================================================================================
 void Robot::Timeout()
 {
+    // QList<int> _motorPosition;
     //qDebug()<<"Tick";
-         QList<int> _motorPosition;
+
 
 //    if(dir)pos++;
 //    else pos--;
@@ -218,7 +231,7 @@ void Robot::Timeout()
    // _motorPosition.clear();
      for(int ii=0; ii<12 ; ii++)
      {
-         _motorPosition.append(0);
+         _motorPosition[ii];
      }
 
      Epos4.SetAllPositionCST(_motorPosition,12);
@@ -227,18 +240,33 @@ void Robot::Timeout()
 
 void Robot::HommingLoop()
 {
-  // qDebug()<<"Homming";
-   QList<int> _motorPosition;
-   float error =CurrentAbsPositions[2]-offset[2];
 
+int j=0;
+double max=20.0;
+double kp=1000*2*M_PI/4096;//230400/2/3.14/2;
 
- for(int ii=0; ii<12 ; ii++)
-{
-   _motorPosition.append(0);
-}
+       j=HomeOrder[currentHomeIndex];
 
- _motorPosition[2]=(int)pid.Calculate(150,CurrentAbsPositions[2])+CurrentIncPositions[2];
-  qDebug()<<"sp=150 "<<"current abs="<<CurrentAbsPositions[2]<<"pid="<<_motorPosition[2]<<" current inc="<<CurrentIncPositions[2];
+ if(abs((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<=max){_motorPosition[j]+= ((offset[j]-CurrentAbsPositions[j]))*kp*Direction[j];}
+     if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])>max){_motorPosition[j]+=(max);}
+     if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<-max){_motorPosition[j]-=(max);}
+
+     qDebug()<<"offset"<<offset[j]<<"position["<<j<<"]="<<CurrentAbsPositions[j]<<"command"<<_motorPosition[j];
+     //// here we receive home
+     if(offset[j]-CurrentAbsPositions[j]==0){
+
+      currentHomeIndex++;
+
+     }
+     if(currentHomeIndex>11){
+         qDebug()<<"Home Finished!";
+         _hommingTimer.stop();
+         ResetAllNodes();
+
+     }
+     ///
+ ///
+
 
 Epos4.SetAllPositionCST(_motorPosition,12);
 

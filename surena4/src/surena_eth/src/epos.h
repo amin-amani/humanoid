@@ -126,7 +126,7 @@ const double sensitivityFTRight[6]=  // #573 Right foot FTsensor
 };
 
 TcpHandler tcp;
-int flag_sensor_pa=0;
+
 
 uint16_t bump_sensor_left[4];
 uint16_t bump_sensor_right[4];

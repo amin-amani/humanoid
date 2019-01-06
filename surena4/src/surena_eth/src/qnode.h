@@ -1,9 +1,9 @@
 /**
- * @file /include/my_qt_gui_subscriber/qnode.hpp
+ * @file /qnode.hpp
  *
  * @brief Communications central!
  *
- * @date February 2011
+ * @date sep 2018
  **/
 /*****************************************************************************
 ** Ifdefs
@@ -57,6 +57,19 @@
     using namespace visualization_msgs;
 class QNode : public QThread {
     Q_OBJECT
+
+private:
+    //=================================================================================================
+    int init_argc;
+    char** init_argv;
+    ros::Subscriber _jointsSubscriber;
+    ros::Publisher chatter_publisher;
+    ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
+    QStringListModel logging_model;
+    ros::ServiceServer _activeCSPService;
+    ros::ServiceServer _hommingService;
+    ros::ServiceServer _resetAllNodesService;
+
 public:
     /*********************
     ** Logging
@@ -69,14 +82,13 @@ public:
              Fatal
      };
     QString teststr="";
-     std_msgs::Int32MultiArray  JointsData;
-
-QList<double> ActualPositions;
-QList<double> IncPositions;
-  int BumpSensor[8];
- double Imu[6];
-     sensor_msgs::Imu imuSesnsorMsg;
-     geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
+    std_msgs::Int32MultiArray  JointsData;
+    QList<double> ActualPositions;
+    QList<double> IncPositions;
+    int BumpSensor[8];
+    double Imu[6];
+    sensor_msgs::Imu imuSesnsorMsg;
+    geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
      //=================================================================================================
     QNode();
     //=================================================================================================
@@ -84,16 +96,14 @@ QList<double> IncPositions;
     //=================================================================================================
 	virtual ~QNode();
     //=================================================================================================
-	bool init();
+	bool Init();
     //=================================================================================================
-	bool init(const std::string &master_url, const std::string &host_url);
+	bool Init(const std::string &master_url, const std::string &host_url);
     //=================================================================================================
 	void run();
     //=================================================================================================
-	void myCallback(const std_msgs::Float64& message_holder);
+    void Callback(const std_msgs::Float64& message_holder);
     //=================================================================================================
-
-//=================================================================================================
 	QStringListModel* loggingModel() { return &logging_model; }
     //=================================================================================================
 	void Log( const LogLevel &level, const std_msgs::Float64 &msg);
@@ -120,22 +130,6 @@ QList<double> IncPositions;
     void DoResetAllNodes();
     //=================================================================================================
     void SetHome();
-    //=================================================================================================
-
-private:
-    //=================================================================================================
-	int init_argc;
-	char** init_argv;
-    ros::Subscriber _jointsSubscriber;
-    ros::Publisher chatter_publisher;
-    ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
-    QStringListModel logging_model;
-    ros::ServiceServer _activeCSPService;
-    ros::ServiceServer _hommingService;
-    ros::ServiceServer _resetAllNodesService;
-
-    //------------------------------------------------------------------------------------------
-
     //=================================================================================================
 };
 

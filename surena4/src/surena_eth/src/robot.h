@@ -19,13 +19,19 @@ class Robot : public QObject
     QTimer _hommingTimer;
     QTimer _initialTimer;
     QTimer _statusCheckTimer;
+     QList<int> _motorPosition;
     bool Initialized=false;
     float CurrentAbsPositions[40];
     int HommingState=0;
     float CurrentIncPositions[40];
 
-    const double offset[12]={ -68 ,-77, 119, 131, 339, -139, 4 ,224, -174, -48, -1004, 141};
+    const double offset[12]={ -44 ,-47, 166, 216, 319, -127, 1 ,200, -149, 9, -976, 143};
     const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
+    //const double Direction[12]={1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
+        const double Direction[12]={1,1,1,1,1,1,1,1,1,1,1,1};
+    const int HomeOrder[12]={0,1,2,3,8,9,5,4,6,7,10,11};
+    int currentHomeIndex=0;
+
     int pos;
     bool dir=false;
     PIDController pid;
