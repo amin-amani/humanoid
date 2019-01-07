@@ -86,7 +86,7 @@ public:
     VectorXd q_next;
     right_hand();
     right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
-    right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
+    right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
     double toRad(double d);
     double sai_calc(MatrixXd R);
     double phi_calc(MatrixXd R);
@@ -116,6 +116,8 @@ public:
     double wrist_pos2mot(double pos);
     vector<int> data2qc_without_wrist(vector<double> cntrl);
     vector<int> data2qc(vector<double> cntrl);
+    double velocity(double d, double d0);
+    
 };
 
 #endif // RIGHT_HAND_H

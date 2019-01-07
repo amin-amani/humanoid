@@ -1,6 +1,12 @@
 ﻿#include "right_hand.h"
 
-right_hand::right_hand(){}
+right_hand::right_hand(){
+    L_arm=.254;
+    L_forearm=.3302;
+    L_palm=.001;
+
+
+}
 
 right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target)
 {
@@ -18,7 +24,7 @@ right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target)
 }
 
 
-right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,int i,double d0)
+right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,double d0,double v_0, double v__target)
 {
 T=.05;
 L_arm=.254;
@@ -41,8 +47,11 @@ sai_target=sai_calc(R_target);
 theta_target=theta_calc(R_target);
 phi_target=phi_calc(R_target);
 V.resize(3,1);
-double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
-V=v_coef*(r_target-r_right_palm);
+//double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
+v0=v_0;
+v_target=v__target;
+double v_coef=velocity(dist,d0);
+V=v_coef*(r_target-r_right_palm)/dist;
 
 double oriet_coef=pow(tanh(3*(d_orient-dist)/d_orient),2);
 sai_dot=oriet_coef*(sai_target-sai);
@@ -51,6 +60,9 @@ theta_dot=oriet_coef*(theta_target-theta);
 euler2w();
 jacob(q_ra);
 }
+
+
+
 
 double right_hand::toRad(double d){
     double r;
@@ -142,6 +154,13 @@ double right_hand::distance(VectorXd V1,VectorXd V2){
     double d;
     d=sqrt(pow(V1(0)-V2(0),2)+pow(V1(1)-V2(1),2)+pow(V1(2)-V2(2),2));
     return d;
+}
+
+double right_hand::velocity(double d,double d0){
+    double a2,a3;
+    a3=2*(v_target-v0)/d0/d0/d0;
+    a2=-3/2*a3*d0;
+    return v_target+a2*d*d+a3*d*d*d;
 }
 
 void right_hand::HO_FK_right_palm(VectorXd q_ra){

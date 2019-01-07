@@ -25,7 +25,6 @@
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
 #include "right_hand.h"
-#include "hand_gui.h"
 
 
 using namespace  std;
@@ -126,8 +125,7 @@ void  SendGazebo(vector<double> q){
 
 int main(int argc, char **argv)
 {
-//hand_gui my_hand_gui;
-//my_hand_gui.show();
+
     ros::init(argc, argv, "myNode");
 
     ros::NodeHandle nh;
@@ -167,27 +165,21 @@ int main(int argc, char **argv)
 
 
     right_hand hand_funcs;
-
-
-
-
-
     VectorXd r_target(3);
+    VectorXd r_shaking(3);
+    VectorXd r_shaking2(3);
 
     MatrixXd R_target(3,3);
     //shaking
 
-//    r_target<<.5,
-//            .05,
-//            -.35;
-        r_target<<0,
-                -0.55,
-                0;
-
+    r_shaking<<.5,
+            .05,
+            -.35;
+    r_shaking2<<.5,
+            .05,
+            -.25;
 
     R_target=hand_funcs.rot(2,80*M_PI/180,3);
-
-
 
 VectorXd q0(7);
 q0<<0,
@@ -198,8 +190,7 @@ q0<<0,
         0,
         0;
 
-double v0=0;
-double v_target =.4;
+
 right_hand hand0(q0,r_target,R_target,0,0);
 double d0=hand0.dist;
 double d=d0;
@@ -258,17 +249,23 @@ vector<double> q(30);
 
 ros::Rate loop_rate(int(1.0/hand0.T));
 int count = 0;
-
+int kk=-1;
     while (ros::ok())
     {
-//        for (int k = 0; k < 7; ++k) {
-//            if (k%2==1){r_target=r_shaking;}
-//            else{r_target=r_shaking2;}
-//right_hand hand00(q_ra,r_target,R_target,i,d0);
-//d=hand00.dist;
-        while (d>d0/2){//  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
+        if (kk==6){break;}
+        for (int k = 0; k < 7; ++k) {
+            kk=k;
 
-        right_hand hand(q_ra,r_target,R_target,d0,v0,v_target);
+            if (k%2==1){r_target=r_shaking;}
+            else{r_target=r_shaking2;}
+
+right_hand hand00(q_ra,r_target,R_target,i,d0);
+int j=i;
+d=hand00.dist;
+        while (d>d_des  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
+
+
+        right_hand hand(q_ra,r_target,R_target,d0,);
         hand.doQP(q_ra);
         q_ra=hand.q_next;
 
@@ -287,26 +284,22 @@ int count = 0;
 
         i++;
 
-        for (int i = 0; i < 30; ++i) {
-            q[i]=0;
+
+
+
+
+        for (int l = 0; l < 30; ++l) {
+            q[l]=0;
         }
-
-//         q[15]=-M_PI/2;
-//         q[16]=-10*M_PI/180;
-//         q[17]=-10*M_PI/180;
-
         q[15]=qr1[count];
         q[16]=qr2[count];
         q[17]=qr3[count];
         q[18]=qr4[count];
-
-
         q[19]=qr5[count];
         q[20]=qr6[count];
         q[21]=qr7[count];
 
        ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
-       ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
         SendGazebo(q);
 
         //chatter_pub.publish(msg);
@@ -316,57 +309,8 @@ int count = 0;
         loop_rate.sleep();
         ++count;
 }
-        
-        while (d>d_des){//  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
 
-        right_hand hand(q_ra,r_target,R_target,d0,v_target,v0);
-        hand.doQP(q_ra);
-        q_ra=hand.q_next;
-
-        qr1.append(q_ra(0));
-        qr2.append(-q_ra(1));
-        qr3.append(-q_ra(2));
-        qr4.append(q_ra(3));
-        qr5.append(-q_ra(4));
-        qr6.append(-q_ra(5));
-        qr7.append(q_ra(6));
-
-        d=hand.dist;
-        theta=hand.theta;
-        sai=hand.sai;
-        phi=hand.phi;
-
-        i++;
-
-        for (int i = 0; i < 30; ++i) {
-            q[i]=0;
         }
-
-//         q[15]=-M_PI/2;
-//         q[16]=-10*M_PI/180;
-//         q[17]=-10*M_PI/180;
-
-        q[15]=qr1[count];
-        q[16]=qr2[count];
-        q[17]=qr3[count];
-        q[18]=qr4[count];
-
-
-        q[19]=qr5[count];
-        q[20]=qr6[count];
-        q[21]=qr7[count];
-
-       ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
-       ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
-        SendGazebo(q);
-
-        //chatter_pub.publish(msg);
-
-
-        ros::spinOnce();
-        loop_rate.sleep();
-        ++count;
-}
 
            }
     return 0;

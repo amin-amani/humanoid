@@ -43,7 +43,7 @@ TaskSpaceOffline::TaskSpaceOffline()
     timeVector.append(0);
     globalTime=0;
     time=0;
-    _timeStep=0.01;
+    _timeStep=0.005;//0.01;
     SetParameters();
     CoeffArrayAnkle();
     CoeffArrayPelvis();
@@ -60,7 +60,7 @@ TaskSpaceOffline::TaskSpaceOffline()
 }
 
 void TaskSpaceOffline::SetParameters(){
-YOffsetOfAnkletrajectory=0.0;//for compensating the clearance of the hip roll in experiment
+YOffsetOfAnkletrajectory=0.04;//for compensating the clearance of the hip roll in experiment
     er=0.000;
     Rqa=0.95;
     Ra_i=0;
@@ -138,8 +138,8 @@ YOffsetOfAnkletrajectory=0.0;//for compensating the clearance of the hip roll in
     ReferencePelvisHeight=0.83;
     MaxHeightPelvis=MinHeightPelvis+Delta;
     if (true) {
-        Xe=1*Sc*StepLength/(Rse+1);
-        Xs=1.05*Rse*Xe;
+        Xe=1.05*Sc*StepLength/(Rse+1);
+        Xs=0.9*Rse*Xe;
         YpMax=1*Rm*0.5*_pelvisLength;
         Yd=1*Rd*YpMax;
         YStMax=1.0*YpMax;
@@ -768,7 +768,7 @@ MatrixXd TaskSpaceOffline::PelvisTrajectory(double time){
         //  zp=polyval(Cz_end_b,t);
     }
     else if (t>T_end_p_ez && t<=(TGait+TDs+TEnd)){
-        zp=MaxHeightPelvis;
+        zp=ReferencePelvisHeight;
         dzp=0;
         ddzp=0;
         //zp=z_Off_st_slope+((2*N_Stride+1)*Ds-x_Off_st_slope-x_z_p_ref;

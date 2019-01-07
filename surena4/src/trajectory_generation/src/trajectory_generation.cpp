@@ -28,43 +28,67 @@
 using namespace  std;
 using namespace  Eigen;
 //data of left foot sensor
-double a;
-double b;
-double c;
-double d;
+int a;
+int b;
+int c;
+int d;
+int e;
+int f;
+int g;
+int h;
+
 
 
 
 void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 {
-    if (msg.data.size()!=4) {
+    if (msg.data.size()!=8) {
         qDebug("the size of sensor data is in wrong");
         return;
     }
 
-    //ROS_INFO("I heard: [%d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3]);
-    double temp[4];
-    int tempInt[4];
-    temp[0]=msg.data[0];
-    temp[1]=msg.data[1];
-    temp[2]=msg.data[2];
-    temp[3]=msg.data[3];
+    ROS_INFO("I heard: [%d  %d %d %d %d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3],(int)msg.data[4],(int)msg.data[5],(int)msg.data[6],(int)msg.data[7]);
+    double temp[8];
+    int tempInt[8];
+    //Left Foot
+    temp[0]=msg.data[0]-1023;
+    temp[1]=-1*(msg.data[1]-929);
+    temp[2]=msg.data[2]-3035;
+    temp[3]=-1*(msg.data[3]-3099);
+    //Right Foot
+    temp[4]=msg.data[4]-3041;
+    temp[5]=-1*(msg.data[5]-3005);
+    temp[6]=msg.data[6]-1138;
+    temp[7]=-1*(msg.data[7]-1006);
 
     //normalizing data of sensors
     temp[0]=temp[0]*(100.0/105);
-    temp[1]=temp[1]*(100.0/99);
-    temp[2]=temp[2]*(100.0/116);
-    temp[3]=temp[3]*(100.0/116);
+    temp[1]=temp[1]*(100.0/100);
+    temp[2]=temp[2]*(100.0/117);
+    temp[3]=temp[3]*(100.0/118);
+    temp[4]=temp[4]*(100.0/109);
+    temp[5]=temp[5]*(100.0/115);
+    temp[6]=temp[6]*(100.0/107);
+    temp[7]=temp[7]*(100.0/107);
 
     tempInt[0]=temp[0];
     tempInt[1]=temp[1];
     tempInt[2]=temp[2];
     tempInt[3]=temp[3];
+    tempInt[4]=temp[4];
+    tempInt[5]=temp[5];
+    tempInt[6]=temp[6];
+    tempInt[7]=temp[7];
 
     a=tempInt[0];
     b=tempInt[1];
     c=tempInt[2];
     d=tempInt[3];
+    e=tempInt[4];
+    f=tempInt[5];
+    g=tempInt[6];
+    h=tempInt[7];
+    ROS_INFO("I heard: [%d  %d %d %d %d %d %d %d]", a,b,c,d,e,f,g,h);
     //deleting data with negative sign
     if (a<0) {
         a=0;
@@ -80,6 +104,22 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     }
     if (d<0) {
         d=0;
+
+    }
+    if (e<0) {
+        e=0;
+
+    }
+    if (f<0) {
+        f=0;
+
+    }
+    if (g<0) {
+        g=0;
+
+    }
+    if (h<0) {
+        h=0;
 
     }
 
@@ -126,6 +166,7 @@ ros::Publisher pub28 ;
 void  SendGazebo(QList<LinkM> links){
     if(links.count()<28){qDebug()<<"index err";return;}
     std_msgs::Float64 data;
+    
     data.data=links[1].JointAngle;
     pub1.publish(data);
     data.data=links[2].JointAngle;
@@ -247,7 +288,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
 
-    ros::Subscriber sub = nh.subscribe("/foot", 1000, receiveFootSensor);
+    ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
 
     pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
     pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -280,11 +321,7 @@ int main(int argc, char **argv)
 
     //pid1= nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/pid/parameter_updates",1000);
 
-
-
-
-
-    ros::Rate loop_rate(100);
+    ros::Rate loop_rate(200);
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -301,14 +338,14 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
-        // qDebug()<<StartTime;
+        //-------------for detecting the full contact of foot with ground-------------//
         if ((a)>=footSensorSaturation && (b)>=footSensorSaturation && (c)>=footSensorSaturation && (d)>=footSensorSaturation){
             qDebug("swing foot landing is successful");
             aState=true;
             bState=true;
             cState=true;
             dState=true;
-            LeftFootLanded=true;
+          //  LeftFootLanded=true;//this variable is used for flag up when the left foot have a full contact with the ground
 
             //do nothing all sensors are on the ground
             teta_motor_L=teta_motor_L;
@@ -316,11 +353,11 @@ int main(int argc, char **argv)
 
             teta_motor_R=teta_motor_R;
             phi_motor_R=phi_motor_R;
-             exit(0);
+            //exit(0);//will finish the code but during walking is not true
         }
 
 
-        else {//when the four sensors are not saturated
+        else {//---------when the four sensors are not saturated-->>>>during landing------//
 
             LeftFootLanded=false;
             if ((a)>=footSensorthreshold ){aState=true;}else {aState=false;}
@@ -329,7 +366,7 @@ int main(int argc, char **argv)
             if ((d)>=footSensorthreshold ){dState=true;}else {dState=false;}
 
 
-           //Pitch left ankle motor control
+            //-----------------Pitch left ankle motor control---------------//
             if (abs(b-a)>=abs(c-d)) {
                 if (abs(a-b)<100) {
                     teta_motor_L=1*teta_motor_L+k1*(a-b);
@@ -338,7 +375,6 @@ int main(int argc, char **argv)
                     teta_motor_L=teta_motor_L;
                 }
             }
-
             else {
                 if (abs(d-c)<100) {
                     teta_motor_L=1*teta_motor_L+k1*(d-c);
@@ -349,7 +385,7 @@ int main(int argc, char **argv)
             }
 
 
-            //Roll left ankle motor control
+            //----------------Roll left ankle motor control---------------//
             if (abs(c-b)>=abs(d-a)) {
                 if (abs(c-b)<100) {
                     phi_motor_L=1*phi_motor_L+k2*(c-b);
@@ -366,26 +402,31 @@ int main(int argc, char **argv)
                     phi_motor_L=phi_motor_L;
                 }
             }
-}//end of if landing is successful else we are during landing
-            //saturation of ankle motors
-            if ((abs(phi_motor_L))>0.9) {
-                phi_motor_L=0.9;
-            }
-            if ((abs(teta_motor_L))>0.9) {
-                teta_motor_L=0.9;
-            }
-            if ((abs(phi_motor_R))>0.9) {
-                phi_motor_L=0.9;
-            }
-            if ((abs(teta_motor_R))>0.9) {
-                teta_motor_R=0.9;
-            }
-
-
-        ROS_INFO("I heard data of sensors : [%f %f %f %f]",a,b,c,d);
+        }
 
 
 
+        //------------------------saturation of ankle motors----------------------------//
+        if ((abs(phi_motor_L))>0.9) {
+            phi_motor_L=0.9;
+        }
+        if ((abs(teta_motor_L))>0.9) {
+            teta_motor_L=0.9;
+        }
+        if ((abs(phi_motor_R))>0.9) {
+            phi_motor_L=0.9;
+        }
+        if ((abs(teta_motor_R))>0.9) {
+            teta_motor_R=0.9;
+        }
+
+
+        // ROS_INFO("I heard data of sensors : [%f %f %f %f]",a,b,c,d);
+
+
+        //-----------------------------------------------------------------------------------------------------//
+        //-----------------start phase--initializing the height of pelvis for walking--------------------------//
+        //-----------------------------------------------------------------------------------------------------//
         if (startPhase==true && StartTime<=DurationOfStartPhase) {
             MinimumJerkInterpolation Coef;
             MatrixXd ZPosition(1,2);
@@ -400,24 +441,6 @@ int main(int argc, char **argv)
             Time<<0,DurationOfStartPhase;
             MatrixXd CoefZStart =Coef.Coefficient(Time,ZPosition,ZVelocity,ZAcceleration);
 
-            //R1=AnkleRollRight
-            //R2=AnklePitchRight
-            //R3=KneePitchRight
-            //R4=HipPitchRight
-            //R5=HipRollRight
-            //R6=HipYawRight
-
-            //L1=AnkleRollLeft
-            //L2=AnklePitchLeft
-            //L3=KneePitchLeft
-            //L4=HipPitchLeft
-            //L5=HipRollLeft
-            //L6=HipYawLeft
-
-            //R1=0*(1/2Pi)*(2304)*100  R2=1*-1*(1/2Pi)*(2304)*100   R3=2(1/2Pi)*(2304)*50   R4=3*-1(1/2Pi)*(2304)*80    L2=4*(1/2Pi)*(2304)*100    L1=5*(1/2Pi)*(2304)*100   L3=6*-1*(1/2Pi)*(2304)*50     L4=7*(1/2Pi)*(2304)*80   R6=8*-1*(1/2Pi)*(2304)*120   R5=9*(1/2Pi)*(2304)*120    L5=10*(1/2Pi)*(2304)*120    L6=11*-1*(1/2Pi)*(2304)*120
-
-
-            //qDebug()<<mm(0,0);
             double zStart=0;
             double yStart=0;
             double xStart=0;
@@ -447,9 +470,11 @@ int main(int argc, char **argv)
         }
 
 
+        //-----------------------------------------------------------------------------------------------------//
+        //------------------------------- main loop of cyclic walking -----------------------------------------//
+        //-----------------------------------------------------------------------------------------------------//
 
         if (StartTime>DurationOfStartPhase && StartTime<(DurationOfStartPhase+SURENAOffilneTaskSpace.MotionTime)){
-
 
             double m1;
             double m2;
@@ -459,6 +484,7 @@ int main(int argc, char **argv)
             double m6;
             double m7;
             double m8;
+
             StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
             //qDebug()<<StartTime;
             MatrixXd P;
@@ -474,57 +500,41 @@ int main(int argc, char **argv)
                 m8=m(7,0);
 
                 P=SURENAOffilneTaskSpace.PelvisTrajectory (SURENAOffilneTaskSpace.globalTime);
-
-                // just some samples for plotting!!!
-                //                SURENAOffilneTaskSpace.CoMXVector.append(P(0,0));
-                //                SURENAOffilneTaskSpace.timeVector.append(SURENAOffilneTaskSpace.globalTime);
-                //                SURENAOffilneTaskSpace.LeftFootXTrajectory.append(m1);
-
-
-
                 SURENAOffilneTaskSpace.globalTime=SURENAOffilneTaskSpace.globalTime+SURENAOffilneTaskSpace._timeStep;
 
                 if (round(SURENAOffilneTaskSpace.globalTime)<=round(SURENAOffilneTaskSpace.MotionTime)){
 
-                    //// hip roll modification
-                    if (SURENAOffilneTaskSpace.DoubleSupport!=true) {
-                        //For modifying the angle of roll during single support
-                        RollTime=RollTime+SURENAOffilneTaskSpace._timeStep;
-                        MinimumJerkInterpolation Coef;
-                        MatrixXd RollAngle(1,3);
-                        RollAngle<<0,0.0,0;
-                        MatrixXd RollAngleVelocity(1,3);
-                        RollAngleVelocity<<0.000,INFINITY,0.000;
-                        MatrixXd RollAngleAcceleration(1,3);
-                        RollAngleAcceleration<<0,INFINITY,0;
+                    //--------------------- hip roll modification is commented and is not active --------------------------//
+                    //--------------------- hip roll modification is commented and is not active --------------------------//
+//                    if (SURENAOffilneTaskSpace.DoubleSupport!=true) {
+//                        //For modifying the angle of roll during single support
+//                        RollTime=RollTime+SURENAOffilneTaskSpace._timeStep;
+//                        MinimumJerkInterpolation Coef;
+//                        MatrixXd RollAngle(1,3);
+//                        RollAngle<<0,0.0,0;
+//                        MatrixXd RollAngleVelocity(1,3);
+//                        RollAngleVelocity<<0.000,INFINITY,0.000;
+//                        MatrixXd RollAngleAcceleration(1,3);
+//                        RollAngleAcceleration<<0,INFINITY,0;
+//                        MatrixXd Time22(1,3);
+//                        Time22<<0,(SURENAOffilneTaskSpace.TSS/2),SURENAOffilneTaskSpace.TSS;
+//                        MatrixXd CoefRoll =Coef.Coefficient(Time22,RollAngle,RollAngleVelocity,RollAngleAcceleration);
+//                        //StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
+//                        MatrixXd outputRollAngle;
+//                        if (RollTime<=(SURENAOffilneTaskSpace.TSS/2)) {
+//                            outputRollAngle= SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(0),RollTime,0,5);
+//                            hipRoll=outputRollAngle(0,0);
+//                        }
+//                        else {
+//                            outputRollAngle =SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(1),RollTime,SURENAOffilneTaskSpace.TSS/2,5);
+//                            hipRoll=outputRollAngle(0,0);
+//                        }
+//                    }
+//                    else {
+//                        hipRoll=0;
+//                        RollTime=0;
+//                    }
 
-
-                        MatrixXd Time22(1,3);
-                        Time22<<0,(SURENAOffilneTaskSpace.TSS/2),SURENAOffilneTaskSpace.TSS;
-                        MatrixXd CoefRoll =Coef.Coefficient(Time22,RollAngle,RollAngleVelocity,RollAngleAcceleration);
-
-
-                        //StartTime=StartTime+SURENAOffilneTaskSpace._timeStep;
-
-                        MatrixXd outputRollAngle;
-                        if (RollTime<=(SURENAOffilneTaskSpace.TSS/2)) {
-                            outputRollAngle= SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(0),RollTime,0,5);
-                            hipRoll=outputRollAngle(0,0);
-                        }
-                        else {
-                            outputRollAngle =SURENAOffilneTaskSpace.GetAccVelPos(CoefRoll.row(1),RollTime,SURENAOffilneTaskSpace.TSS/2,5);
-                            hipRoll=outputRollAngle(0,0);
-                        }
-
-
-                    }
-                    else {
-                        hipRoll=0;
-                        RollTime=0;
-                    }
-
-                    //cout<<SURENAOffilneTaskSpace.TSS<<endl;
-                    //cout<<RollTime<<endl;
 
                     PoseRoot<<P(0,0),
                             P(1,0),
@@ -550,10 +560,8 @@ int main(int argc, char **argv)
 
                     //// hip roll modification
                     //                    if (SURENAOffilneTaskSpace.LeftSupport==true && SURENAOffilneTaskSpace.HipRollModification==true){
-
                     //                        SURENA.doIKhipRollModify("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot,-1*hipRoll);
                     //                        SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,0);
-
                     //                    }
 
                     //                    else if (SURENAOffilneTaskSpace.HipRollModification==true && SURENAOffilneTaskSpace.LeftSupport!=true )  {
@@ -561,29 +569,15 @@ int main(int argc, char **argv)
                     //                        SURENA.doIKhipRollModify("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot,0*hipRoll);
                     //                    }
 
-
                     SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
                     SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
-                    //R1=AnkleRollRight
-                    //R2=AnklePitchRight
-                    //R3=KneePitchRight
-                    //R4=HipPitchRight
-                    //R5=HipRollRight
-                    //R6=HipYawRight
-
-                    //L1=AnkleRollLeft
-                    //L2=AnklePitchLeft
-                    //L3=KneePitchLeft
-                    //L4=HipPitchLeft
-                    //L5=HipRollLeft
-                    //L6=HipYawLeft
-
-                    //R1=0*(1/2Pi)*(2304)*100  R2=1*-1*(1/2Pi)*(2304)*100   R3=2(1/2Pi)*(2304)*50   R4=3*-1(1/2Pi)*(2304)*80    L2=4*(1/2Pi)*(2304)*100    L1=5*(1/2Pi)*(2304)*100   L3=6*-1*(1/2Pi)*(2304)*50     L4=7*(1/2Pi)*(2304)*80   R6=8*-1*(1/2Pi)*(2304)*120   R5=9*(1/2Pi)*(2304)*120    L5=10*(1/2Pi)*(2304)*120    L6=11*-1*(1/2Pi)*(2304)*120
-
                 }
-
             }
         }
+
+        //-----------------------------------------------------------------------------------------------------//
+        //------------------- end phase-- finializing height of pelvis to home position -----------------------//
+        //-----------------------------------------------------------------------------------------------------//
 
         if (endPhase==true &&  StartTime>=(DurationOfStartPhase+SURENAOffilneTaskSpace.MotionTime) && StartTime<=DurationOfendPhase+DurationOfStartPhase+SURENAOffilneTaskSpace.MotionTime) {
             MinimumJerkInterpolation Coef;
@@ -593,7 +587,6 @@ int main(int argc, char **argv)
             ZVelocity<<0.000,0.000;
             MatrixXd ZAcceleration(1,2);
             ZAcceleration<<0.000,0.000;
-
 
             MatrixXd Time(1,2);
             Time<<DurationOfStartPhase+SURENAOffilneTaskSpace.MotionTime,DurationOfStartPhase+SURENAOffilneTaskSpace.MotionTime+DurationOfendPhase;
@@ -626,15 +619,12 @@ int main(int argc, char **argv)
             SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
             SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
         }
+
+
         links = SURENA.GetLinks();
         msg.data.clear();
 
-        //        ROS_INFO("I heard motor pitch: [%f]",teta_motor_L);
-        //        ROS_INFO("I heard motor roll: [%f]",phi_motor_L);
-        msg.data.clear();
-
-
-        if (  LeftFootLanded==true) {//else if is for situation that foot landed successfully on the ground
+        if (LeftFootLanded==true) {//else if is for situation that foot landed successfully on the ground
             cntrl[0]=0.0;
             cntrl[1]=cntrl[1];
             cntrl[2]=cntrl[2];
@@ -653,25 +643,22 @@ int main(int argc, char **argv)
             endPhase=false;
             startPhase=false;
         }
-        else {//else if is for situation that sensor is contacting and adapting ground
-
-                cntrl[0]=0.0;
-                cntrl[1]=links[1].JointAngle;
-                cntrl[2]=links[2].JointAngle;
-                cntrl[3]=links[3].JointAngle;
-                cntrl[4]=links[4].JointAngle;
-                cntrl[5]=links[5].JointAngle;//+teta_motor_R;//pitch
-                cntrl[6]=links[6].JointAngle;//roll
-                cntrl[7]=links[7].JointAngle;
-                cntrl[8]=links[8].JointAngle;
-                cntrl[9]=links[9].JointAngle;
-                cntrl[10]=links[10].JointAngle;
-
-                cntrl[11]=+1*teta_motor_L+links[11].JointAngle;
-                cntrl[12]=+1*phi_motor_L+links[12].JointAngle;
 
 
-
+        else {//else  is for situation that sensor is contacting and adapting ground
+            cntrl[0]=0.0;
+            cntrl[1]=links[1].JointAngle;
+            cntrl[2]=links[2].JointAngle;
+            cntrl[3]=links[3].JointAngle;
+            cntrl[4]=links[4].JointAngle;
+            cntrl[5]=links[5].JointAngle;//+teta_motor_R;//pitch
+            cntrl[6]=links[6].JointAngle;//roll
+            cntrl[7]=links[7].JointAngle;
+            cntrl[8]=links[8].JointAngle;
+            cntrl[9]=links[9].JointAngle;
+            cntrl[10]=links[10].JointAngle;
+            cntrl[11]=+0*teta_motor_L+links[11].JointAngle;
+            cntrl[12]=+0*phi_motor_L+links[12].JointAngle;
         }
 
 
@@ -681,13 +668,11 @@ int main(int argc, char **argv)
 
         for(int  i = 0;i < 12;i++)
         {
-            msg.data.push_back(qref[i]);
-
+           // msg.data.push_back(qref[i]);
+            msg.data.push_back(0);
         }
-        // std::string varAsString = std::to_string(qref[i-1]);
-        // msg.data =varAsString;
+
         SendGazebo(links);
-        // SendGazeboPID();
         chatter_pub.publish(msg);
         //  ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
 

@@ -25,7 +25,7 @@ class Robot
     MatrixXd ExtractionOfMatrix(QByteArray data);
     MatrixXd Rodrigues(MatrixXd omega, double angle);
     QList<LinkM> CreateRobotLinks(QByteArray content);
-    void ForwardKinematic(int input);
+
     MatrixXi _route;
     void SetJointAngle(MatrixXd JointAngle, MatrixXi Route);
     MatrixXi FindRoutfromRoot2Destination(QString Destination);
@@ -35,6 +35,7 @@ class Robot
     MatrixXd CalcJacobian(MatrixXi route);
     double IKLevenbergMarquardt(LinkM Target, QString current);
 public:
+    void ForwardKinematic(int input);
     Robot();
     QList<LinkM> Links;
     QList<LinkM> GetLinks();
