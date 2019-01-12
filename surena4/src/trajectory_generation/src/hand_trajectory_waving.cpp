@@ -193,7 +193,7 @@ q0<<0,
         0;
 
 
-right_hand hand0(q0,r_target,R_target,0,0);
+right_hand hand0(q0,r_target,R_target);
 double d0=hand0.dist;
 double d=d0;
 double d_des=hand0.d_des;
@@ -262,14 +262,14 @@ int kk=-1;
             r_target=r_wavings.block(0,k,3,1);
             ROS_INFO("r_target=[%f,%f,%f]^T",r_target(0),r_target(1),r_target(2));
 kk=k;
-right_hand hand00(q_ra,r_target,R_target,i,d0);
+right_hand hand00(q_ra,r_target,R_target,v0,v_target);
 int j=i;
 d=hand00.dist;
 //        while (d>d_des  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
 while (d>d_des) {
 
 
-        right_hand hand(q_ra,r_target,R_target,(i-j)*20,d0);
+        right_hand hand(q_ra,r_target,R_target,v0,v_target);
         hand.doQP(q_ra);
         q_ra=hand.q_next;
 

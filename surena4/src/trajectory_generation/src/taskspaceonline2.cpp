@@ -27,8 +27,8 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
-    RightHipRollModification=5;//degree;
-    LeftHipRollModification=4;//degree
+    RightHipRollModification=4;//5;//degree;
+    LeftHipRollModification=4;//4;//degree
 
     toeOff=true;
     HipRollModification=true;

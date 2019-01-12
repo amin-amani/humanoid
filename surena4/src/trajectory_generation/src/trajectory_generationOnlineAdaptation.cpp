@@ -24,7 +24,7 @@
 #include<sensor_msgs/Imu.h>
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
-
+#include<termios.h>
 
 
 
@@ -145,7 +145,7 @@ int h;
 
 bool RFT;//True Right Support Phase used in Taskspace online (in Ankle Trajectory)
 bool LFT;//True Left Support Phase used in Taskspace online (in Ankle Trajectory)
-bool KRtemp;// for online: when true-> current positon is updated
+bool KRtemp;// for online: when true-> current positon is updated _end of step)
 bool KLtemp;// for online
 bool aState;
 bool bState;
@@ -273,6 +273,19 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 
 
 
+int getch()
+{
+  static struct termios oldt, newt;
+  tcgetattr( STDIN_FILENO, &oldt);           // save old settings
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON);                 // disable buffering
+  tcsetattr( STDIN_FILENO, TCSANOW, &newt);  // apply new settings
+
+  int c = getchar();  // read character (non-blocking)
+
+  tcsetattr( STDIN_FILENO, TCSANOW, &oldt);  // restore old settings
+  return c;
+}
 
 
 
@@ -372,45 +385,60 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
 
+
+    ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
+
+
+
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
-    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
-    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
-    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
-    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
-    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
-    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
-    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
-    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
-    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
-    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
-    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
-    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
-    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
-    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
-    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
-    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
-    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
-    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
-    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
-    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
-    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
-    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
-    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
-    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
-    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
-    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
-    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
-    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+//    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
+//    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
+//    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
+//    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
+//    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
+//    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
+//    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
+//    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
+//    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
+//    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
+//    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
+//    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
+//    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
+//    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
+//    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
+//    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
+//    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
+//    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
+//    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
+//    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
+//    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
+//    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
+//    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
+//    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
+//    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
+//    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
+//    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
+//    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+int32_t contact_flag_timing=1000;
+int32_t contact_flag_sensor=1000;
+int32_t contact_flag_sensor2=1000;
 
     ros::Rate loop_rate(200);
     std_msgs::Int32MultiArray msg;
+
+    std_msgs::Int32MultiArray msg_contact_flag;
     std_msgs::MultiArrayDimension msg_dim;
 
     msg_dim.label = "joint_position";
     msg_dim.size = 1;
+
     msg.layout.dim.clear();
     msg.layout.dim.push_back(msg_dim);
 
+msg_contact_flag.data.clear();
+msg_contact_flag.data.push_back(contact_flag_timing);
+
+//msg_flag.data=-msg_flag.data;
 
     k1=0.000015;
     k2=0.000015;
@@ -425,10 +453,49 @@ int main(int argc, char **argv)
     LFT=false;
     links=SURENA.GetLinks();
     SURENAOnlineTaskSpace1.StepNumber=1;
+    msg.data.clear();
+    for(int  i = 0;i < 12;i++)
+    {
+        msg.data.push_back(0);
+    }
+    for (int var = 0; var < 20; ++var) {
+        chatter_pub.publish(msg);
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+
+
+
+ROS_INFO("press any key to start!");
+getch();
+ROS_INFO("started!");
+
+
+bool firststep_sensor_test=true;
+
+
     while (ros::ok())
     {
+        //-------------flag to show expected contact according to timing-------------//
+        //-------------sign of flag changes-------------//
+        if(SURENAOnlineTaskSpace1.localTiming<.1){contact_flag_timing=-contact_flag_timing;}
+       // ROS_INFO("globaltime=%f\tlocaltiming=%f  %d",StartTime,SURENAOnlineTaskSpace1.localTiming,contact_flag_timing);
+
+//ROS_INFO("a=%d,  b=%d,  c=%d,  d=%d,  e=%d,  f=%d,  g=%d,  h=%d",a,b,c,d,e,f,g,h);
+        //-------------for detecting the first contact of Left foot with ground-------------//
+        //-------------flag to show contact detected by sensors-------------//
+        //-------------sign of flag changes-------------//
+//        if (SURENAOnlineTaskSpace1.LeftSensorActive==true &&( (a)>=footSensorSaturation || (b)>=footSensorSaturation || (c)>=footSensorSaturation || (d)>=footSensorSaturation)){
+//            contact_flag_sensor2=-contact_flag_sensor2;
+//        }
+
+
+
         //-------------for detecting the full contact of Left foot with ground-------------//
+        //-------------flag to show contact detected by sensors-------------//
+        //-------------sign of flag changes-------------//
         if (SURENAOnlineTaskSpace1.LeftSensorActive==true && (a)>=footSensorSaturation && (b)>=footSensorSaturation && (c)>=footSensorSaturation && (d)>=footSensorSaturation){
+            contact_flag_sensor=-contact_flag_sensor;
             ROS_INFO("left swing foot landing is successful = [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
             aState=true;
             bState=true;
@@ -447,7 +514,6 @@ int main(int argc, char **argv)
 
             //exit(0);//will finish the code but during walking is not true
         }
-
 
         else if (/*SURENAOnlineTaskSpace1.LeftSensorActive==false*/true) {//---------when the four left foot sensors are not saturated-->>>>during landing------//
 
@@ -498,9 +564,18 @@ int main(int argc, char **argv)
 
         //        ROS_INFO("Tc= [%d] ", SURENAOnlineTaskSpace1.Tc);
         //        ROS_INFO("Tds= [%f] ", SURENAOnlineTaskSpace1.TDs);
+
+        //-------------for detecting the first contact of Right foot with ground-------------//
+        //-------------flag to show contact detected by sensors-------------//
+        //-------------sign of flag changes-------------//
+//        if (SURENAOnlineTaskSpace1.RightSensorActive==true &&( (e)>=footSensorSaturation || (f)>=footSensorSaturation || (g)>=footSensorSaturation || (h)>=footSensorSaturation)){
+//            contact_flag_sensor2=-contact_flag_sensor2;
+//        }
+
         //-------------for detecting the full contact of Right foot with ground-------------//
         if (SURENAOnlineTaskSpace1.RightSensorActive==true && (e)>=footSensorSaturation && (f)>=footSensorSaturation && (g)>=footSensorSaturation && (h)>=footSensorSaturation){
             // qDebug("swing foot landing is successful");
+            contact_flag_sensor=-contact_flag_sensor;
             ROS_INFO("Right swing foot landing is successful= [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
             eState=true;
             fState=true;
@@ -520,7 +595,6 @@ int main(int argc, char **argv)
             Offset_phi_R=phi_motor_R;
             //exit(0);//will finish the code but during walking is not true
         }
-
 
         else if(/*SURENAOnlineTaskSpace1.RightSensorActive==false*/ true) {//---------when the four left foot sensors are not saturated-->>>>during landing------//
 
@@ -674,6 +748,17 @@ int main(int argc, char **argv)
                     KLtemp=false;
                     SURENAOnlineTaskSpace1.CoeffArrayPelvisZMod();
                     //SURENAOnlineTaskSpace1.OldPelvisZ=SURENAOnlineTaskSpace1.NewPlevisZ;
+
+
+
+
+                  //  if(firststep_sensor_test){
+                   // SURENAOnlineTaskSpace1.LeftSensorActive==true; // was uncomment
+                  //  firststep_sensor_test=false;}
+
+
+
+
                 }
 
 
@@ -720,10 +805,10 @@ int main(int argc, char **argv)
                     SURENAOnlineTaskSpace1.currentRightFootZ=links[6].PositionInWorldCoordinate(2);
                 }
 
-//replace false with following commented for activing sensro
-//                if (  /*(RightFootLanded==true)*/ false &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
+//replace false with following commented for activing sensor
+                if (  /*(RightFootLanded==true)*/ false &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
 
-                if (  (RightFootLanded==true)  &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
+//                if (  (RightFootLanded==true)  &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
 
                     SURENAOnlineTaskSpace1.oldRightFootX2= SURENAOnlineTaskSpace1.currentRightFootX2;
                     SURENAOnlineTaskSpace1.oldRightFootY2= SURENAOnlineTaskSpace1.currentRightFootY2;
@@ -745,8 +830,8 @@ int main(int argc, char **argv)
 
 
 //replace false with following commented for activing sensro
-            //    if ((  /*(LeftFootLanded==true)*/ false && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
-                    if ((  (LeftFootLanded==true) && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
+                if ((  /*(LeftFootLanded==true)*/ false && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
+//                    if ((  (LeftFootLanded==true) && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
 
                     SURENAOnlineTaskSpace1.oldLeftFootX2= SURENAOnlineTaskSpace1.currentLeftFootX2;
                     SURENAOnlineTaskSpace1.oldLeftFootY2= SURENAOnlineTaskSpace1.currentLeftFootY2;
@@ -876,6 +961,7 @@ int main(int argc, char **argv)
         //SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator=false;
 
         //        else {//else  is for situation that sensor is contacting and adapting ground
+
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
         cntrl[2]=(links[2].JointAngle+1*RollModified(0,0));
@@ -901,8 +987,15 @@ int main(int argc, char **argv)
             msg.data.push_back(qref[i]);
         }
 
-        //SendGazebo(links,RollModified);
+      //  SendGazebo(links,RollModified);
         chatter_pub.publish(msg);
+
+        msg_contact_flag.data.clear();
+        msg_contact_flag.data.push_back(contact_flag_timing);
+         msg_contact_flag.data.push_back(contact_flag_sensor);
+msg_contact_flag.data.push_back(contact_flag_sensor2);
+
+        contact_flag.publish(msg_contact_flag);
         //  ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
 
         ros::spinOnce();

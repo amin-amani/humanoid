@@ -234,7 +234,7 @@ set( QT_SOURCES
    # src/TaskSpace.cpp
     src/pidcontroller.cpp
     src/qcgenerator.cpp
-#    src/right_hand.cpp
+    src/right_hand.cpp
     src/taskspaceofflineRamp.cpp
     src/taskspaceonline2.cpp
 
@@ -288,14 +288,14 @@ target_link_libraries(trajectory_generationOnlineAdaptation
 )
 install(TARGETS trajectory_generationOnlineAdaptation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-#add_executable(hand_trajectory src/hand_trajectory.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-#target_link_libraries(hand_trajectory
-#    ${catkin_LIBRARIES}
-#    Qt5::Core
-#    Qt5::Widgets
-#    Qt5::PrintSupport
-#)
-#install(TARGETS hand_trajectory RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(hand_trajectory src/hand_trajectory.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #add_executable(hand_trajectory_shaking src/hand_trajectory_shaking.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_trajectory_shaking
@@ -341,6 +341,15 @@ target_link_libraries(home_legs
     Qt5::PrintSupport
 )
 install(TARGETS home_legs RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(deflection_measure src/deflection_measure.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(deflection_measure
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS deflection_measure RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #add_executable(hand_gui src/hand_gui.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_gui

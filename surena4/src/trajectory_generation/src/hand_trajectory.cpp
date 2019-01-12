@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
 
-
+{
 
     pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
     pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
     pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
     pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
 
-
+}
 
     right_hand hand_funcs;
 
@@ -180,12 +180,24 @@ int main(int argc, char **argv)
 //    r_target<<.5,
 //            .05,
 //            -.35;
-        r_target<<0,
-                -0.55,
+
+        r_target<<.05,
+                -0.5,
                 0;
+R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,atan2(r_target(1),r_target(0)),3);
+//    r_target<<0,
+//            -.550,
+//            0;
 
 
-    R_target=hand_funcs.rot(2,80*M_PI/180,3);
+//from base to end
+
+
+  // R_target=hand_funcs.rot(3,-90*M_PI/180,3)*hand_funcs.rot(2,-90*M_PI/180,3);
+
+
+ //R_target=hand_funcs.rot(2,90*M_PI/180,3)*hand_funcs.rot(3,-90*M_PI/180,3);
+//R_target=hand_funcs.rot(2,90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3);
 
 
 
@@ -266,9 +278,12 @@ int count = 0;
 //            else{r_target=r_shaking2;}
 //right_hand hand00(q_ra,r_target,R_target,i,d0);
 //d=hand00.dist;
-        while (d>d0/2){//  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
+        //while ((d>d0/2)  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
+while (1){
+        right_hand hand(q_ra,r_target,R_target,i,d0);
 
-        right_hand hand(q_ra,r_target,R_target,d0,v0,v_target);
+
+
         hand.doQP(q_ra);
         q_ra=hand.q_next;
 
@@ -317,56 +332,7 @@ int count = 0;
         ++count;
 }
         
-        while (d>d_des){//  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
 
-        right_hand hand(q_ra,r_target,R_target,d0,v_target,v0);
-        hand.doQP(q_ra);
-        q_ra=hand.q_next;
-
-        qr1.append(q_ra(0));
-        qr2.append(-q_ra(1));
-        qr3.append(-q_ra(2));
-        qr4.append(q_ra(3));
-        qr5.append(-q_ra(4));
-        qr6.append(-q_ra(5));
-        qr7.append(q_ra(6));
-
-        d=hand.dist;
-        theta=hand.theta;
-        sai=hand.sai;
-        phi=hand.phi;
-
-        i++;
-
-        for (int i = 0; i < 30; ++i) {
-            q[i]=0;
-        }
-
-//         q[15]=-M_PI/2;
-//         q[16]=-10*M_PI/180;
-//         q[17]=-10*M_PI/180;
-
-        q[15]=qr1[count];
-        q[16]=qr2[count];
-        q[17]=qr3[count];
-        q[18]=qr4[count];
-
-
-        q[19]=qr5[count];
-        q[20]=qr6[count];
-        q[21]=qr7[count];
-
-       ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
-       ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
-        SendGazebo(q);
-
-        //chatter_pub.publish(msg);
-
-
-        ros::spinOnce();
-        loop_rate.sleep();
-        ++count;
-}
 
            }
     return 0;

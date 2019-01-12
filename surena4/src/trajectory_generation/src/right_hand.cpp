@@ -24,6 +24,41 @@ right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target)
 }
 
 
+right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,int i,double d0)
+{
+T=.05;
+L_arm=.254;
+L_forearm=.3302;
+L_palm=.001;
+angle_fix_shd=toRad(10);
+angle_fix_elbow=0.0;//=toRad(20);
+qdot_max=2;
+v_des=.6;
+d_des=.01;
+d_orient=.1;
+power=1e-4;
+Right_palm_position_power=1e6;
+Right_palm_orientation_power=1e2;
+
+HO_FK_right_palm(q_ra);
+
+dist=distance(r_target,r_right_palm);
+sai_target=sai_calc(R_target);
+theta_target=theta_calc(R_target);
+phi_target=phi_calc(R_target);
+V.resize(3,1);
+double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
+V=v_coef*(r_target-r_right_palm);
+
+double oriet_coef=pow(tanh(3*(d_orient-dist)/d_orient),2);
+sai_dot=oriet_coef*(sai_target-sai);
+phi_dot=oriet_coef*(phi_target-phi);
+theta_dot=oriet_coef*(theta_target-theta);
+euler2w();
+jacob(q_ra);
+}
+
+
 right_hand::right_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,double d0,double v_0, double v__target)
 {
 T=.05;
@@ -38,7 +73,7 @@ d_des=.01;
 d_orient=.1;
 power=1e-4;
 Right_palm_position_power=1e6;
-Right_palm_orientation_power=1e2*0;
+Right_palm_orientation_power=1e2;
 
 HO_FK_right_palm(q_ra);
 
