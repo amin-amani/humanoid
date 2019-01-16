@@ -35,7 +35,7 @@ angle_fix_elbow=0.0;//=toRad(20);
 qdot_max=2;
 v_des=.6;
 d_des=.01;
-d_orient=.1;
+d_orient=.2;
 power=1e-4;
 Right_palm_position_power=1e6;
 Right_palm_orientation_power=1e2;
@@ -296,14 +296,14 @@ g=g+pow(tanh(3*(d_orient-dist)/d_orient),2)*Right_palm_orientation_power*(-2)*J_
     CI<<MatrixXd::Identity(7,7)*(-1),MatrixXd::Identity(7,7);
     ci0.resize(14,1);
     ci0<<min((toRad(45)-q_ra(0))/T,qdot_max),
-            min((toRad(90)-q_ra(1))/T,qdot_max),
+            min((toRad(10)-q_ra(1))/T,qdot_max),
             min((toRad(45)-q_ra(2))/T,qdot_max),
             min((toRad(-5)-q_ra(3))/T,qdot_max),
             min((toRad(60)-q_ra(4))/T,qdot_max),
             min((toRad(30)-q_ra(5))/T,qdot_max),
             min((toRad(30)-q_ra(6))/T,qdot_max),
             -max((toRad(-90)-q_ra(0))/T,-qdot_max),
-            -max((toRad(0)-q_ra(1))/T,-qdot_max),
+            -max((toRad(-10)-q_ra(1))/T,-qdot_max),
             -max((toRad(-45)-q_ra(2))/T,-qdot_max),
             -max((toRad(-90)-q_ra(3))/T,-qdot_max),
             -max((toRad(-60)-q_ra(4))/T,-qdot_max),

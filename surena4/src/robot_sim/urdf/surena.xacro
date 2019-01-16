@@ -197,7 +197,7 @@
       </material>
     </visual>
     <collision name='RLeg_Foot_Link_collision'>
-        <origin xyz=".045  0 -.09" rpy="0 0 0"/>
+        <origin xyz=".045  0 -.1" rpy="0 0 0"/>
         <geometry>
            <box size="0.26 0.16 0.02"/>
         </geometry>
@@ -358,7 +358,7 @@
       </material>
     </visual>
     <collision  name='LLeg_Foot_Link_collision'>
-    <origin xyz=".045  0 -.09" rpy="0 0 0"/>
+    <origin xyz=".045  0 -.1" rpy="0 0 0"/>
         <geometry>
           <box size="0.26 0.16 0.02"/>
         </geometry>
@@ -1068,7 +1068,7 @@
 
 
 <joint name="RArm_ShoulderP_J1" type="continuous">
-   <origin xyz="0  -0.207 0.2694" rpy="-0.174533 0 0"/>
+   <origin xyz="0  -0.239 0.2694" rpy="-0.174533 0 0"/>
    <parent link="WAIST_LINK2"/>
    <child link="RARM_LINK1"/>
    <axis xyz="0 1 0"/>
@@ -1200,7 +1200,7 @@
 
 
 <joint name="LArm_ShoulderP_J1" type="continuous">
-   <origin xyz="0 0.207 0.2694" rpy="0.174533 0 0"/>
+   <origin xyz="0 0.239 0.2694" rpy="0.174533 0 0"/>
    <parent link="WAIST_LINK2"/>
    <child link="LARM_LINK1"/>
    <axis xyz="0 1 0"/>

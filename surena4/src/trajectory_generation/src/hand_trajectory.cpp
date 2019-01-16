@@ -181,10 +181,10 @@ int main(int argc, char **argv)
 //            .05,
 //            -.35;
 
-        r_target<<.05,
-                -0.5,
-                0;
-R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,atan2(r_target(1),r_target(0)),3);
+        r_target<<.5,
+                0.2,
+                -.2;
+R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,-20*M_PI/180+atan2(r_target(1),r_target(0)),3);
 //    r_target<<0,
 //            -.550,
 //            0;
@@ -202,10 +202,17 @@ R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,atan2(r_target(1),r_t
 
 
 VectorXd q0(7);
-q0<<0,
+//q0<<0,
+//        0,
+//        0,
+//        -10*M_PI/180,
+//        0,
+//        0,
+//        0;
+q0<<10*M_PI/180,
+        4*M_PI/180,
         0,
-        0,
-        -10*M_PI/180,
+        -20*M_PI/180,
         0,
         0,
         0;
@@ -278,8 +285,8 @@ int count = 0;
 //            else{r_target=r_shaking2;}
 //right_hand hand00(q_ra,r_target,R_target,i,d0);
 //d=hand00.dist;
-        //while ((d>d0/2)  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
-while (1){
+        while ((d>d0/2)  || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  ) {
+//while (1){
         right_hand hand(q_ra,r_target,R_target,i,d0);
 
 
@@ -320,7 +327,7 @@ while (1){
         q[20]=qr6[count];
         q[21]=qr7[count];
 
-       ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
+       ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",180/M_PI*q[15],180/M_PI*q[16],180/M_PI*q[17],180/M_PI*q[18],180/M_PI*q[19],180/M_PI*q[20],180/M_PI*q[21]);
        ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
         SendGazebo(q);
 

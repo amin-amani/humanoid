@@ -61,9 +61,13 @@ bool Epos::CheckZynq()
 //========================================================================
 EPOSErrors Epos::Init(int tryCount)
 {
+static bool lastresult=false;
+
 
     int numberOfSuccess=0;
     int pingCount=0;
+
+    if(lastresult)return OK;
        qDebug()<<"ping";
     while(! ping.Start("192.168.1.10") && pingCount<tryCount )
     {
@@ -102,7 +106,35 @@ if(values[i]!=0x20192)return SDO_BAD_REPLAY;
 //{
 //return EPOS_ERROR;
 //}
+lastresult=true;
     return OK;
+
+}
+//========================================================================
+EPOSErrors Epos::HandsInit(int tryCount)
+{
+static bool lastresult=false;
+//if(lastresult)return OK;
+    int numberOfSuccess=0;
+//===========================
+QList<int32_t> values;
+for(int i=0;i<4;i++){
+    int32_t value=0;
+if(ReadRegister(0x1000,0,i+1,13,value,10,3)==OK)
+{
+//qDebug()<<"read"<<QString::number(i+1)<<"...OK"<<QString::number(value);
+values.append(value);
+numberOfSuccess++;
+}
+
+}
+if(numberOfSuccess==4){
+    //qDebug()<<"init ok";
+    lastresult=true;
+    return OK;
+
+}
+else return SDO_BAD_REPLAY;
 
 }
 //========================================================================
@@ -137,7 +169,7 @@ EPOSErrors Epos::EnableDevice(int devID,EPOSOperationMode mode)
     return OK;
 }
 //========================================================================
-void Epos::SetPreoperationalMode(int devID)
+void Epos::SetPreoperationalMode(int devID,int nodeID)
 {
     QByteArray data;
     data.append(0x80);     // ???????????? check 0x80 (for 0x01)
@@ -150,6 +182,7 @@ void Epos::SetPreoperationalMode(int devID)
     data.append((char)0x00);
     can.WriteMessage(00,devID,data);
 }
+
 //========================================================================
 void  Epos::ResetComunication(int devID)
 {
@@ -193,7 +226,7 @@ void Epos::StopNode(int devID)
     can.WriteMessage(0,devID,data);
 }
 //========================================================================
-void Epos::SetMode(int devID,EPOSOperationMode mode)
+void Epos::SetMode(int devID,EPOSOperationMode mode,int canID)
 {
     QByteArray data;
     data.append(mode);
@@ -205,10 +238,10 @@ void Epos::SetMode(int devID,EPOSOperationMode mode)
     data.append((char)0x00);
     data.append((char)0x00);
 
-    can.WriteMessage(0x301,devID,data);
+    can.WriteMessage(0x300+canID,devID,data);
 }
 //========================================================================
-void Epos::SwitchOn(int devID)
+void Epos::SwitchOn(int devID ,int canID)
 {
     QByteArray data;
     data.append(0x0f);
@@ -220,10 +253,10 @@ void Epos::SwitchOn(int devID)
     data.append((char)0x00);
     data.append((char)0x00);
 
-    can.WriteMessage(0x201,devID,data);
+    can.WriteMessage(0x200+canID,devID,data);
 }
 //========================================================================
-void Epos::SwitchOff(int devID)
+void Epos::SwitchOff(int devID,int canID)
 {
 
     QByteArray data;
@@ -236,7 +269,7 @@ void Epos::SwitchOff(int devID)
     data.append((char)0x00);
     data.append((char)0x00);
 
-    can.WriteMessage(0x201,devID,data);
+    can.WriteMessage(0x200+canID,devID,data);
 }
 //========================================================================
 unsigned char Epos::GetSDOCODE(int len)
@@ -309,6 +342,54 @@ void Epos::WaitMs(int ms)
 
 }
 //========================================================================
+bool Epos::ActiveHand() //13,2
+{
+    WaitMs(700);
+    for(int i=0 ;i<4;i++){
+    SetPreoperationalMode(12,i+1);
+        SetPreoperationalMode(13,i+1);
+}
+    WaitMs(700);
+
+    StartNode(12);
+    StartNode(13);
+
+    WaitMs(700);
+        for(int i=0 ;i<4;i++){
+        SetMode(12,PPM,i+1);
+        SetMode(13,PPM,i+1);
+        }
+    WaitMs(700);
+        for(int i=0 ;i<4;i++){
+        SwitchOff(12,i+1);
+        SwitchOff(13,i+1);
+        }
+    WaitMs(700);
+        for(int i=0 ;i<4;i++){
+        SwitchOn(12,i+1);
+        SwitchOn(13,i+1);
+        }
+    WaitMs(700);
+    return OK;
+}
+
+//========================================================================
+bool Epos::ActivePPMPDO(int nodeID,int canID) //13,2
+{
+    WaitMs(700);
+    SetPreoperationalMode(nodeID,canID);
+    WaitMs(700);
+    StartNode(nodeID);
+    WaitMs(700);
+    SetMode(nodeID,PPM,canID);
+    WaitMs(700);
+    SwitchOff(nodeID,canID);
+    WaitMs(700);
+    SwitchOn(nodeID,canID);
+    WaitMs(700);
+    return OK;
+}
+//========================================================================
 bool Epos::ActiveCSP(int nodeID)
 {
     WaitMs(700);
@@ -324,6 +405,8 @@ bool Epos::ActiveCSP(int nodeID)
     WaitMs(700);
     return OK;
 }
+
+
 //========================================================================
 bool Epos::AllActiveCSP()
 {
@@ -382,15 +465,24 @@ EPOSErrors Epos::ReadAllRegisters(int index,int subIndex,int canID,QList< int32_
     uint16_t inpid;
     QByteArray replay;
 
+
     can.ReadMessage(255, replay);
+    QThread::msleep(timeout);
+    can.ReadMessage(255, replay);
+    QThread::msleep(timeout);
+
     can.ReadMessage(255, replay);
     SDOReadCommand(canID+0x600,index,subIndex,255);
+    QThread::msleep(timeout);
+
+    SDOReadCommand(canID+0x600,index,subIndex,255);
+
     QThread::msleep(timeout);
   qDebug()<<"Read all";
     can.ReadMessage(255,replay);
     if(replay.length()!=160)
     {
-        qDebug()<<"Invalid lengh!"<<replay.toHex();
+        //qDebug()<<"Invalid lengh!"<<replay.toHex()<<replay.length();
         return SDO_BAD_REPLAY;
     }
 //qDebug()<<"packet!"<<replay.toHex();
@@ -412,12 +504,13 @@ for(int i=0;i<12;i++)
         tempValue=(tempValue)<<8;
         tempValue+=replay[i*10+6]&0xff;
         value.append(tempValue);
-      // qDebug()<<"inja"<<QString::number(tempValue);
+//       qDebug()<<"inja"<<QString::number(tempValue);
 
     }
     else
     {
-       // qDebug()<<"Invalid ID!"<<QString::number( inpid,16);
+        qDebug()<<"Invalid ID!"<<QString::number( inpid,16);
+                return SDO_BAD_REPLAY;
     }
 }
 
@@ -633,16 +726,22 @@ void  Epos::CheckCanBoardRequest()
     // qDebug() << "send data: " << data.toHex();
 }
 //========================================================================
+
+//========================================================================
 void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
 {
     int i=0;
     QByteArray data;
+    static int flag_sensor_pa=0;
+    static int handDeviceID=0;
+
+
     data.append(0x01);  // mode 1: Run
     data.append(0xAA);  // Header check
     data.append(0x55);  // Header check
     data.append(0xAA);  // Header check
 
-    for(i=0; i< motor_num; i++)  // send 12 data motor (48 byte)
+    for(i=0; i< motor_num; i++)  // send 12 data motor (72 byte)
     {
         data.append(0x04); // can id high byte   0401
         data.append(0x01); // can id low byte    0401
@@ -652,37 +751,161 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
         data.append((all_position[i] >> 16) & 0xff);
         data.append((all_position[i] >> 24) & 0xff);
      }
+    //76 t ainja
+//qDebug()<<handDeviceID;
+  // send 4 data can(each can 10 byte) (40 byte)
+    ///////////////////////for 4 maxon motors
+if(handDeviceID<4){
+//right hand
+    data.append(0x4);
+    data.append(1+handDeviceID);
 
-    for(i=0; i< 4; i++)  // send 4 data can(each can 8 byte) (40 byte)
-        {
-            switch (i) {
-            case 0:                 // CS = 12  ==> Right Hand
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                break;
 
-            case 1:               // CS = 13  ==> Left Hand
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                data.append(0x01);
-                break;
+    data.append((all_position[12+handDeviceID] >> 0) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 8) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 16) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+    data.append((char)0x3f);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
 
-            case 2:               // CS = 14  ==>  Neck and Other
+    ///left hand
+    data.append(0x4);
+    data.append(0x01+handDeviceID);
+
+    data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+
+    data.append((char)0x3f);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+
+    handDeviceID++;
+
+
+}
+else if(handDeviceID> 3 && handDeviceID<7)
+{
+handDeviceID++;
+data.append(0x9);
+data.append(1+handDeviceID);
+
+
+data.append((all_position[12+handDeviceID] >> 0) & 0xff);
+data.append((all_position[12+handDeviceID] >> 8) & 0xff);
+data.append((all_position[12+handDeviceID] >> 16) & 0xff);
+data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+data.append((char)0x00);
+data.append((char)0x00);
+data.append((char)00);
+data.append((char)0x00);
+
+///left hand
+data.append(0x9);
+data.append(0x01+handDeviceID);
+
+data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
+data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
+data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
+data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+
+data.append((char)0x00);
+data.append((char)0x00);
+data.append((char)0x00);
+data.append((char)0x00);
+}
+else if(handDeviceID==7){
+
+
+    data.append(0x9);
+    data.append(1+handDeviceID);
+
+
+    data.append((all_position[12+handDeviceID] >> 0) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 8) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 16) & 0xff);
+    data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
+
+    ///left hand
+    data.append(0x9);
+    data.append(0x01+handDeviceID);
+
+    data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
+    data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+
+     handDeviceID++;
+
+}
+else if(handDeviceID==8){//start move into controlworld
+
+    data.append(0x5);
+    data.append(1);
+
+
+
+    data.append((char)0x0f);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
+    data.append((char)0x0f);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
+
+
+    data.append(0x5);
+    data.append(1);
+
+    data.append((char)0x0f);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
+    data.append((char)0x0f);
+    data.append((char)0x00);
+    data.append((char)00);
+    data.append((char)0x00);
+
+    handDeviceID=0;
+
+}
+//                   // CS = 12  ==> Right Hand
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                    // CS = 13  ==> Left Hand
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+                   // CS = 14  ==>  Neck and Other
 
                 data.append(0x01);
                 data.append(0x01);
@@ -694,9 +917,9 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
                 data.append(0x01);
                 data.append(0x01);
                 data.append(0x01);
-                break;
 
-            case 3:  // 2 sensor Pa
+
+                // 2 sensor Pa
                 data.append(0x03); // can id high byte   0401
                 if (flag_sensor_pa==1)
                 {
@@ -716,13 +939,9 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
                 data.append(0x01);
                 data.append(0x01);
                 data.append(0x01);
-                break;
 
-            default:
-                break;
-            }
 
-         }
+
 
 
     for(i = (6*motor_num)+44 ; i < 296; i++)
@@ -735,11 +954,118 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
     data.append(0x33);  // Tailer
     data.append(0xCC);  // Tailer
 //qDebug()<<"packet size="<<data.length();
-    tcp.WriteData(data);  // send 128 Byte Packet
+   tcp.WriteData(data);  // send 128 Byte Packet
 
     // just for test
     // qDebug() << "send data: " << data.toHex();
 }
+//void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
+//{
+//    int i=0;
+//    QByteArray data;
+//    data.append(0x01);  // mode 1: Run
+//    data.append(0xAA);  // Header check
+//    data.append(0x55);  // Header check
+//    data.append(0xAA);  // Header check
+
+//    for(i=0; i< motor_num; i++)  // send 12 data motor (72 byte)
+//    {
+//        data.append(0x04); // can id high byte   0401
+//        data.append(0x01); // can id low byte    0401
+
+//        data.append((all_position[i] >> 0) & 0xff);
+//        data.append((all_position[i] >> 8) & 0xff);
+//        data.append((all_position[i] >> 16) & 0xff);
+//        data.append((all_position[i] >> 24) & 0xff);
+//     }
+
+//    for(i=0; i< 4; i++)  // send 4 data can(each can 10 byte) (40 byte)
+//        {
+//            switch (i) {
+//            case 0:                 // CS = 12  ==> Right Hand
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                break;
+
+//            case 1:               // CS = 13  ==> Left Hand
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                break;
+
+//            case 2:               // CS = 14  ==>  Neck and Other
+
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                break;
+
+//            case 3:  // 2 sensor Pa
+//                data.append(0x03); // can id high byte   0401
+//                if (flag_sensor_pa==1)
+//                {
+//                    data.append(0x82); // can id low byte    0401
+//                    flag_sensor_pa = 0;
+//                }
+//                else
+//                {
+//                    data.append(0x83); // can id low byte    0401
+//                    flag_sensor_pa =1 ;
+//                }
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x20);  // command to sensor pa
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                data.append(0x01);
+//                break;
+
+//            default:
+//                break;
+//            }
+
+//         }
+
+
+//    for(i = (6*motor_num)+44 ; i < 296; i++)
+//    {
+//        data.append(0x01);  // fill data packet with 01 byte
+//    }
+
+//    data.append(0xFF);  // Parity | 0xFF
+//    data.append(0xCC);  // Tailer
+//    data.append(0x33);  // Tailer
+//    data.append(0xCC);  // Tailer
+////qDebug()<<"packet size="<<data.length();
+//    tcp.WriteData(data);  // send 128 Byte Packet
+
+//    // just for test
+//    // qDebug() << "send data: " << data.toHex();
+//}
 //========================================================================
 EPOSErrors Epos::test_arya(int devID) // if devID=255 -> reset all nodes
 {

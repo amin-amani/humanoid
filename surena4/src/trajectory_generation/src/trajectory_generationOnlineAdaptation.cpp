@@ -25,6 +25,8 @@
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
 #include<termios.h>
+#include<gazebo_msgs/LinkStates.h>
+
 
 
 
@@ -63,7 +65,7 @@ ros::Publisher pub28 ;
 
 
 
-void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds){
+void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds){
     if(links.count()<28){qDebug()<<"index err";return;}
     std_msgs::Float64 data;
 
@@ -71,7 +73,7 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds){
     pub1.publish(data);
     data.data=links[2].JointAngle+RollModifieds(0,0);
     pub2.publish(data);
-    data.data=links[3].JointAngle;
+    data.data=links[3].JointAngle+PitchModifieds;
     pub3.publish(data);
     data.data=links[4].JointAngle;
     pub4.publish(data);
@@ -83,7 +85,7 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds){
     pub7.publish(data);
     data.data=links[8].JointAngle+RollModifieds(1,0);
     pub8.publish(data);
-    data.data=links[9].JointAngle;
+    data.data=links[9].JointAngle+PitchModifieds;
     pub9.publish(data);
     data.data=links[10].JointAngle;
     pub10.publish(data);
@@ -127,6 +129,9 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds){
 
 
 }
+
+
+
 
 
 
@@ -273,6 +278,90 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 
 
 
+
+
+
+//int a,b,c,d,e,f,g,h;
+
+MatrixXd quater2rot(double w,double x,double y, double z){
+    MatrixXd R(3,3);
+    R<<w*w+x*x-y*y-z*z,2*x*y-2*w*z,2*x*z+2*w*y,
+            2*x*y+2*w*z,w*w-x*x+y*y-z*z,2*y*z-2*w*x,
+            2*x*z-2*w*y,2*y*z+2*w*x,w*w-x*x-y*y+z*z;
+    return R;
+
+}
+
+void ankle_states(const gazebo_msgs::LinkStates& msg){
+    double x_left, x_right,y_left, y_right,z_left, z_right;
+Vector3d vec_A_E;
+Vector3d vec_B_F;
+Vector3d vec_C_G;
+Vector3d vec_D_H;
+
+vec_A_E<<-.085,
+         -.08,
+        -.11;
+vec_B_F<<.135,
+         -.08,
+        -.11;
+vec_C_G<<.135,
+         .08,
+        -.11;
+vec_D_H<<-.085,
+         .08,
+        -.11;
+
+    x_left=msg.pose[7].position.x;
+    x_right=msg.pose[13].position.x;
+    y_left=msg.pose[7].position.y;
+    y_right=msg.pose[13].position.y;
+
+    z_left=msg.pose[7].position.z;
+    z_right=msg.pose[13].position.z;
+
+    MatrixXd R_left(3,3);
+    MatrixXd R_right(3,3);
+    R_left=quater2rot(msg.pose[7].orientation.w,msg.pose[7].orientation.x,msg.pose[7].orientation.y,msg.pose[7].orientation.z);
+    R_right=quater2rot(msg.pose[13].orientation.w,msg.pose[13].orientation.x,msg.pose[13].orientation.y,msg.pose[13].orientation.z);
+Vector3d temp;
+temp=R_left*vec_A_E;
+//A=temp(2)+z_left;
+a=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_B_F;
+//B=temp(2)+z_left;
+b=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_C_G;
+//C=temp(2)+z_left;
+c=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_D_H;
+//D=temp(2)+z_left;
+d=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_right*vec_A_E;
+//E=temp(2)+z_right;
+e=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_B_F;
+//F=temp(2)+z_right;
+f=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_C_G;
+//G=temp(2)+z_right;
+g=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_D_H;
+//H=temp(2)+z_right;
+h=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+
+
+ //ROS_INFO("z_left=%f  A=%d,B=%d,C=%d,D=%d\tz_right=%f  E=%d,F=%d,G=%d,H=%d",z_left,a,b,c,d,z_right,e,f,g,h);
+
+//    ROS_INFO("x_left=%f,x_right=%f,y_left=%f,y_right=%fz_left=%f,z_right=%f",x_left,x_right,y_left,y_right,z_left,z_right);
+
+}
+
+
+
+
+
+
 int getch()
 {
   static struct termios oldt, newt;
@@ -371,6 +460,8 @@ int main(int argc, char **argv)
     bool walk=true;
       MatrixXd RollModified(2,1);//parameters for hip roll angles charge, for keep pelvis straight
      RollModified<<0,0;
+     double pitchOffset=SURENAOnlineTaskSpace1.HipPitchModification;
+     double PitchModified=0;
     PoseRoot.resize(6,1); //pelvis trajectory from taskspace_online,xyzrpy
     PoseRFoot.resize(6,1);//right ankle joint trajectory from taskspace_online,xyzrpy
     PoseLFoot.resize(6,1);//left ankle joint trajectory from taskspace_online,xyzrpy
@@ -389,36 +480,39 @@ int main(int argc, char **argv)
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
 
 
-
+{
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
-//    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
-//    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
-//    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
-//    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
-//    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
-//    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
-//    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
-//    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
-//    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
-//    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
-//    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
-//    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
-//    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
-//    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
-//    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
-//    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
-//    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
-//    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
-//    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
-//    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
-//    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
-//    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
-//    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
-//    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
-//    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
-//    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
-//    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
-//    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
+    pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
+    pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
+    pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
+    pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
+    pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
+    pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
+    pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
+    pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
+    pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
+    pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
+    pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
+    pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
+    pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
+    pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
+    pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
+    pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
+    pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
+    pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
+    pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
+    pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
+    pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
+    pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
+    pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
+    pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
+    pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
+    pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
+    pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+}
+   // ros::Subscriber ankleStates = nh.subscribe("/gazebo/link_states", 10, ankle_states);
+
 int32_t contact_flag_timing=1000;
 int32_t contact_flag_sensor=1000;
 int32_t contact_flag_sensor2=1000;
@@ -471,11 +565,13 @@ getch();
 ROS_INFO("started!");
 
 
-bool firststep_sensor_test=true;
+bool firstcontact=true;
 
 
     while (ros::ok())
     {
+
+       // ROS_INFO("%d\t%f",SURENAOnlineTaskSpace1.localtimingInteger,SURENAOnlineTaskSpace1.localTiming);
         //-------------flag to show expected contact according to timing-------------//
         //-------------sign of flag changes-------------//
         if(SURENAOnlineTaskSpace1.localTiming<.1){contact_flag_timing=-contact_flag_timing;}
@@ -485,9 +581,22 @@ bool firststep_sensor_test=true;
         //-------------for detecting the first contact of Left foot with ground-------------//
         //-------------flag to show contact detected by sensors-------------//
         //-------------sign of flag changes-------------//
-//        if (SURENAOnlineTaskSpace1.LeftSensorActive==true &&( (a)>=footSensorSaturation || (b)>=footSensorSaturation || (c)>=footSensorSaturation || (d)>=footSensorSaturation)){
-//            contact_flag_sensor2=-contact_flag_sensor2;
+
+//        if (SURENAOnlineTaskSpace1.LeftSensorActive==true ){
+//            ROS_INFO("left sensor active  [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
+
 //        }
+//        if ( SURENAOnlineTaskSpace1.RightSensorActive==true){
+//            ROS_INFO("right sensor active  [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
+
+//        }
+
+        if (SURENAOnlineTaskSpace1.LeftSensorActive==true && firstcontact==true &&( (a)>=footSensorSaturation || (b)>=footSensorSaturation || (c)>=footSensorSaturation || (d)>=footSensorSaturation)){
+            contact_flag_sensor2=-contact_flag_sensor2;
+            firstcontact=false;
+            ROS_INFO("shalap [%f  %f] a=%d b=%d c=%d d=%d", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime,a,b,c,d);
+
+        }
 
 
 
@@ -496,13 +605,14 @@ bool firststep_sensor_test=true;
         //-------------sign of flag changes-------------//
         if (SURENAOnlineTaskSpace1.LeftSensorActive==true && (a)>=footSensorSaturation && (b)>=footSensorSaturation && (c)>=footSensorSaturation && (d)>=footSensorSaturation){
             contact_flag_sensor=-contact_flag_sensor;
-            ROS_INFO("left swing foot landing is successful = [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
+            ROS_INFO("left swing foot landing is successful = [%f  %f] a=%d b=%d c=%d d=%d", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime,a,b,c,d);
             aState=true;
             bState=true;
             cState=true;
             dState=true;
             LeftFootLanded=true;//this variable is used for flag up when the left foot have a full contact with the ground
             SURENAOnlineTaskSpace1.LeftSensorActive=false;
+            firstcontact=true;
             SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator=false;
             //do nothing all sensors are on the ground
             teta_motor_L=teta_motor_L;
@@ -568,15 +678,17 @@ bool firststep_sensor_test=true;
         //-------------for detecting the first contact of Right foot with ground-------------//
         //-------------flag to show contact detected by sensors-------------//
         //-------------sign of flag changes-------------//
-//        if (SURENAOnlineTaskSpace1.RightSensorActive==true &&( (e)>=footSensorSaturation || (f)>=footSensorSaturation || (g)>=footSensorSaturation || (h)>=footSensorSaturation)){
-//            contact_flag_sensor2=-contact_flag_sensor2;
-//        }
+        if (SURENAOnlineTaskSpace1.RightSensorActive==true && firstcontact==true && ( (e)>=footSensorSaturation || (f)>=footSensorSaturation || (g)>=footSensorSaturation || (h)>=footSensorSaturation)){
+            contact_flag_sensor2=-contact_flag_sensor2;
+            firstcontact=false;
+           ROS_INFO("shooloop[%f  %f]  e=%d f=%d g=%d h=%d", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime,e,f,g,h);
+        }
 
         //-------------for detecting the full contact of Right foot with ground-------------//
         if (SURENAOnlineTaskSpace1.RightSensorActive==true && (e)>=footSensorSaturation && (f)>=footSensorSaturation && (g)>=footSensorSaturation && (h)>=footSensorSaturation){
             // qDebug("swing foot landing is successful");
             contact_flag_sensor=-contact_flag_sensor;
-            ROS_INFO("Right swing foot landing is successful= [%f  %f] ", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime);
+            ROS_INFO("Right swing foot landing is successful= [%f  %f]  e=%d f=%d g=%d h=%d", SURENAOnlineTaskSpace1.localTiming,SURENAOnlineTaskSpace1.globalTime,e,f,g,h);
             eState=true;
             fState=true;
             gState=true;
@@ -585,6 +697,7 @@ bool firststep_sensor_test=true;
 
             RightFootLanded=true;//this variable is used for flag up when the left foot have a full contact with the ground
             SURENAOnlineTaskSpace1.RightSensorActive=false;
+            firstcontact=true;
             //do nothing all sensors are on the ground
             SURENAOnlineTaskSpace1.RightFootOrientationAdaptator=false;
 
@@ -709,6 +822,29 @@ bool firststep_sensor_test=true;
 
             SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
             SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+
+MinimumJerkInterpolation CoefOffline;
+                double D_pitch=-1*pitchOffset*(M_PI/180);
+                double TstartofPitchModify=DurationOfStartPhase/6;
+                double TendofPitchModify=DurationOfStartPhase;
+                double D_time=TendofPitchModify-TstartofPitchModify;
+            if (StartTime>=TstartofPitchModify && StartTime<=TendofPitchModify){
+                    MatrixXd Ct_pitch_st(1,2);
+                    Ct_pitch_st<<0 ,D_time;
+                    MatrixXd Cp_pitch_st(1,2);
+                    Cp_pitch_st<<0, D_pitch;
+                    MatrixXd Cv_pitch_st(1,2);
+                    Cv_pitch_st<<0 ,0;
+                    MatrixXd Ca_pitch_st(1,2);
+                    Ca_pitch_st<<0 ,0;
+                    MatrixXd C_pitch_st=CoefOffline.Coefficient(Ct_pitch_st,Cp_pitch_st,Cv_pitch_st,Ca_pitch_st);
+
+                                    MatrixXd output=SURENAOnlineTaskSpace1.GetAccVelPos(C_pitch_st,StartTime-(TstartofPitchModify),0,5);
+                        PitchModified=output(0,0);
+
+            }
+
+
         }
 
 
@@ -817,7 +953,7 @@ bool firststep_sensor_test=true;
                     SURENAOnlineTaskSpace1.currentRightFootX2=links[6].PositionInWorldCoordinate(0);
                     SURENAOnlineTaskSpace1.currentRightFootY2=links[6].PositionInWorldCoordinate(1);
                     SURENAOnlineTaskSpace1.currentRightFootZ=links[6].PositionInWorldCoordinate(2);
-                    ROS_INFO("Right foot Z height early contact offset: [%f ]", (SURENAOnlineTaskSpace1.currentRightFootZ-SURENAOnlineTaskSpace1._lenghtOfAnkle));
+                   // ROS_INFO("Right foot Z height early contact offset: [%f ]", (SURENAOnlineTaskSpace1.currentRightFootZ-SURENAOnlineTaskSpace1._lenghtOfAnkle));
                     // ROS_INFO("Right foot Z height early contact offset: [%f ]", (SURENAOnlineTaskSpace1.currentRightFootX2-SURENAOnlineTaskSpace1._lenghtOfAnkle));
                    //SURENAOnlineTaskSpace1.NewPlevisZ =SURENAOnlineTaskSpace1.OldPelvisZ+(SURENAOnlineTaskSpace1.currentRightFootZ-SURENAOnlineTaskSpace1.OldPelvisZ);
                      SURENAOnlineTaskSpace1.NewPlevisZ =SURENAOnlineTaskSpace1.OldPelvisZ+(SURENAOnlineTaskSpace1.currentRightFootZ-SURENAOnlineTaskSpace1.oldRightFootZ);
@@ -841,7 +977,7 @@ bool firststep_sensor_test=true;
                     SURENAOnlineTaskSpace1.currentLeftFootY2=links[12].PositionInWorldCoordinate(1);
                     SURENAOnlineTaskSpace1.currentLeftFootZ=links[12].PositionInWorldCoordinate(2);
                     //SURENAOnlineTaskSpace1.NewPlevisZ =SURENAOnlineTaskSpace1.OldPelvisZ+(SURENAOnlineTaskSpace1.currentLeftFootZ-SURENAOnlineTaskSpace1.OldPelvisZ);
-                    ROS_INFO("left foot Z height early contact offset: [%f ]", (SURENAOnlineTaskSpace1.currentLeftFootZ-SURENAOnlineTaskSpace1._lenghtOfAnkle));
+                   // ROS_INFO("left foot Z height early contact offset: [%f ]", (SURENAOnlineTaskSpace1.currentLeftFootZ-SURENAOnlineTaskSpace1._lenghtOfAnkle));
                      SURENAOnlineTaskSpace1.NewPlevisZ =SURENAOnlineTaskSpace1.OldPelvisZ+(SURENAOnlineTaskSpace1.currentLeftFootZ-SURENAOnlineTaskSpace1.oldLeftFootZ);
                     LFT=true;
                 }
@@ -864,7 +1000,7 @@ bool firststep_sensor_test=true;
                 Pz=SURENAOnlineTaskSpace1.ModificationOfPelvisHeight(SURENAOnlineTaskSpace1.globalTime,SURENAOnlineTaskSpace1.StepNumber,SURENAOnlineTaskSpace1.localTiming,RFT,LFT,indexLastDS);
 
                 RollModified=SURENAOnlineTaskSpace1.RollAngleModification(SURENAOnlineTaskSpace1.globalTime,SURENAOnlineTaskSpace1.StepNumber,SURENAOnlineTaskSpace1.localTiming,indexLastDS);
-
+              //  PitchModified=SURENAOnlineTaskSpace1.PitchAngleModification(SURENAOnlineTaskSpace1.globalTime,SURENAOnlineTaskSpace1.StepNumber,SURENAOnlineTaskSpace1.localTiming,indexLastDS);
                 P=SURENAOnlineTaskSpace1.PelvisTrajectory (SURENAOnlineTaskSpace1.globalTime,SURENAOnlineTaskSpace1.StepNumber,SURENAOnlineTaskSpace1.localTiming,indexLastDS);
 
                 SURENAOnlineTaskSpace1.globalTime=SURENAOnlineTaskSpace1.globalTime+SURENAOnlineTaskSpace1._timeStep;
@@ -900,6 +1036,7 @@ bool firststep_sensor_test=true;
 
                     SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
                     SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+
                     SURENA.ForwardKinematic(1);
                 }
             }
@@ -949,6 +1086,30 @@ bool firststep_sensor_test=true;
             SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
             SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
 
+
+            MinimumJerkInterpolation CoefOffline;
+            double D_pitch=-1*pitchOffset*(M_PI/180);
+            double TstartofPitchModify=DurationOfendPhase/6+DurationOfStartPhase+SURENAOnlineTaskSpace1.MotionTime;
+            double TendofPitchModify=DurationOfendPhase*5/6+DurationOfStartPhase+SURENAOnlineTaskSpace1.MotionTime;
+            double D_time=TendofPitchModify-TstartofPitchModify;
+            if (StartTime>=TstartofPitchModify && StartTime<=TendofPitchModify){
+                MatrixXd Ct_pitch_st(1,2);
+                Ct_pitch_st<<-D_time, 0;
+                MatrixXd Cp_pitch_st(1,2);
+                Cp_pitch_st<<D_pitch, 0;
+                MatrixXd Cv_pitch_st(1,2);
+                Cv_pitch_st<<0 ,0;
+                MatrixXd Ca_pitch_st(1,2);
+                Ca_pitch_st<<0 ,0;
+                MatrixXd C_pitch_st=CoefOffline.Coefficient(Ct_pitch_st,Cp_pitch_st,Cv_pitch_st,Ca_pitch_st);
+
+                MatrixXd output=SURENAOnlineTaskSpace1.GetAccVelPos(C_pitch_st,StartTime-(TendofPitchModify),-D_time,5);
+                PitchModified=output(0,0);
+
+            }
+
+
+
         }
 
 
@@ -965,13 +1126,13 @@ bool firststep_sensor_test=true;
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
         cntrl[2]=(links[2].JointAngle+1*RollModified(0,0));
-        cntrl[3]=links[3].JointAngle;
+        cntrl[3]=links[3].JointAngle+1*PitchModified;
         cntrl[4]=links[4].JointAngle;
         cntrl[5]=links[5].JointAngle+(/*SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true*/0)*teta_motor_R+(0)*Offset_teta_R;//pitch
         cntrl[6]=links[6].JointAngle+(/*SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true*/0)*phi_motor_R+(0)*Offset_phi_R;//roll
         cntrl[7]=links[7].JointAngle;
         cntrl[8]=links[8].JointAngle+1*RollModified(1,0);
-        cntrl[9]=links[9].JointAngle;
+        cntrl[9]=links[9].JointAngle+1*PitchModified;
         cntrl[10]=links[10].JointAngle;
         cntrl[11]=links[11].JointAngle+(/*SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true*/0)*teta_motor_L+(0)*Offset_teta_L;
         cntrl[12]=links[12].JointAngle+(/*SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true*/0)*phi_motor_L+(0)*Offset_phi_L;
@@ -987,7 +1148,12 @@ bool firststep_sensor_test=true;
             msg.data.push_back(qref[i]);
         }
 
-      //  SendGazebo(links,RollModified);
+        for(int  i = 12;i < 28;i++)
+        {
+            msg.data.push_back(0);
+        }
+
+       // SendGazebo(links,RollModified,PitchModified);
         chatter_pub.publish(msg);
 
         msg_contact_flag.data.clear();

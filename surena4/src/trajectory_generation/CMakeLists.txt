@@ -252,23 +252,23 @@ target_link_libraries(trajectory_generation
     Qt5::PrintSupport
 )
 install(TARGETS trajectory_generation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-add_executable(trajectory_generation_with_foot_corr src/trajectory_generation_with_foot_corr.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(trajectory_generation_with_foot_corr
-    ${catkin_LIBRARIES}
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::PrintSupport
-)
-install(TARGETS trajectory_generation_with_foot_corr RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#add_executable(trajectory_generation_with_foot_corr src/trajectory_generation_with_foot_corr.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#target_link_libraries(trajectory_generation_with_foot_corr
+#    ${catkin_LIBRARIES}
+#    Qt5::Core
+#    Qt5::Widgets
+#    Qt5::PrintSupport
+#)
+#install(TARGETS trajectory_generation_with_foot_corr RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-add_executable(ankle_controller src/ankle_controller.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(ankle_controller
-    ${catkin_LIBRARIES}
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::PrintSupport
-)
-install(TARGETS ankle_controller RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#add_executable(ankle_controller src/ankle_controller.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#target_link_libraries(ankle_controller
+#    ${catkin_LIBRARIES}
+#    Qt5::Core
+#    Qt5::Widgets
+#    Qt5::PrintSupport
+#)
+#install(TARGETS ankle_controller RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(bumpsensor src/bumpsensor.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(bumpsensor
@@ -297,6 +297,15 @@ target_link_libraries(hand_trajectory
 )
 install(TARGETS hand_trajectory RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(hand_test src/hand_test.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_test
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 #add_executable(hand_trajectory_shaking src/hand_trajectory_shaking.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_trajectory_shaking
 #    ${catkin_LIBRARIES}
@@ -324,14 +333,14 @@ target_link_libraries(trajectory_generation_ramp
 )
 install(TARGETS trajectory_generation_ramp RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-add_executable(trajectory_generation_imu_pushrecovery src/trajectory_generation_imu_pushrecovery.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(trajectory_generation_imu_pushrecovery
-    ${catkin_LIBRARIES}
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::PrintSupport
-)
-install(TARGETS trajectory_generation_imu_pushrecovery RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#add_executable(trajectory_generation_imu_pushrecovery src/trajectory_generation_imu_pushrecovery.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+#target_link_libraries(trajectory_generation_imu_pushrecovery
+#    ${catkin_LIBRARIES}
+#    Qt5::Core
+#    Qt5::Widgets
+#    Qt5::PrintSupport
+#)
+#install(TARGETS trajectory_generation_imu_pushrecovery RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(home_legs src/home_legs.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(home_legs

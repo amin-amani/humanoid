@@ -64,7 +64,7 @@ private:
     char** init_argv;
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
-    ros::Publisher _imuPublisher,_jointPublisher,_absPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
+    ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
     QStringListModel logging_model;
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;
@@ -83,8 +83,6 @@ public:
      };
     QString teststr="";
     std_msgs::Int32MultiArray  JointsData;
-
-    QList<double> absNumber;
     QList<double> ActualPositions;
     QList<double> IncPositions;
     int BumpSensor[8];

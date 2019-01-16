@@ -24,6 +24,7 @@
 #include<sensor_msgs/Imu.h>
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
+#include <gazebo_msgs/LinkStates.h>
 
 using namespace  std;
 using namespace  Eigen;
@@ -125,6 +126,89 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 
     // ROS_INFO("I heard: [%d  %d %d %d]", tempInt[0],tempInt[1],tempInt[2],tempInt[3]);
 }
+
+
+
+
+
+
+//int a,b,c,d,e,f,g,h;
+
+MatrixXd quater2rot(double w,double x,double y, double z){
+    MatrixXd R(3,3);
+    R<<w*w+x*x-y*y-z*z,2*x*y-2*w*z,2*x*z+2*w*y,
+            2*x*y+2*w*z,w*w-x*x+y*y-z*z,2*y*z-2*w*x,
+            2*x*z-2*w*y,2*y*z+2*w*x,w*w-x*x-y*y+z*z;
+    return R;
+
+}
+
+void ankle_states(const gazebo_msgs::LinkStates& msg){
+    double x_left, x_right,y_left, y_right,z_left, z_right;
+Vector3d vec_A_E;
+Vector3d vec_B_F;
+Vector3d vec_C_G;
+Vector3d vec_D_H;
+
+vec_A_E<<-.085,
+         -.08,
+        -.11;
+vec_B_F<<.135,
+         -.08,
+        -.11;
+vec_C_G<<.135,
+         .08,
+        -.11;
+vec_D_H<<-.085,
+         .08,
+        -.11;
+
+    x_left=msg.pose[7].position.x;
+    x_right=msg.pose[13].position.x;
+    y_left=msg.pose[7].position.y;
+    y_right=msg.pose[13].position.y;
+
+    z_left=msg.pose[7].position.z;
+    z_right=msg.pose[13].position.z;
+
+    MatrixXd R_left(3,3);
+    MatrixXd R_right(3,3);
+    R_left=quater2rot(msg.pose[7].orientation.w,msg.pose[7].orientation.x,msg.pose[7].orientation.y,msg.pose[7].orientation.z);
+    R_right=quater2rot(msg.pose[13].orientation.w,msg.pose[13].orientation.x,msg.pose[13].orientation.y,msg.pose[13].orientation.z);
+Vector3d temp;
+temp=R_left*vec_A_E;
+//A=temp(2)+z_left;
+a=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_B_F;
+//B=temp(2)+z_left;
+b=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_C_G;
+//C=temp(2)+z_left;
+c=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_left*vec_D_H;
+//D=temp(2)+z_left;
+d=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
+temp=R_right*vec_A_E;
+//E=temp(2)+z_right;
+e=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_B_F;
+//F=temp(2)+z_right;
+f=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_C_G;
+//G=temp(2)+z_right;
+g=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+temp=R_right*vec_D_H;
+//H=temp(2)+z_right;
+h=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
+
+
+ //ROS_INFO("z_left=%f  A=%d,B=%d,C=%d,D=%d\tz_right=%f  E=%d,F=%d,G=%d,H=%d",z_left,a,b,c,d,z_right,e,f,g,h);
+
+//    ROS_INFO("x_left=%f,x_right=%f,y_left=%f,y_right=%fz_left=%f,z_right=%f",x_left,x_right,y_left,y_right,z_left,z_right);
+
+}
+
+
 
 
 

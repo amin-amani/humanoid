@@ -30,6 +30,8 @@ class TaskSpaceOnline2
 public:
     double LeftHipRollModification;
     double RightHipRollModification;
+    double HipPitchModification;
+
     double _lenghtOfAnkle;
     double OldPelvisZ;
     double NewPlevisZ;
@@ -78,6 +80,7 @@ int kbumpR;
     double TGait;
     double T_beta;
     double TSS;
+    double Tm;
     double YOffsetOfAnkletrajectory;
 
     double RollTimeSS;
@@ -285,6 +288,7 @@ double _timeStep;
     MatrixXd ModificationOfPelvisHeight(double time, int n, double localtiming, bool RFT_state, bool LFT_state, bool LastDSIndex);
     void CoeffArrayPelvisZMod();
     MatrixXd RollAngleModification(double time, int n, double localtiming, bool LastDSIndex);
+    //double PitchAngleModification(double time, int n, double localtiming, bool LastDSIndex);
 };
 
 #endif // TASKSPACEONLINE_H

@@ -77,9 +77,6 @@ bool QNode::Init() {
     _leftFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_l_state", 1000);
     _imuPublisher =    n.advertise<sensor_msgs::Imu>("surena/imu_state", 1000);
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
-
-    _absPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_num", 1000);
-
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
 
@@ -89,7 +86,6 @@ bool QNode::Init() {
      //   _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP);
    //ros::Subscriber sub = nh.subscribe("jointdata/qc", 1000, SendDataToMotors);
     for (int i = 0; i < 13; i++) {
-    absNumber.append(0);
     ActualPositions.append(0);
     IncPositions.append(0);
 
@@ -143,7 +139,7 @@ void QNode::run() {
 
     while ( ros::ok() ) {
     std_msgs::String msg;
-    sensor_msgs::JointState ActualJointState,IncJointState,absNum;
+    sensor_msgs::JointState ActualJointState,IncJointState;
     std_msgs::Int32MultiArray BumpSensorState;
     //sensor_msgs::Imu imuSesnsorMsg;
     //geometry_msgs::Wrench ftSensorMessage;
@@ -156,14 +152,12 @@ void QNode::run() {
     BumpSensorState.layout.dim.push_back(msg_dim);
 
     //chatter_publisher.publish(msg); // publish the value--of type Float64-
-    absNum.header.stamp = ros::Time::now();
  ActualJointState.header.stamp = ros::Time::now();
   IncJointState.header.stamp = ros::Time::now();
   imuSesnsorMsg.header.stamp= ros::Time::now();;
   imuSesnsorMsg.header.frame_id="base_link";
 
   for(int i=0 ;i<13;i++){
-  absNum.position.push_back(absNumber[i]);
   ActualJointState.position.push_back(ActualPositions[i]);
   IncJointState.position.push_back(IncPositions[i]);
   }
@@ -182,7 +176,7 @@ _leftFtPublisher.publish(LeftFtSensorMessage);
 
   _bumpPublisher.publish(BumpSensorState);
   _imuPublisher.publish(imuSesnsorMsg);
-_absPublisher.publish(absNum);
+
     _jointPublisher.publish(ActualJointState);
     _incJointPublisher.publish(IncJointState);
     UpdateRobotModel(ActualPositions);

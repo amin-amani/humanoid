@@ -936,6 +936,7 @@ void TaskSpaceOffline::CoeffArrayAnkle(){
 
         MatrixXd C_cy_iTime(1,3);
         C_cy_iTime<<0 ,TSS/2, TSS;
+        //C_cy_iTime<<0 ,TSS*22/35, TSS;
         MatrixXd C_cy_iPos(1,3);
         C_cy_iPos<<_lenghtOfAnkle*cos(ToeOffAnglePitch*(M_PI/180))-_toeLength*(sin(ToeOffAnglePitch*(M_PI/180))),AnkleMaximumHeight, _heelLength*sin(HeelLandingAnglePitch*(M_PI/180))+_lenghtOfAnkle*cos(HeelLandingAnglePitch*(M_PI/180));
         MatrixXd C_cy_iVel(1,3);
