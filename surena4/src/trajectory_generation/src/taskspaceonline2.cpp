@@ -548,7 +548,7 @@ MatrixXd TaskSpaceOnline2::PelvisTrajectory(double time, int n, double localtimi
         N=NStride;
         t=0;
     }
-
+//*******************   x
 
     if (t<=T_st_p_sx){
         xp=0;
@@ -810,6 +810,8 @@ MatrixXd TaskSpaceOnline2::PelvisTrajectory(double time, int n, double localtimi
     //    cout<<"time="<<localTime1<<endl;
     //    cout<<"timedsss="<<localtime<<endl;
 
+
+    //*******************   y
     if(t<=T_st_p_sy){
         yp=0;
         dyp=0;
