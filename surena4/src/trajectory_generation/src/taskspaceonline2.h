@@ -125,6 +125,7 @@ int kbumpR;
     double MinHeightPelvis;
     double MaxHeightPelvis;
     double ReferencePelvisHeight;
+    double InitialPelvisHeight;
     double za_st_m;
     double za_end_m;
     double xa_end_m;

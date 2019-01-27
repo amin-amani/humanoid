@@ -27,9 +27,9 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
-    RightHipRollModification=3;//3;//4;//5;//degree;
-    LeftHipRollModification=4;//4;//4;//4;//degree
-    HipPitchModification=0;
+    RightHipRollModification=5;//3;//4;//5;//degree;
+    LeftHipRollModification=6;//4;//4;//4;//degree
+    HipPitchModification=4;
 
     toeOff=true;
     HipRollModification=true;
@@ -49,7 +49,7 @@ void TaskSpaceOnline2::SetParameters(){
     _toeLength=0.15;
     _pelvisLength=0.23;
     ReferencePelvisHeight=0.86;
-
+    InitialPelvisHeight=0.95100;
     NStride=2;
     NStep=NStride*2;
     DesiredVelocity=0.10000;
@@ -88,18 +88,19 @@ void TaskSpaceOnline2::SetParameters(){
     //sagital plane
     Xe=Sc*StepLength/(Rse+1)*1.2;//*.5;//pelvis and support at the end of sigle support phase
     Xs=Rse*Xe*.90;//*3.0;//pelvis and support at the begining of sigle support phase
-
-    Xe=.06;//fixed almost
+//***********************ok in test
+    Xe=.04;//
     Xs=0;//fixed
 
 
     //frontal plane
-    YpMax=Rm*0.5*_pelvisLength*1.1;//*1.1;//distace between pelvis to global coord in the middle of single support
+    YpMax=Rm*0.5*_pelvisLength*1.2;//*1.1;//distace between pelvis to global coord in the middle of single support
     Yd=1*Rd*YpMax;//distace between pelvis to global coord at the begining of single support
-
-
-    YStMax=1.0*YpMax/1.1;///1.1;
-    YEndMax=1.0*YpMax/1.1;///1.1;
+ //***********************ok in test
+YpMax=0.09;
+  Yd =0.07;
+    YStMax=1.0*YpMax/.9;///1.1;
+    YEndMax=1.0*YpMax/.9;///1.1;
 
 
     cout<<" Xe="<<Xe<<" Xs="<< Xs <<" YpMax="<<YpMax<<" Yd="<<Yd<<" YStMax="<<YStMax<<" YEndMax="<<YEndMax<<endl;

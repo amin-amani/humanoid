@@ -23,7 +23,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/pelvis.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/pelvis.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -144,7 +144,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -159,7 +159,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Upper-arm-Left.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -231,7 +231,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/fore-arm-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/fore-arm-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -296,7 +296,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -311,7 +311,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Hand-Left.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -400,7 +400,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -415,7 +415,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Foot-Left.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -504,7 +504,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Shank-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Shank-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -591,7 +591,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Thigh-Left.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Thigh-Left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -729,7 +729,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -744,7 +744,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Upper-arm-right.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -816,7 +816,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/fore-arm-right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/fore-arm-right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -881,7 +881,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -896,7 +896,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Hand-Right.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -986,7 +986,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -1003,7 +1003,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Foot-Right.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -1092,7 +1092,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Shank-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Shank-Right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -1179,7 +1179,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/Thigh-Right.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/Thigh-Right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -1284,7 +1284,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -1356,7 +1356,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -1371,7 +1371,7 @@
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/milad/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
+            <uri>/home/cast/humanoid/surena4/src/robot_sim/meshes/tORSO.STL</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

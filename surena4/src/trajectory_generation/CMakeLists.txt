@@ -126,7 +126,7 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS}
 /opt/ros/kinetic/include
-/home/milad/humanoid/surena4/devel/include
+/home/cast/humanoid/surena4/devel/include
 
 )
 ## Declare a C++ library

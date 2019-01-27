@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     QTime pc_time;
     QString name;
-    name="/home/milad/Desktop/deflection_data_save/data_";
+    name="/home/cast/Desktop/deflection_data_save/data_";
     name+=QString::number(pc_time.currentTime().hour())+"_";
     name+=QString::number(pc_time.currentTime().minute())+"_";
     name+=QString::number(pc_time.currentTime().second())+"_";
