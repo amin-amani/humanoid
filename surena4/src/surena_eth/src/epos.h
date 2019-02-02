@@ -154,13 +154,13 @@ geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
 /// use -1 for infinit wait
     EPOSErrors Init(int tryCount);
     EPOSErrors EnableDevice(int devID,EPOSOperationMode mode);
-    void SetPreoperationalMode(int devID);
+    void SetPreoperationalMode(int devID, int nodeID=1);
     void ResetComunication(int devID);
     void StartNode(int devID);
-    void SetMode(int devID, EPOSOperationMode mode);
+    void SetMode(int devID, EPOSOperationMode mode, int canID=1);
     void StopNode(int devID);
-    void SwitchOn(int devID);
-    void SwitchOff(int devID);
+    void SwitchOn(int devID, int canID=1);
+    void SwitchOff(int devID, int canID=1);
     EPOSErrors ResetNode(int devID);
     unsigned char GetSDOCODE(int len);
     EPOSErrors SDOWriteCommand(int id, unsigned long input, int index, unsigned char sub_index, unsigned char len, char devID);
@@ -206,6 +206,11 @@ geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
         float QByteArrayToFloat(QByteArray arr);
         EPOSErrors ReadAllRegisters(int index, int subIndex, int canID, QList<int32_t> &value, int timeout);
         bool CheckZynq();
+        EPOSErrors HandsInit(int tryCount);
+
+
+        bool ActivePPMPDO(int nodeID, int canID);
+        bool ActiveHand();
 signals:
 
     void NewDataReady();
