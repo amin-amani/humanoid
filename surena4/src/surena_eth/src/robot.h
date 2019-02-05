@@ -25,8 +25,7 @@ class Robot : public QObject
     int HommingState=0;
     float CurrentIncPositions[40];
 
-    const double offset[12]={ -95 ,-151, 300, 394, 683, -277, -3 ,419, -275, -300, -1930, 287};//32,-1938
-
+    const double offset[12]={ -95 ,-151, 300, 394, 683, -277, -3 ,419, -275, -300-24, -1930-6, 287};
     const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
     //const double Direction[12]={1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
         const double Direction[12]={1,1,1,1,1,1,1,1,1,1,1,1};

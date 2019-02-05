@@ -103,30 +103,30 @@ int s=-int(6*75*(1-cos(t*2*M_PI/8)));
 
 
 
-//count++;
-//int c=0;
-//if(count>20) {
-//    ROS_INFO("`");
-//     c= getch();
-//    count=0;
-//}
+count++;
+int c=0;
+if(count>20) {
+    ROS_INFO("`");
+     c= getch();
+    count=0;
+}
 
-//if(c==113){break;}
-//if(c==97){q[0]+=1;}if(c==122){q[0]-=1;}
-//if(c==115){q[1]+=1;}if(c==120){q[1]-=1;}
-//if(c==100){q[2]+=1;}if(c==99){q[2]-=1;}
-//if(c==102){q[3]+=1;}if(c==118){q[3]-=1;}
-//if(c==103){q[4]+=1;}if(c==98){q[4]-=1;}
-//if(c==104){q[5]+=1;}if(c==110){q[5]-=1;}
-//if(c==106){q[6]+=1;}if(c==109){q[6]-=1;}
-//if(c==107){q[7]+=1;}if(c==44){q[7]-=1;}
+if(c==113){break;}
+if(c==97){q[0]+=4;}if(c==122){q[0]-=4;}
+if(c==115){q[1]+=4;}if(c==120){q[1]-=4;}
+if(c==100){q[2]+=4;}if(c==99){q[2]-=4;}
+if(c==102){q[3]+=4;}if(c==118){q[3]-=4;}
+if(c==103){q[4]+=4;}if(c==98){q[4]-=4;}
+if(c==104){q[5]+=4;}if(c==110){q[5]-=4;}
+if(c==106){q[6]+=4;}if(c==109){q[6]-=4;}
+if(c==107){q[7]+=4;}if(c==44){q[7]-=4;}
 
 //right hand epose
 msg.data.push_back(q[0]);//12 -y  a,z
 msg.data.push_back(q[1]);//13 +x
 msg.data.push_back(q[2]);//14 -z
 //msg.data.push_back(q[3]);//15 +y
-msg.data.push_back(s);
+msg.data.push_back(q[3]);
 
 //right hand dynamixel + fingers
 msg.data.push_back(0);//16

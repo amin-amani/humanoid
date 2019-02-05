@@ -27,8 +27,8 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
-    RightHipRollModification=5;//3;//4;//5;//degree;
-    LeftHipRollModification=6;//4;//4;//4;//degree
+    RightHipRollModification=3;//3;//4;//5;//degree;
+    LeftHipRollModification=5;//4;//4;//4;//degree
     HipPitchModification=4;
 
     toeOff=true;
@@ -50,7 +50,7 @@ void TaskSpaceOnline2::SetParameters(){
     _pelvisLength=0.23;
     ReferencePelvisHeight=0.86;
     InitialPelvisHeight=0.95100;
-    NStride=2;
+    NStride=10;
     NStep=NStride*2;
     DesiredVelocity=0.10000;
     StepLength=0.0840000;
@@ -63,11 +63,13 @@ void TaskSpaceOnline2::SetParameters(){
     /// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\\\\\\\\\
 
     Tc=StepLength*3.6/DesiredVelocity;
+//    Tc=3;
+//StepLength=.05;
 
     TStart=6;//time of first step
     TEnd=6;//time of last step
     TDs=.4*Tc; // Duration of double support phase
-
+//TDs=1.2;
     //  T_beta=TDs/2;
     TSS=Tc-TDs; // Duration of single support phase
     TGait=TStart+NStride*2*Tc;
@@ -97,10 +99,10 @@ void TaskSpaceOnline2::SetParameters(){
     YpMax=Rm*0.5*_pelvisLength*1.2;//*1.1;//distace between pelvis to global coord in the middle of single support
     Yd=1*Rd*YpMax;//distace between pelvis to global coord at the begining of single support
  //***********************ok in test
-YpMax=0.09;
-  Yd =0.07;
-    YStMax=1.0*YpMax/.9;///1.1;
-    YEndMax=1.0*YpMax/.9;///1.1;
+YpMax=0.10;
+  Yd =0.08;
+    YStMax=.10;//1.0*YpMax/.9;///1.1;
+    YEndMax=.10;//1.0*YpMax/.9;///1.1;
 
 
     cout<<" Xe="<<Xe<<" Xs="<< Xs <<" YpMax="<<YpMax<<" Yd="<<Yd<<" YStMax="<<YStMax<<" YEndMax="<<YEndMax<<endl;

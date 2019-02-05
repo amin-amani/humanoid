@@ -147,6 +147,7 @@ public:
 sensor_msgs::Imu IMU;
 sensor_msgs::MagneticField MagneticSensor;
 geometry_msgs::Accel Acceleration;
+sensor_msgs::Imu IMURPY;
 geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
     PingModel ping;
 	Can can;

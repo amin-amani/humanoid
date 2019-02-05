@@ -189,16 +189,16 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     int tempInt[8];
 
 
-    temp[0]=msg.data[0]-1024;
-    temp[1]=-1*(msg.data[1]-929);
-    temp[2]=msg.data[2]-3038;
+    temp[0]=msg.data[0]-1005;
+    temp[1]=-1*(msg.data[1]-937);
+    temp[2]=msg.data[2]-3037;
     temp[3]=-1*(msg.data[3]-3099);
 
     //normalizing data of sensors
-    temp[0]=temp[0]*(100.0/105);
-    temp[1]=temp[1]*(100.0/100);
-    temp[2]=temp[2]*(100.0/117);
-    temp[3]=temp[3]*(100.0/118);
+    temp[0]=temp[0]*(100.0/(1105-1005));
+    temp[1]=temp[1]*(100.0/(937-833));
+    temp[2]=temp[2]*(100.0/(3150-3037));
+    temp[3]=temp[3]*(100.0/(3099-2987));
 
     tempInt[0]=temp[0];
     tempInt[1]=temp[1];
@@ -215,14 +215,14 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 
     temp[4]=msg.data[4]-3041;
     temp[5]=-1*(msg.data[5]-3006);
-    temp[6]=msg.data[6]-1139+15;
-    temp[7]=-1*(msg.data[7]-1009);
+    temp[6]=msg.data[6]-1128;
+    temp[7]=-1*(msg.data[7]-1014);
 
     //normalizing data of sensors
-    temp[4]=temp[4]*(100.0/109);
-    temp[5]=temp[5]*(100.0/115);
-    temp[6]=temp[6]*(100.0/107);
-    temp[7]=temp[7]*(100.0/107);
+    temp[4]=temp[4]*(100.0/(3144-3041));
+    temp[5]=temp[5]*(100.0/(3006-2898));
+    temp[6]=temp[6]*(100.0/(1229-1128));
+    temp[7]=temp[7]*(100.0/(1014-909));
 
 
 
@@ -629,7 +629,7 @@ bool firstcontact=true;
 
 
 //
-//        ROS_INFO("a=%d b=%d c=%d d=%d e=%d f=%d g=%d h=%d",a,b,c,d,e,f,g,h);
+  //   ROS_INFO("a=%d b=%d c=%d d=%d e=%d f=%d g=%d h=%d",a,b,c,d,e,f,g,h);
 
        // ROS_INFO("%d\t%f",SURENAOnlineTaskSpace1.localtimingInteger,SURENAOnlineTaskSpace1.localTiming);
         //-------------flag to show expected contact according to timing-------------//
@@ -752,8 +752,6 @@ bool firstcontact=true;
             //do nothing all sensors are on the ground
             SURENAOnlineTaskSpace1.RightFootOrientationAdaptator=false;
 
-            teta_motor_R=teta_motor_R;
-            phi_motor_R=phi_motor_R;
 
             Offset_teta_R=teta_motor_R;
             Offset_phi_R=phi_motor_R;
@@ -1177,14 +1175,20 @@ double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring 
         cntrl[2]=(links[2].JointAngle+1*RollModified(0,0));
         cntrl[3]=links[3].JointAngle+1*PitchModified;
         cntrl[4]=links[4].JointAngle;
-        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*teta_motor_R+Offset_teta_R);//pitch
-        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*phi_motor_R+Offset_phi_R);//roll
+//        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*teta_motor_R+Offset_teta_R);//pitch
+//        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*phi_motor_R+Offset_phi_R);//roll
+        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*teta_motor_R;//pitch
+        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*phi_motor_R;//roll
+
         cntrl[7]=links[7].JointAngle;
         cntrl[8]=links[8].JointAngle+1*RollModified(1,0);
         cntrl[9]=links[9].JointAngle+1*PitchModified;
         cntrl[10]=links[10].JointAngle;
-        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*teta_motor_L+Offset_teta_L);
-        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*phi_motor_L+Offset_phi_L);
+//        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*teta_motor_L+Offset_teta_L);
+//        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*phi_motor_L+Offset_phi_L);
+        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*teta_motor_L;
+        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*phi_motor_L;
+
         //        }
        // ROS_INFO("teta_R=%f,Offset_teta_R=%f,phi_R=%f,Offset_phi_R=%f,teta_L=%f,Offset_teta_L=%f,phi_L=%f,Offset_phi_L=%f",teta_motor_R,Offset_teta_R,phi_motor_R,Offset_phi_R,teta_motor_L,Offset_teta_L,phi_motor_L,Offset_phi_L);
 //please uncomment /*SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true* for activing sensor and also replace 0 with  1 in above code

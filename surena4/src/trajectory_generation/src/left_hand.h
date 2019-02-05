@@ -1,5 +1,5 @@
-#ifndef RIGHT_HAND_H
-#define RIGHT_HAND_H
+#ifndef LEFT_HAND_H
+#define LEFT_HAND_H
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include "Eigen/QuadProg.h"
@@ -13,7 +13,7 @@
 using namespace Eigen;
 using namespace std;
 
-class right_hand
+class left_hand
 {
 public:
 
@@ -23,15 +23,15 @@ public:
     double L_arm=.254;
     double L_forearm=.3302;
     double L_palm=0;
-    double angle_fix_shd=toRad(10);
+    double angle_fix_shd=toRad(-10);
     double angle_fix_elbow=0;
 
     double v_des=0.3;
     double d_des=0.01;
     double d_orient=0.2;
     double power=1e-4;
-    double Right_palm_position_power=1e6;
-    double Right_palm_orientation_power=1e2;
+    double left_palm_position_power=1e6;
+    double left_palm_orientation_power=1e2;
        double qdot_max=.2;
     VectorXd qdot;
     //    double q1_ra;
@@ -58,9 +58,9 @@ public:
     MatrixXd P_forearm_ra;
     MatrixXd P_palm_ra;
 
-    MatrixXd T_right_palm;
-    MatrixXd R_right_palm;
-    VectorXd r_right_palm;
+    MatrixXd T_left_palm;
+    MatrixXd R_left_palm;
+    VectorXd r_left_palm;
 
     double v0;
     double v_target;
@@ -74,23 +74,23 @@ public:
     double phi_target;
 
     MatrixXd Jha;
-    MatrixXd J_right_palm;
-    MatrixXd J_w_right_palm;
+    MatrixXd J_left_palm;
+    MatrixXd J_w_left_palm;
 
-    double Vx_right_palm;
-    double Vy_right_palm;
-    double Vz_right_palm;
-    Vector3d w_right_palm;
+    double Vx_left_palm;
+    double Vy_left_palm;
+    double Vz_left_palm;
+    Vector3d w_left_palm;
     double sai_dot;
     double phi_dot;
     double theta_dot;
 
     VectorXd V;
     VectorXd q_next;
-    right_hand();
-    right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
-    right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
-    right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
+    left_hand();
+    left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
+    left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
+    left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
     double toRad(double d);
     double sai_calc(MatrixXd R);
     double phi_calc(MatrixXd R);
@@ -98,7 +98,7 @@ public:
     MatrixXd trans(Vector3d d);
     MatrixXd rot(int axis, double q, int dim);
     double theta_calc(MatrixXd R);
-    void HO_FK_right_palm(VectorXd q_ra);
+    void HO_FK_left_palm(VectorXd q_ra);
     void euler2w();
     void jacob(VectorXd q_ra);
     double dist;
@@ -125,4 +125,4 @@ public:
 
 };
 
-#endif // RIGHT_HAND_H
+#endif // LEFT_HAND_H

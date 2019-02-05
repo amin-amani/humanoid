@@ -262,7 +262,7 @@ double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
      if(currentHomeIndex>11){
          qDebug()<<"Home Finished!";
          _hommingTimer.stop();
-         ResetAllNodes();
+         //ResetAllNodes();
 
      }
      ///

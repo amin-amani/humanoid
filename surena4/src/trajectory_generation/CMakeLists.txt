@@ -235,8 +235,10 @@ set( QT_SOURCES
     src/pidcontroller.cpp
     src/qcgenerator.cpp
     src/right_hand.cpp
+    src/left_hand.cpp
     src/taskspaceofflineRamp.cpp
     src/taskspaceonline2.cpp
+    src/surenastateestimation.cpp
 
 #    src/hand_gui.cpp
 
@@ -306,6 +308,7 @@ target_link_libraries(hand_test
 )
 install(TARGETS hand_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+
 #add_executable(hand_trajectory_shaking src/hand_trajectory_shaking.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_trajectory_shaking
 #    ${catkin_LIBRARIES}
@@ -315,14 +318,32 @@ install(TARGETS hand_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #)
 #install(TARGETS hand_trajectory_shaking RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-#add_executable(hand_trajectory_waving src/hand_trajectory_waving.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-#target_link_libraries(hand_trajectory_waving
-#    ${catkin_LIBRARIES}
-#    Qt5::Core
-#    Qt5::Widgets
-#    Qt5::PrintSupport
-#)
-#install(TARGETS hand_trajectory_waving RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(hand_trajectory_waving src/hand_trajectory_waving.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_waving
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_waving RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(hands_interaction src/hands_interaction.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hands_interaction
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hands_interaction RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(hand_trajectory_pick_and_place src/hand_trajectory_pick_and_place.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_pick_and_place
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_pick_and_place RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(trajectory_generation_ramp src/trajectory_generation_ramp.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(trajectory_generation_ramp
@@ -359,6 +380,15 @@ target_link_libraries(deflection_measure
     Qt5::PrintSupport
 )
 install(TARGETS deflection_measure RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(onlinetrajectorygeneration src/onlinetrajectorygeneration.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(onlinetrajectorygeneration
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS onlinetrajectorygeneration RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #add_executable(hand_gui src/hand_gui.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_gui

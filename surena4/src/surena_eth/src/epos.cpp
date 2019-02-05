@@ -790,68 +790,94 @@ if(handDeviceID<4){
 }
 else if(handDeviceID> 3 && handDeviceID<7)
 {
-handDeviceID++;
-data.append(0x9);
-data.append(1+handDeviceID);
+    //motor1 from
+    //motor2 from
+    //motor3  from
+
+data.append(0x05);
+data.append(0x81);
 
 
-data.append((all_position[12+handDeviceID] >> 0) & 0xff);
-data.append((all_position[12+handDeviceID] >> 8) & 0xff);
-data.append((all_position[12+handDeviceID] >> 16) & 0xff);
-data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+data.append(handDeviceID-3);//id from 1 t0 3 left hand 24 25 26
+data.append((all_position[12+handDeviceID] >> 8) & 0xff); //pos hi
+data.append((all_position[12+handDeviceID] >> 0) & 0xff); //pos low
+data.append(40);  //speed
 data.append((char)0x00);
 data.append((char)0x00);
 data.append((char)00);
 data.append((char)0x00);
 
 ///left hand
-data.append(0x9);
-data.append(0x01+handDeviceID);
+data.append(0x05);
+data.append(0x81);
 
-data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
-data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
-data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
-data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+data.append(handDeviceID-3);
+data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);//pos hi
+data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);//pos hi
+data.append(40);//pos hi
 
 data.append((char)0x00);
 data.append((char)0x00);
 data.append((char)0x00);
 data.append((char)0x00);
+handDeviceID++;
 }
 else if(handDeviceID==7){
 
-
-    data.append(0x9);
-    data.append(1+handDeviceID);
-
-
-    data.append((all_position[12+handDeviceID] >> 0) & 0xff);
-    data.append((all_position[12+handDeviceID] >> 8) & 0xff);
-    data.append((all_position[12+handDeviceID] >> 16) & 0xff);
-    data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+     ///right palm
+    data.append(0x3);
+    data.append(0x52);
+    data.append(all_position[19] &0xff);
     data.append((char)0x00);
     data.append((char)0x00);
-    data.append((char)00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
     data.append((char)0x00);
 
-    ///left hand
-    data.append(0x9);
-    data.append(0x01+handDeviceID);
+        ///left palm
 
-    data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
-    data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
-    data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
-    data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+    data.append(0x3);
+    data.append(0x52);
+    data.append(all_position[27] &0xff);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
+    data.append((char)0x00);
 
-    data.append((char)0x00);
-    data.append((char)0x00);
-    data.append((char)0x00);
-    data.append((char)0x00);
+    //qDebug()<<QString::number( all_position[27]&0xff,16);
+
+//    data.append((all_position[12+handDeviceID] >> 0) & 0xff);
+//    data.append((all_position[12+handDeviceID] >> 8) & 0xff);
+//    data.append((all_position[12+handDeviceID] >> 16) & 0xff);
+//    data.append((all_position[12+handDeviceID] >> 24) & 0xff);
+//    data.append((char)0x00);
+//    data.append((char)0x00);
+//    data.append((char)00);
+//    data.append((char)0x00);
+
+//    ///left hand
+//    data.append(0x9);
+//    data.append(0x01+handDeviceID);
+
+//    data.append((all_position[12+handDeviceID+8] >> 0) & 0xff);
+//    data.append((all_position[12+handDeviceID+8] >> 8) & 0xff);
+//    data.append((all_position[12+handDeviceID+8] >> 16) & 0xff);
+//    data.append((all_position[12+handDeviceID+8] >> 24) & 0xff);
+
+//    data.append((char)0x00);
+//    data.append((char)0x00);
+//    data.append((char)0x00);
+//    data.append((char)0x00);
 
      handDeviceID++;
 
 }
-else if(handDeviceID==8){//start move into controlworld
+else if(handDeviceID==8){//start move into controlworld for hands
 
     data.append(0x5);
     data.append(1);

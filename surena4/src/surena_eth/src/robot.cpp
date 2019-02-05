@@ -9,7 +9,7 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     _rosNode=new QNode(argc,argv);
     if(!_rosNode->Init())exit(0);
 
-QThread::msleep(1000);
+
 //if(Epos4.Init(2)==OK){qDebug()<<"ok";return;}
  //   connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
 
@@ -59,8 +59,7 @@ void Robot::Initialize()
 
 if(! ReadAllInitialPositions())
 {return; }
-
-    _initialTimer.stop();
+//_initialTimer.stop();
 
 //   Epos4.ActivePPMPDO(13,1);
 //   Epos4.ActivePPMPDO(13,2);
@@ -214,7 +213,13 @@ for(int ii=0; ii<28 ; ii++)
 {
     _motorPosition.append(_rosNode->JointsData.data.at(ii));
 }
-
+// moto offset dynamixel
+_motorPosition[24]+=3000;
+_motorPosition[25]+=2050;
+_motorPosition[26]+=2050;
+_motorPosition[16]+=2300;
+_motorPosition[17]+=2050;
+_motorPosition[18]+=2050;
 Epos4.SetAllPositionCST(_motorPosition,12);
 }
 //=================================================================================================
@@ -249,13 +254,7 @@ _rosNode->LeftFtSensorMessage=Epos4.ForceTorqSensorLeft;
 //=================================================================================================
 void Robot::ActiveCSP()
 {
-    if(! ReadAllInitialPositions())
-    {qDebug()<<"error read positions";return; }
 
-    for(int ii=0; ii<24 ; ii++)
-   {
-      _motorPosition[ii]=CurrentIncPositions[ii];
-   }
     ////////////hand test
         qDebug()<<"active csp slot...";
         _rosNode->teststr="OK";
@@ -340,7 +339,10 @@ double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
  if(abs((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<=max){_motorPosition[j]+= ((offset[j]-CurrentAbsPositions[j]))*kp*Direction[j];}
      if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])>max){_motorPosition[j]+=(max);}
      if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<-max){_motorPosition[j]-=(max);}
-
+//if(abs(_motorPosition[j])>10000){
+//    qDebug()<<"home error!";
+//    break;
+//}
      qDebug()<<"offset"<<offset[j]<<"position["<<j<<"]="<<CurrentAbsPositions[j]<<"command"<<_motorPosition[j];
      //// here we receive home
      if(offset[j]-CurrentAbsPositions[j]==0){
@@ -351,15 +353,7 @@ double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
      if(currentHomeIndex>11){
          qDebug()<<"Home Finished!";
          _hommingTimer.stop();
-
-         if(! ReadAllInitialPositions())
-         {qDebug()<<"error read positions";return; }
-
-         for(int ii=0; ii<24 ; ii++)
-        {
-           _motorPosition[ii]=CurrentIncPositions[ii];
-        }
-        // ResetAllNodes();
+//         ResetAllNodes();
 
      }
      ///
