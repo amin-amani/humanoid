@@ -174,6 +174,7 @@ double Offset_phi_L;
 double Offset_phi_R;
 
 int qc_offset[12];
+double roll_absoulte[2];
 bool qc_initial_bool;
 
 //
@@ -278,7 +279,7 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 }
 
 
-void qc_initial(const sensor_msgs::JointState & msg){
+void qc_initial(){
     if (qc_initial_bool){
         for (int i = 0; i < 12; ++i) {
             qc_offset[i]=int(msg.position[i+1]);
@@ -294,6 +295,10 @@ void qc_initial(const sensor_msgs::JointState & msg){
 
 }
 
+void roll_absolute_correction(const sensor_msgs::JointState & msg){
+    roll_absoulte[0]= msg.position[10];
+    roll_absoulte[1]= msg.position[11];
+}
 
 
 
@@ -411,6 +416,7 @@ int main(int argc, char **argv)
     QCgenerator QC;
     for (int i = 0; i < 12; ++i) {
          qc_offset[i]=0;
+         qc_corretction[i]=0;
     }
     qc_initial_bool=true;
 
@@ -506,7 +512,7 @@ int main(int argc, char **argv)
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
  ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
  ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-
+ros::Subscriber roll_absolute = nh.subscribe("/surena/inc_joint_state",1000,roll_absolute_correction);
 
 
 //    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);

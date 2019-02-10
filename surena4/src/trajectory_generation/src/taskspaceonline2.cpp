@@ -27,8 +27,8 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
-    RightHipRollModification=3;//3;//4;//5;//degree;
-    LeftHipRollModification=5;//4;//4;//4;//degree
+    RightHipRollModification=4;//3;//4;//5;//degree;
+    LeftHipRollModification=4;//4;//4;//4;//degree
     HipPitchModification=4;
 
     toeOff=true;
@@ -50,7 +50,7 @@ void TaskSpaceOnline2::SetParameters(){
     _pelvisLength=0.23;
     ReferencePelvisHeight=0.86;
     InitialPelvisHeight=0.95100;
-    NStride=10;
+    NStride=2;
     NStep=NStride*2;
     DesiredVelocity=0.10000;
     StepLength=0.0840000;
@@ -99,7 +99,7 @@ void TaskSpaceOnline2::SetParameters(){
     YpMax=Rm*0.5*_pelvisLength*1.2;//*1.1;//distace between pelvis to global coord in the middle of single support
     Yd=1*Rd*YpMax;//distace between pelvis to global coord at the begining of single support
  //***********************ok in test
-YpMax=0.10;
+YpMax=0.15;
   Yd =0.08;
     YStMax=.10;//1.0*YpMax/.9;///1.1;
     YEndMax=.10;//1.0*YpMax/.9;///1.1;

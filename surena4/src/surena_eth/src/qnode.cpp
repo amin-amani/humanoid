@@ -76,6 +76,7 @@ bool QNode::Init() {
     _rigthtFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_r_state", 1000);
     _leftFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_l_state", 1000);
     _imuPublisher =    n.advertise<sensor_msgs::Imu>("surena/imu_state", 1000);
+    _imuRPYPublisher = n.advertise<sensor_msgs::Imu>("surena/imuRPY_state",1000);
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
@@ -154,8 +155,10 @@ void QNode::run() {
     //chatter_publisher.publish(msg); // publish the value--of type Float64-
  ActualJointState.header.stamp = ros::Time::now();
   IncJointState.header.stamp = ros::Time::now();
-  imuSesnsorMsg.header.stamp= ros::Time::now();;
+  imuSesnsorMsg.header.stamp= ros::Time::now();
   imuSesnsorMsg.header.frame_id="base_link";
+  imuRPYSensorMsg.header.stamp = ros::Time::now();
+  imuRPYSensorMsg.header.frame_id="base_link";
 
   for(int i=0 ;i<13;i++){
   ActualJointState.position.push_back(ActualPositions[i]);
@@ -176,6 +179,7 @@ _leftFtPublisher.publish(LeftFtSensorMessage);
 
   _bumpPublisher.publish(BumpSensorState);
   _imuPublisher.publish(imuSesnsorMsg);
+  _imuRPYPublisher.publish(imuRPYSensorMsg);
 
     _jointPublisher.publish(ActualJointState);
     _incJointPublisher.publish(IncJointState);

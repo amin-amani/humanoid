@@ -249,7 +249,7 @@ CurrentIncPositions[i]=positionsInc[i];
 _rosNode->imuSesnsorMsg=Epos4.IMU;
 _rosNode->RightFtSensorMessage=Epos4.ForceTorqSensorRight;
 _rosNode->LeftFtSensorMessage=Epos4.ForceTorqSensorLeft;
-
+_rosNode->imuRPYSensorMsg=Epos4.IMURPY;
 }
 //=================================================================================================
 void Robot::ActiveCSP()

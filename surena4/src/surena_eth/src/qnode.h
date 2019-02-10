@@ -65,6 +65,7 @@ private:
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
     ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
+    ros::Publisher _imuRPYPublisher;
     QStringListModel logging_model;
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;
@@ -88,6 +89,7 @@ public:
     int BumpSensor[8];
     double Imu[6];
     sensor_msgs::Imu imuSesnsorMsg;
+    sensor_msgs::Imu imuRPYSensorMsg;
     geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
      //=================================================================================================
     QNode();

@@ -836,8 +836,7 @@ else if(handDeviceID==7){
     data.append((char)0x00);
     data.append((char)0x00);
 
-        ///left palm
-
+    ///left palm
     data.append(0x3);
     data.append(0x52);
     data.append(all_position[27] &0xff);
@@ -1213,7 +1212,7 @@ ForceTorqSensorLeft.torque.z/=(65535*gainFTLeft[5]*sensitivityFTLeft[5]*ExFTLeft
 
 
 
-        tf2::Quaternion myQuaternion;
+tf2::Quaternion myQuaternion;
 myQuaternion.setRPY( incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
 //--------------------orientation
 IMU.orientation.x=myQuaternion.getX();
@@ -1228,11 +1227,22 @@ IMU.linear_acceleration.y=incommingPacket->IMU.ay;
  IMU.angular_velocity.x=incommingPacket->IMU.wx;
  IMU.angular_velocity.y=incommingPacket->IMU.wy;
  IMU.angular_velocity.z=incommingPacket->IMU.wz;
+
+// ROS_INFO("%f%f%f",incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
+
+ //Roll, Pitch, and Yaw from IMU====================NEW
+ IMURPY.angular_velocity.x = incommingPacket->IMU.roll;
+ IMURPY.angular_velocity.y = incommingPacket->IMU.pitch;
+ IMURPY.angular_velocity.z = incommingPacket->IMU.yaw;
+ //mx, my, and mz from IMU====================NEW
+ IMURPY.linear_acceleration.x = incommingPacket->IMU.mx;
+ IMURPY.linear_acceleration.y = incommingPacket->IMU.my;
+ IMURPY.linear_acceleration.z = incommingPacket->IMU.mz;
+
  //free acc
  Acceleration.linear.x=incommingPacket->IMU.fax;
  Acceleration.linear.y=incommingPacket->IMU.fay;
  Acceleration.linear.z=incommingPacket->IMU.faz;
-
 
  //mag feild
 MagneticSensor.magnetic_field.x=incommingPacket->IMU.mx;
