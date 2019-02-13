@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     ** Qt
     **********************/
     QApplication app(argc, argv);
-
+   qDebug()<<"start..";
    Robot w(nullptr,argc,argv);
    // w.show();
 //   app.connect(&w, SIGNAL(, &app, SLOT(quit()));

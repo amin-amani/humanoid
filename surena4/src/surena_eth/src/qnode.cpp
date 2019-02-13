@@ -33,7 +33,11 @@ QNode::QNode()
 }
 //=============================================================================================================================
 QNode::QNode(int argc, char** argv ) :	init_argc(argc),	init_argv(argv)
-	{}
+{
+RobotStatus="";
+
+
+}
 //=============================================================================================================================
 QNode::~QNode() {
     if(ros::isStarted()) {
@@ -79,13 +83,14 @@ bool QNode::Init() {
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
-
+    //define ros services
     _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
+    _getRobotStatus = n.advertiseService("GetRobotStatus", &QNode::GetRobotStatus, this);
      //   _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP);
    //ros::Subscriber sub = nh.subscribe("jointdata/qc", 1000, SendDataToMotors);
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 29; i++) {
     ActualPositions.append(0);
     IncPositions.append(0);
 
@@ -95,11 +100,20 @@ bool QNode::Init() {
 	return true;
 }
 //================================================================================================================================================================
+bool QNode::GetRobotStatus(std_srvs::TriggerRequest &req,std_srvs::TriggerResponse &res)
+{
+res.message=RobotStatus.toStdString();
+res.success=true;
+
+return true;
+
+}
+//================================================================================================================================================================
 bool QNode::ActiveCSP(surena_eth::active_csp::Request  &req,surena_eth::active_csp::Response &res)
 {
 
 teststr="";
-    Q_EMIT       SetActiveCSP();
+    Q_EMIT SetActiveCSP();
     //this sleep is mandatory if u want thread wait until function return
     QThread::msleep(1);
     qDebug()<<"Active CSP...> "<<teststr;
@@ -108,20 +122,81 @@ teststr="";
 bool QNode::Home(surena_eth::home::Request  &req,surena_eth::home::Response &res)
 {
 
+    _lastOperationResult=-1;
     Q_EMIT SetHome();
-    QThread::msleep(1);
-    ROS_INFO("request: homming mode");
+    if(!WaitExternalOperation(6000))
+    {
+   // res.success=false;
+  //  res.message="home timeout!";
+    return false;
+
+    }
+    if(_lastOperationResult!=0)
+    {
+     //   res.success=false;
+      //  res.message="home error";
+
+        return false;
+
+    }
+  //  res.success=true;
+  //  res.message="home ok";
+
+    return false;
+
+}
+//================================================================================================================================================================
+bool QNode::WaitExternalOperation(int timeoutms=60000)
+{
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    connect(this,  SIGNAL(ExternalOperationComleted()), &loop, SLOT(quit()) );
+    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+    timer.start(timeoutms);
+    loop.exec();
+    if(timer.isActive())return true;
+    return false;
 
 }
 //================================================================================================================================================================
 bool QNode::ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
 {
-teststr="";
+    //if(!_nodeInitialized)return false;
+    // QSignalSpy spysig(this,SIGNAL(ExternalOperationComleted(int)));
+
+_lastOperationResult=-1;
     Q_EMIT DoResetAllNodes();
-    QThread::msleep(1);
+   // QThread::msleep(1);
+    //===============================
+if(!WaitExternalOperation(6000))
+{
+res.success=false;
+res.message="response timeout!";
+return false;
+
+}
+if(_lastOperationResult!=0)
+{
+    res.success=false;
+    res.message="response with error";
+
+    return false;
+
+}
+
+//===============================
+    //spy.wait(10000);
     res.success=true;
-    res.message=teststr.toStdString();
+    res.message="OK";
     qDebug()<<"Reset all...> "<<teststr;
+    return true;
+}
+//================================================================================================================================================================
+void QNode::OperationCompleted(int status)
+{
+    _lastOperationResult=status;
+    emit ExternalOperationComleted();
 }
 //================================================================================================================================================================
 void QNode::SendDataToMotors(const std_msgs::Int32MultiArray & msg)
@@ -157,7 +232,7 @@ void QNode::run() {
   imuSesnsorMsg.header.stamp= ros::Time::now();;
   imuSesnsorMsg.header.frame_id="base_link";
 
-  for(int i=0 ;i<13;i++){
+  for(int i=0 ;i<29;i++){
   ActualJointState.position.push_back(ActualPositions[i]);
   IncJointState.position.push_back(IncPositions[i]);
   }

@@ -756,7 +756,7 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
   // send 4 data can(each can 10 byte) (40 byte)
     ///////////////////////for 4 maxon motors
 if(handDeviceID<4){
-//right hand
+//right hand 12 13 14 15
     data.append(0x4);
     data.append(1+handDeviceID);
 
@@ -770,7 +770,7 @@ if(handDeviceID<4){
     data.append((char)00);
     data.append((char)0x00);
 
-    ///left hand
+    ///left hand 20 21 22 23
     data.append(0x4);
     data.append(0x01+handDeviceID);
 
@@ -794,11 +794,11 @@ else if(handDeviceID> 3 && handDeviceID<7)
     //motor2 from
     //motor3  from
 
-data.append(0x05);
+data.append(0x05);//id from 1 t0 3 right hand 24 25 26
 data.append(0x81);
 
 
-data.append(handDeviceID-3);//id from 1 t0 3 left hand 24 25 26
+data.append(handDeviceID-3);
 data.append((all_position[12+handDeviceID] >> 8) & 0xff); //pos hi
 data.append((all_position[12+handDeviceID] >> 0) & 0xff); //pos low
 data.append(40);  //speed
@@ -807,7 +807,7 @@ data.append((char)0x00);
 data.append((char)00);
 data.append((char)0x00);
 
-///left hand
+///left hand id from 1 t0 3 left hand 24 25 26
 data.append(0x05);
 data.append(0x81);
 

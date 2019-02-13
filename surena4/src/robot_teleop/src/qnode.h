@@ -25,10 +25,13 @@
 #include <QStringListModel>
 #include <std_msgs/Bool.h>
 #include "std_msgs/String.h"
+
 #include "surena_eth/active_csp.h"
 #include "surena_eth/reset_node.h"
 #include "surena_eth/home.h"
+
 #include <std_srvs/Empty.h>
+#include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Imu.h>
@@ -40,11 +43,8 @@
 #include <std_msgs/Int32MultiArray.h>
 #include <interactive_markers/interactive_marker_server.h>
 #include <interactive_markers/menu_handler.h>
-#include "visualize.h"
 #include <tf/transform_datatypes.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <QtTest/QSignalSpy>
-#include <std_srvs/Trigger.h>
 
 
 /*****************************************************************************
@@ -64,17 +64,13 @@ private:
     //=================================================================================================
     int init_argc;
     char** init_argv;
-
-    bool _nodeInitialized=false;
-    int _lastOperationResult=0;
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
-    ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
+    ros::Publisher _jointPublisher;
     QStringListModel logging_model;
-    ros::ServiceServer _activeCSPService;
-    ros::ServiceServer _hommingService;
-    ros::ServiceServer _resetAllNodesService;
-    ros::ServiceServer _getRobotStatus;
+    ros::ServiceClient _getstatusService ;
+ros::ServiceClient _activeCspService;
+ros::ServiceClient _resetNodeService ;
 
 public:
     /*********************
@@ -87,15 +83,15 @@ public:
              Error,
              Fatal
      };
-    QString RobotStatus;
-    QString teststr="";
+
     std_msgs::Int32MultiArray  JointsData;
-    QList<double> ActualPositions;
-    QList<double> IncPositions;
-    int BumpSensor[8];
-    double Imu[6];
-    sensor_msgs::Imu imuSesnsorMsg;
-    geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
+
+
+    bool PositioningIsActive;
+    double IncPositions[30];
+
+
+
      //=================================================================================================
     QNode();
     //=================================================================================================
@@ -121,11 +117,11 @@ public:
     //=================================================================================================
     bool Home(surena_eth::home::Request &req, surena_eth::home::Response &res);
     //=================================================================================================
-    bool ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+   // bool ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
     //=================================================================================================
-    void OperationCompleted(int status);
-    bool WaitExternalOperation(int timeoutms);
-    bool GetRobotStatus(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
+
+    void DoPositioning();
+    void ResetAllNodes();
 Q_SIGNALS:
     //=================================================================================================
 	void loggingUpdated();
@@ -140,7 +136,6 @@ Q_SIGNALS:
     //=================================================================================================
     void SetHome();
     //=================================================================================================
-  void ExternalOperationComleted();
 };
 
 //}  // namespace my_qt_gui_subscriber

@@ -2,20 +2,21 @@
 //=================================================================================================
 Robot::Robot(QObject *parent, int argc, char **argv)
 {
+    qDebug()<<"start..";
+
     for(int ii=0; ii<12+8+8 ; ii++)
    {
       _motorPosition.append(100);
    }
+
     _rosNode=new QNode(argc,argv);
     if(!_rosNode->Init())exit(0);
 
-
+    _rosNode->RobotStatus="Initialize";
 //if(Epos4.Init(2)==OK){qDebug()<<"ok";return;}
  //   connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
 
 //_statusCheckTimer.start(1000);
-
-
     pos=0;
     connect(_rosNode,SIGNAL(rosShutdown()),this,SLOT(CleanAndExit()));
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
@@ -23,19 +24,10 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(DoResetAllNodes()),this,SLOT(ResetAllNodes()));
     connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
     connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
-
-
-
     connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
           _initialTimer.start(2000);
 
          return;
-
-
-
-
-
-
 
 }
 
@@ -56,9 +48,10 @@ void Robot::Initialize()
 //}
 
 
+//if(! ReadAllInitialPositions())
+//{return; }
 
-if(! ReadAllInitialPositions())
-{return; }
+
 //_initialTimer.stop();
 
 //   Epos4.ActivePPMPDO(13,1);
@@ -77,7 +70,7 @@ connect(&timer,SIGNAL(timeout()),this,SLOT(Timeout()));
 Initialized=true;
 //Epos4.StartFeedBack();
 //timer.start(5);
-
+    _rosNode->RobotStatus="Ready";
 
 }
 //=================================================================================================
@@ -160,15 +153,77 @@ return false;
 bool Robot::ReadAllInitialPositions()
 {
     int numberOfSuccess=0;
+
+   ///////////read right hand offsets
+    //ReadRegister(int index,int subIndex,int canID, int devID,int32_t &value,int timeout,int trycount)
+      //can id 12 right and 13 left hand
+        for(int i=0;i<4;i++){
+              int32_t result=0;
+    if(Epos4.ReadRegister(0x60e4,3,i+1,12,result,10,3)==OK) //13 ok
+    {
+
+    qDebug()<<"hand inc "<<i<<"=" << result;
+      CurrentIncPositions[12+i]=result;
+    _rosNode->IncPositions[12+i+1]=(CurrentIncPositions[12+i]);
+    }
+    else{
+         qDebug()<<"hand read error"<<i;
+    }
+}
+
+        for(int i=0;i<4;i++){
+              int32_t result=0;
+    if(Epos4.ReadRegister(0x60e4,3,i+1,13,result,10,3)==OK) //13 ok
+    {
+
+    qDebug()<<"hand inc "<<i<<"=" << result;
+    CurrentIncPositions[20+i]=result;
+  _rosNode->IncPositions[20+i+1]=(CurrentIncPositions[20+i]);
+    }
+    else{
+         qDebug()<<"hand read error"<<i;
+    }
+}
+///////////////////
+        for(int i=0;i<4;i++){
+              int32_t result=0;
+    if(Epos4.ReadRegister(0x60e4,2,i+1,12,result,10,3)==OK) //13 ok
+    {
+
+    qDebug()<<"hand abs "<<i<<"=" << result;
+      CurrentAbsPositions[12+i]=result;
+    _rosNode->ActualPositions[12+i+1]=(CurrentAbsPositions[12+i]);
+    }
+    else{
+         qDebug()<<"hand read error"<<i;
+    }
+}
+
+        for(int i=0;i<4;i++){
+              int32_t result=0;
+    if(Epos4.ReadRegister(0x60e4,2,i+1,13,result,10,3)==OK) //13 ok
+    {
+
+    qDebug()<<"hand abs "<<i<<"=" << result;
+    CurrentAbsPositions[20+i]=result;
+  _rosNode->ActualPositions[20+i+1]=(CurrentAbsPositions[20+i]);
+    }
+    else{
+         qDebug()<<"hand read error"<<i;
+    }
+}
+///////////////////
     for(int i=0;i<12;i++){
-        int32_t result=0;
+   int32_t result=0;
+
+
     if(Epos4.ReadRegister(0x60e4,1,1,i,result,10,3)==OK)
     {
-CurrentIncPositions[i]=result;
-      //  positionInc.append(result);
-      numberOfSuccess++;
-          qDebug()<<"inc "<<i<<"=" << result;
-              _rosNode->IncPositions[i+1]=(CurrentIncPositions[i]);
+    CurrentIncPositions[i]=result;
+    //  positionInc.append(result);
+    numberOfSuccess++;
+    qDebug()<<"inc "<<i<<"=" << result;
+    _rosNode->IncPositions[i+1]=(CurrentIncPositions[i]);
     }
     else
     {
@@ -256,6 +311,7 @@ void Robot::ActiveCSP()
 {
 
     ////////////hand test
+        _rosNode->RobotStatus="Motor Activating";
         qDebug()<<"active csp slot...";
         _rosNode->teststr="OK";
 
@@ -265,19 +321,22 @@ void Robot::ActiveCSP()
        Epos4.ActiveAllCSP();
        QThread::msleep(5);
         Epos4.ActiveHand();
+        _rosNode->OperationCompleted(1);
+                _rosNode->RobotStatus="Ready";
             }
 //=================================================================================================
 void Robot::ResetAllNodes()
 {
+            _rosNode->RobotStatus="Reseting Nodes";
         qDebug()<<"Reset all slot...";
         _rosNode->teststr="OK";
         for(int i=0;i<14;i++)
         { Epos4.ResetNode(i);
             QThread::msleep(5);
         }
-
+      _rosNode->OperationCompleted(1);
           //  timer.start(5);
-
+        _rosNode->RobotStatus="Ready";
          // Epos4.StartFeedBack();
 
 }
@@ -285,7 +344,7 @@ void Robot::ResetAllNodes()
 void Robot::Home()
 {
 
-
+        _rosNode->RobotStatus="Homming";
     if(! ReadAllInitialPositions())
     {qDebug()<<"error read positions";return; }
 
@@ -302,6 +361,8 @@ void Robot::Home()
    Epos4.ActiveAllCSP();
       Epos4.ActiveHand();
    _hommingTimer.start(5);
+         _rosNode->OperationCompleted(1);
+                 _rosNode->RobotStatus="Ready";
 
 }
 
@@ -350,7 +411,7 @@ double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
      if(currentHomeIndex>11){
          qDebug()<<"Home Finished!";
          _hommingTimer.stop();
-         ResetAllNodes();
+//         ResetAllNodes();
 
      }
      ///

@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(surena_eth)
+project(robot_teleop)
 
 ##############################################################################
 # Catkin
@@ -40,7 +40,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 #SET(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Network Qt5Test)
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Network)
 
 ##############################################################################
 # Sections
@@ -59,7 +59,6 @@ include_directories(
     ${Qt5Gui_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5PrintSupport_INCLUDE_DIRS}
-    ${Qt5Test_INCLUDE_DIRS}
     )
 
 add_definitions( -std=c++11 -fPIC)
@@ -68,39 +67,25 @@ add_definitions( -std=c++11 -fPIC)
 ##############################################################################
 
 set( QT_SOURCES
-    src/main.cpp
-    src/VisualizeControl.cpp
-    src/visualize.cpp
-    src/visualize.h
-    src/can.cpp
-    src/can.h
-    src/epos.cpp
-    src/epos.h
-    src/tcphandler.cpp
-    src/tcphandler.h
-    src/robot.cpp
-    src/robot.h
+    src/robot_teleop.cpp
+    src/mainwindow.h
+    src/mainwindow.cpp
     src/qnode.h
     src/qnode.cpp
-    src/pingmodel.cpp
-    src/pingmodel.h
-    src/pidcontroller.cpp
-    src/pidcontroller.h
         )
 ##############################################################################
 # Binaries
 ##############################################################################
 
-add_executable(surena_eth ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(surena_eth
+add_executable(robot_teleop ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(robot_teleop
     ${catkin_LIBRARIES}
     Qt5::Core
     Qt5::Network
     Qt5::Widgets
     Qt5::PrintSupport
-    ${QT_QTTEST_LIBRARY}
     ${LIBUSB_1_LIBRARIES}
 )
-install(TARGETS surena_eth RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS robot_teleop RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
