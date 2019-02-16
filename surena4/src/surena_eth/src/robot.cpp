@@ -22,6 +22,7 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
     connect(_rosNode,SIGNAL(SetActiveCSP()),this,SLOT(ActiveCSP()));
     connect(_rosNode,SIGNAL(DoResetAllNodes()),this,SLOT(ResetAllNodes()));
+    connect(_rosNode,SIGNAL(DoReadError()),this,SLOT(ReadErrors()));
     connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
     connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
     connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
@@ -311,33 +312,74 @@ void Robot::ActiveCSP()
 {
 
     ////////////hand test
-        _rosNode->RobotStatus="Motor Activating";
-        qDebug()<<"active csp slot...";
-        _rosNode->teststr="OK";
+    _rosNode->RobotStatus="Motor Activating";
+    qDebug()<<"active csp slot...";
+    _rosNode->teststr="OK";
 
-            timer.stop();
+    timer.stop();
 
-       QThread::msleep(5);
-       Epos4.ActiveAllCSP();
-       QThread::msleep(5);
-        Epos4.ActiveHand();
-        _rosNode->OperationCompleted(1);
-                _rosNode->RobotStatus="Ready";
+    QThread::msleep(5);
+    Epos4.ActiveAllCSP();
+    QThread::msleep(5);
+    Epos4.ActiveHand();
+    _rosNode->OperationCompleted(0);
+    _rosNode->RobotStatus="Ready";
             }
+//=================================================================================================
+void Robot::ReadErrors()
+{
+int32_t result=0;
+QString errorstr="";
+for(int i=0;i<12;i++){
+
+ errorstr+= "M"+QString::number(i)+"->"+ Epos4.ReadCurrentError(1,i)+" ";
+
+}
+//qDebug()<<errorstr;
+_rosNode->RobotStatus=errorstr;
+_rosNode->OperationCompleted(0); //all good
+
+}
 //=================================================================================================
 void Robot::ResetAllNodes()
 {
-            _rosNode->RobotStatus="Reseting Nodes";
-        qDebug()<<"Reset all slot...";
-        _rosNode->teststr="OK";
-        for(int i=0;i<14;i++)
-        { Epos4.ResetNode(i);
-            QThread::msleep(5);
-        }
-      _rosNode->OperationCompleted(1);
-          //  timer.start(5);
-        _rosNode->RobotStatus="Ready";
-         // Epos4.StartFeedBack();
+    _hommingTimer.stop();
+    _rosNode->RobotStatus="Reseting Nodes";
+    qDebug()<<"Reset all slot...";
+    _rosNode->teststr="OK";
+
+    for(int i=0;i<14;i++)
+    { Epos4.ResetNode(i);
+    QThread::msleep(5);
+
+
+
+    }
+
+    for(int i=0;i<12;i++){
+        //checking status word
+          int32_t val;
+          if( OK!=Epos4.ReadRegister(0x6041,0,1,i,val,100,10))
+          {
+                //cant read status word
+              qDebug()<<"cant read status word in id="<<i;
+                  _rosNode->OperationCompleted(-1);
+                  return ;
+          }
+          //status word value is unexpected
+          if(val!=0x1052da0)
+          {
+            qDebug()<<QString::number( val,16);
+              _rosNode->OperationCompleted(-1);
+              return ;
+          }
+
+    }
+
+    _rosNode->OperationCompleted(0);
+    //  timer.start(5);
+    _rosNode->RobotStatus="Ready";
+    // Epos4.StartFeedBack();
 
 }
 //=================================================================================================
@@ -346,26 +388,28 @@ void Robot::Home()
 
         _rosNode->RobotStatus="Homming";
     if(! ReadAllInitialPositions())
-    {qDebug()<<"error read positions";return; }
+    {
+        qDebug()<<"error read positions";
+            _rosNode->OperationCompleted(-1);
+        return;
+    }
 
     for(int ii=0; ii<24 ; ii++)
    {
       _motorPosition[ii]=CurrentIncPositions[ii];
    }
-     currentHomeIndex=0;
-   timer.stop();
+    currentHomeIndex=0;
+    timer.stop();
    //void PIDController::Init(double dt, double max, double min, double Kp, double Kd, double Ki)
-   pid.Init(5,10,-10,1.5,0,0.0);
-   _hommingTimer.disconnect();
-  connect(&_hommingTimer,SIGNAL(timeout()),this,SLOT(HommingLoop()));
-   Epos4.ActiveAllCSP();
-      Epos4.ActiveHand();
-   _hommingTimer.start(5);
-         _rosNode->OperationCompleted(1);
-                 _rosNode->RobotStatus="Ready";
+    pid.Init(5,10,-10,1.5,0,0.0);
+    _hommingTimer.disconnect();
+    connect(&_hommingTimer,SIGNAL(timeout()),this,SLOT(HommingLoop()));
+    Epos4.ActiveAllCSP();
+    Epos4.ActiveHand();
+    _hommingTimer.start(5);
+    _rosNode->RobotStatus="Ready";
 
 }
-
 //=================================================================================================
 void Robot::Timeout()
 {
@@ -387,7 +431,6 @@ void Robot::Timeout()
      Epos4.SetAllPositionCST(_motorPosition,12);
 }
 //=================================================================================================
-
 void Robot::HommingLoop()
 {
 
@@ -411,6 +454,7 @@ double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
      if(currentHomeIndex>11){
          qDebug()<<"Home Finished!";
          _hommingTimer.stop();
+             _rosNode->OperationCompleted(0);
 //         ResetAllNodes();
 
      }

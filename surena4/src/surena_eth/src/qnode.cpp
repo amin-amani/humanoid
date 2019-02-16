@@ -71,10 +71,10 @@ bool QNode::Init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
+    ros::NodeHandle n;
 
     VisualizeInit(&n);
-	// Add your ros communications here.
+    //all ros publishers
     _jointsSubscriber = n.subscribe("jointdata/qc", 1000, &QNode::SendDataToMotors, this);
     chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     _rigthtFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_r_state", 1000);
@@ -83,40 +83,73 @@ bool QNode::Init() {
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
-    //define ros services
+    //all ros services
     _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
+    // _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _getRobotStatus = n.advertiseService("GetRobotStatus", &QNode::GetRobotStatus, this);
-     //   _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP);
-   //ros::Subscriber sub = nh.subscribe("jointdata/qc", 1000, SendDataToMotors);
+
     for (int i = 0; i < 29; i++) {
     ActualPositions.append(0);
     IncPositions.append(0);
 
     }
 
+    //start thread
     start();
 	return true;
 }
 //================================================================================================================================================================
 bool QNode::GetRobotStatus(std_srvs::TriggerRequest &req,std_srvs::TriggerResponse &res)
 {
-res.message=RobotStatus.toStdString();
-res.success=true;
+    _lastOperationResult=-1;
+        Q_EMIT DoReadError();
+       // QThread::msleep(1);
+        //===============================
+    if(!WaitExternalOperation(6000))
+    {
+    res.success=false;
+    res.message="response timeout!";
+    //qDebug()<<"lor:"<<_lastOperationResult;
+    return false;
 
-return true;
+    }
+    if(_lastOperationResult!=0)
+    {
+        res.success=false;
+        res.message="response with error";
+        //qDebug()<<"lor:"<<_lastOperationResult;
+
+        return false;
+
+    }
+
+    //===============================
+        //spy.wait(10000);
+    //qDebug()<<"lor:"<<_lastOperationResult;
+        res.success=true;
+        res.message=RobotStatus.toStdString();
+        //qDebug()<<"Read errors...>\n"<<RobotStatus;
+        return true;
 
 }
 //================================================================================================================================================================
 bool QNode::ActiveCSP(surena_eth::active_csp::Request  &req,surena_eth::active_csp::Response &res)
 {
 
-teststr="";
+    teststr="";
+    _lastOperationResult=-1;
     Q_EMIT SetActiveCSP();
-    //this sleep is mandatory if u want thread wait until function return
-    QThread::msleep(1);
-    qDebug()<<"Active CSP...> "<<teststr;
+    if(!WaitExternalOperation(10000))
+    {
+            return false;
+    }
+    if(_lastOperationResult!=0)
+    {
+        return false;
+    }
+    return true;
 }
 //================================================================================================================================================================
 bool QNode::Home(surena_eth::home::Request  &req,surena_eth::home::Response &res)
@@ -124,7 +157,7 @@ bool QNode::Home(surena_eth::home::Request  &req,surena_eth::home::Response &res
 
     _lastOperationResult=-1;
     Q_EMIT SetHome();
-    if(!WaitExternalOperation(6000))
+    if(!WaitExternalOperation(30000))
     {
    // res.success=false;
   //  res.message="home timeout!";
@@ -142,7 +175,7 @@ bool QNode::Home(surena_eth::home::Request  &req,surena_eth::home::Response &res
   //  res.success=true;
   //  res.message="home ok";
 
-    return false;
+    return true;
 
 }
 //================================================================================================================================================================
@@ -193,6 +226,43 @@ if(_lastOperationResult!=0)
     return true;
 }
 //================================================================================================================================================================
+bool QNode::ReadErrors(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
+{
+    //if(!_nodeInitialized)return false;
+    // QSignalSpy spysig(this,SIGNAL(ExternalOperationComleted(int)));
+
+_lastOperationResult=-1;
+    Q_EMIT DoReadError();
+   // QThread::msleep(1);
+    //===============================
+if(!WaitExternalOperation(6000))
+{
+res.success=false;
+
+qDebug()<<"lor:"<<_lastOperationResult;
+res.message="response timeout!";
+return false;
+
+}
+if(_lastOperationResult!=0)
+{
+    res.success=false;
+    qDebug()<<"lor:"<<_lastOperationResult;
+    res.message="response with error1";
+
+    return false;
+
+}
+qDebug()<<"lor:"<<_lastOperationResult;
+//===============================
+    //spy.wait(10000);
+    res.success=true;
+    res.message="OK";
+    qDebug()<<"Reset all...> "<<teststr;
+    return true;
+}
+
+//================================================================================================================================================================
 void QNode::OperationCompleted(int status)
 {
     _lastOperationResult=status;
@@ -213,24 +283,26 @@ void QNode::run() {
     //  std_msgs::Int32MultiArray msg;
 
     while ( ros::ok() ) {
-    std_msgs::String msg;
+   // std_msgs::String msg;
     sensor_msgs::JointState ActualJointState,IncJointState;
     std_msgs::Int32MultiArray BumpSensorState;
     //sensor_msgs::Imu imuSesnsorMsg;
     //geometry_msgs::Wrench ftSensorMessage;
-    msg.data = "salam";
+    //msg.data = "salam";
 
     std_msgs::MultiArrayDimension msg_dim;
     msg_dim.label = "bump";
     msg_dim.size = 1;
+
+
     BumpSensorState.layout.dim.clear();
     BumpSensorState.layout.dim.push_back(msg_dim);
 
     //chatter_publisher.publish(msg); // publish the value--of type Float64-
- ActualJointState.header.stamp = ros::Time::now();
-  IncJointState.header.stamp = ros::Time::now();
-  imuSesnsorMsg.header.stamp= ros::Time::now();;
-  imuSesnsorMsg.header.frame_id="base_link";
+    ActualJointState.header.stamp = ros::Time::now();
+    IncJointState.header.stamp = ros::Time::now();
+    imuSesnsorMsg.header.stamp= ros::Time::now();;
+    imuSesnsorMsg.header.frame_id="base_link";
 
   for(int i=0 ;i<29;i++){
   ActualJointState.position.push_back(ActualPositions[i]);
@@ -241,17 +313,10 @@ void QNode::run() {
   //BumpSensorState.data[i]=i;
   }
 
-/////
-
-
-_rigthtFtPublisher.publish(RightFtSensorMessage);
-_leftFtPublisher.publish(LeftFtSensorMessage);
-
-///
-
-  _bumpPublisher.publish(BumpSensorState);
-  _imuPublisher.publish(imuSesnsorMsg);
-
+    _rigthtFtPublisher.publish(RightFtSensorMessage);
+    _leftFtPublisher.publish(LeftFtSensorMessage);
+    _bumpPublisher.publish(BumpSensorState);
+    _imuPublisher.publish(imuSesnsorMsg);
     _jointPublisher.publish(ActualJointState);
     _incJointPublisher.publish(IncJointState);
     UpdateRobotModel(ActualPositions);

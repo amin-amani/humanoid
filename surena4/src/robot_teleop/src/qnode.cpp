@@ -72,10 +72,11 @@ bool QNode::Init() {
 
 	// Add your ros communications here.
 
-    chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
-    _jointPublisher =    n.advertise<std_msgs::Int32MultiArray>("jointdata/qc", 1000);
+chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+_jointPublisher =    n.advertise<std_msgs::Int32MultiArray>("jointdata/qc", 1000);
+
 _getstatusService = n.serviceClient<std_srvs::Trigger>("GetRobotStatus");
- _activeCspService = n.serviceClient<surena_eth::active_csp>("ActiveCSP");
+_activeCspService = n.serviceClient<surena_eth::active_csp>("ActiveCSP");
 _resetNodeService = n.serviceClient<std_srvs::SetBool>("ResetAllNodes");
 std_srvs::TriggerRequest req;
 std_srvs::TriggerResponse res;

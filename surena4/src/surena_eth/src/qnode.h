@@ -126,6 +126,7 @@ public:
     void OperationCompleted(int status);
     bool WaitExternalOperation(int timeoutms);
     bool GetRobotStatus(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
+    bool ReadErrors(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
 Q_SIGNALS:
     //=================================================================================================
 	void loggingUpdated();
@@ -139,6 +140,8 @@ Q_SIGNALS:
     void DoResetAllNodes();
     //=================================================================================================
     void SetHome();
+   // =================================================================================================
+        void DoReadError();
     //=================================================================================================
   void ExternalOperationComleted();
 };

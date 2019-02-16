@@ -16,6 +16,13 @@
 
 //#include "tcphandler.h"
 #define USE_NET
+//#define EPOS_DEBUG
+#ifdef EPOS_DEBUG
+#define Debug() qDebug()
+#else
+#define Debug() void(0)
+#endif
+
 
 enum EPOSErrors { OK=0,USB_ERROR, BOARD_ERROR, CAN_ERROR,SDO_REJECT,SDO_BAD_REPLAY,NO_ANSER,NETWOR_ERROR,EPOS_ERROR};
 enum EPOSOperationMode {PPM=1,PVM=3,HMM=6,CSP=8,CST=10};
@@ -23,7 +30,7 @@ enum EPOSOperationMode {PPM=1,PVM=3,HMM=6,CSP=8,CST=10};
 class Epos : public QObject
 {
 Q_OBJECT
-
+    QMap< int,QString> ErrorCodes;
 const double m_dDecouplingCoefficient [6][6]={
 {1,0,0,0,0,0},
 {0,1,0,0,0,0},
@@ -161,6 +168,7 @@ geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
     void StopNode(int devID);
     void SwitchOn(int devID, int canID=1);
     void SwitchOff(int devID, int canID=1);
+    void InitErrorMap();
     EPOSErrors ResetNode(int devID);
     unsigned char GetSDOCODE(int len);
     EPOSErrors SDOWriteCommand(int id, unsigned long input, int index, unsigned char sub_index, unsigned char len, char devID);

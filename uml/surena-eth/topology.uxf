@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>351</x>
+      <y>27</y>
+      <w>90</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>zynq
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>351</x>
+      <y>108</y>
+      <w>90</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Can Interface
+bg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>54</y>
+      <w>27</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>135</x>
+      <y>135</y>
+      <w>279</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;100.0;290.0;100.0;290.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>99</x>
+      <y>270</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lower body Motors
+Chip Select 1~12 
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>396</x>
+      <y>270</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>upperbody
+ID 13~14 
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>135</y>
+      <w>81</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>70.0;150.0;70.0;100.0;10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>540</x>
+      <y>270</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>wrist neck
+ID 15
+fg=black
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>252</x>
+      <y>270</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>wrist neck
+ID 15
+fg=black
+bg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>387</x>
+      <y>135</y>
+      <w>234</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>240.0;150.0;240.0;100.0;10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>297</x>
+      <y>135</y>
+      <w>117</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;100.0;110.0;100.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>450</x>
+      <y>432</y>
+      <w>126</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>Right
+4 epose 4 diff
+3 dxl same can ID
+1 paw single can id
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>441</x>
+      <y>297</y>
+      <w>81</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>70.0;150.0;70.0;100.0;10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>306</x>
+      <y>432</y>
+      <w>126</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>Left
+4 epose
+3 dxl
+1 paw
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>297</y>
+      <w>108</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;100.0;100.0;100.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>423</x>
+      <y>531</y>
+      <w>90</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>can ID 2B</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>513</x>
+      <y>531</y>
+      <w>90</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>DX ID 1 byte</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>603</x>
+      <y>531</y>
+      <w>171</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>Data 7 byte</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
