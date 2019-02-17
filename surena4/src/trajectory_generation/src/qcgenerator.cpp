@@ -21,6 +21,9 @@ vector<int> qref(12);
     qref[8]=int((links[1].JointAngle+cntrl[1])*(1)*(1/(2*M_PI))*(2304)*120);
     qref[9]=int((links[2].JointAngle+cntrl[2])*(1/(2*M_PI))*(2304)*120);
     qref[10]=int((links[8].JointAngle+cntrl[8])*(1/(2*M_PI))*(2304)*120);
+//     qref[9]=int((links[2].JointAngle+cntrl[2])*(1/(2*M_PI))*8192);
+//     qref[10]=int((links[2].JointAngle+cntrl[2])*(1/(2*M_PI))*8192);
+
     qref[11]=int((links[7].JointAngle+cntrl[7])*1*(1/(2*M_PI))*(2304)*120);
 
 
@@ -45,6 +48,9 @@ vector<int> qref(12);
     minimumQC[8]=int(minimum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*(2304)*120);
     minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*8192);
+//    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*8192);
+
     minimumQC[11]=int(minimum[11]*1*(1/(2*M_PI))*(2304)*120);
 
     maximumQC[0]=int(maximum[0]*(1/(2*M_PI))*(2304)*100);
@@ -58,6 +64,9 @@ vector<int> qref(12);
     maximumQC[8]=int(maximum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*(2304)*120);
     maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*8192);
+//    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*8192);
+
     maximumQC[11]=int(maximum[11]*1*(1/(2*M_PI))*(2304)*120);
 
     for (int i = 0; i < 12; ++i) {
@@ -90,6 +99,8 @@ vector<int> qref(12);
     qref[8]=int((links[1].JointAngle)*(1)*(1/(2*M_PI))*(2304)*120);
     qref[9]=int((links[2].JointAngle)*(1/(2*M_PI))*(2304)*120);
     qref[10]=int((links[8].JointAngle)*(1/(2*M_PI))*(2304)*120);
+//    qref[9]=int((links[2].JointAngle)*(1/(2*M_PI))*8192);
+//    qref[10]=int((links[8].JointAngle)*(1/(2*M_PI))*8192);
     qref[11]=int((links[7].JointAngle)*1*(1/(2*M_PI))*(2304)*120);
 
 
@@ -114,6 +125,9 @@ vector<int> qref(12);
     minimumQC[8]=int(minimum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*(2304)*120);
     minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*8192);
+//    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*8192);
+
     minimumQC[11]=int(minimum[11]*1*(1/(2*M_PI))*(2304)*120);
 
     maximumQC[0]=int(maximum[0]*(1/(2*M_PI))*(2304)*100);
@@ -127,6 +141,9 @@ vector<int> qref(12);
     maximumQC[8]=int(maximum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*(2304)*120);
     maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*8192);
+//    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*8192);
+
     maximumQC[11]=int(maximum[11]*1*(1/(2*M_PI))*(2304)*120);
 
     for (int i = 0; i < 12; ++i) {
@@ -159,6 +176,9 @@ vector<int> qref(12);
     qref[8]=int((cntrl[1])*(1)*(1/(2*M_PI))*(2304)*120);
     qref[9]=int((cntrl[2])*(1/(2*M_PI))*(2304)*120);
     qref[10]=int((cntrl[8])*(1/(2*M_PI))*(2304)*120);
+//    qref[9]=int((cntrl[2])*(1/(2*M_PI))*8192);
+//    qref[10]=int((cntrl[8])*(1/(2*M_PI))*8192);
+
     qref[11]=int((cntrl[7])*1*(1/(2*M_PI))*(2304)*120);
 
 
@@ -183,6 +203,8 @@ vector<int> qref(12);
     minimumQC[8]=int(minimum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*(2304)*120);
     minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*8192);
+//    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*8192);
     minimumQC[11]=int(minimum[11]*1*(1/(2*M_PI))*(2304)*120);
 
     maximumQC[0]=int(maximum[0]*(1/(2*M_PI))*(2304)*100);
@@ -196,6 +218,8 @@ vector<int> qref(12);
     maximumQC[8]=int(maximum[8]*(1)*(1/(2*M_PI))*(2304)*120);
     maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*(2304)*120);
     maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*8192);
+//    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*8192);
     maximumQC[11]=int(maximum[11]*1*(1/(2*M_PI))*(2304)*120);
 
 
@@ -209,6 +233,6 @@ vector<int> qref(12);
     qref[8] = -qref[8];
     qref[11] = -qref[11];
 
-
+//qDebug()<<qref[9]<<"\t"<<minimumQC[9]<<"\t"<<maximumQC[9];
     return qref;
 }

@@ -25,8 +25,8 @@ class Robot : public QObject
     int HommingState=0;
     float CurrentIncPositions[40];
 
-    const double offset[12]={ -95 ,-151, 300, 394, 683, -277, -3 ,419, -275, -300-24, -1930-6, 287};
-    const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
+    const double offset[12]={ -95 ,-151, 300, 394, 683, -277, -3 ,419, -275, 580, 732, 287};
+    const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1};
     //const double Direction[12]={1,-1,1,-1,1,1,-1,1,-1,1,1,-1};
         const double Direction[12]={1,1,1,1,1,1,1,1,1,1,1,1};
     const int HomeOrder[12]={0,1,2,3,8,9,5,4,6,7,10,11};
@@ -42,10 +42,12 @@ public:
     //=================================================================================================
 
     bool ReadAllInitialPositions();
-   signals:
+
+signals:
 
 
 public slots:
+        void ReadErrors();
     void StatusCheck();
     //=================================================================================================
     void Initialize();

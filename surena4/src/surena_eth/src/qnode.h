@@ -43,6 +43,8 @@
 #include "visualize.h"
 #include <tf/transform_datatypes.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <QtTest/QSignalSpy>
+#include <std_srvs/Trigger.h>
 
 
 /*****************************************************************************
@@ -62,14 +64,17 @@ private:
     //=================================================================================================
     int init_argc;
     char** init_argv;
+
+    bool _nodeInitialized=false;
+    int _lastOperationResult=0;
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
     ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
-    ros::Publisher _imuRPYPublisher;
     QStringListModel logging_model;
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;
     ros::ServiceServer _resetAllNodesService;
+    ros::ServiceServer _getRobotStatus;
 
 public:
     /*********************
@@ -82,6 +87,7 @@ public:
              Error,
              Fatal
      };
+    QString RobotStatus;
     QString teststr="";
     std_msgs::Int32MultiArray  JointsData;
     QList<double> ActualPositions;
@@ -89,7 +95,6 @@ public:
     int BumpSensor[8];
     double Imu[6];
     sensor_msgs::Imu imuSesnsorMsg;
-    sensor_msgs::Imu imuRPYSensorMsg;
     geometry_msgs::Wrench RightFtSensorMessage,LeftFtSensorMessage;
      //=================================================================================================
     QNode();
@@ -118,8 +123,11 @@ public:
     //=================================================================================================
     bool ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
     //=================================================================================================
-
-  Q_SIGNALS:
+    void OperationCompleted(int status);
+    bool WaitExternalOperation(int timeoutms);
+    bool GetRobotStatus(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
+    bool ReadErrors(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+Q_SIGNALS:
     //=================================================================================================
 	void loggingUpdated();
     //=================================================================================================
@@ -132,7 +140,10 @@ public:
     void DoResetAllNodes();
     //=================================================================================================
     void SetHome();
+   // =================================================================================================
+        void DoReadError();
     //=================================================================================================
+  void ExternalOperationComleted();
 };
 
 //}  // namespace my_qt_gui_subscriber

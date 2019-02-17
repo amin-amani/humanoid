@@ -23,7 +23,7 @@ enum EPOSOperationMode {PPM=1,PVM=3,HMM=6,CSP=8,CST=10};
 class Epos : public QObject
 {
 Q_OBJECT
-
+    QMap< int,QString> ErrorCodes;
 const double m_dDecouplingCoefficient [6][6]={
 {1,0,0,0,0,0},
 {0,1,0,0,0,0},
@@ -147,7 +147,6 @@ public:
 sensor_msgs::Imu IMU;
 sensor_msgs::MagneticField MagneticSensor;
 geometry_msgs::Accel Acceleration;
-sensor_msgs::Imu IMURPY;
 geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
     PingModel ping;
 	Can can;
@@ -162,6 +161,7 @@ geometry_msgs::Wrench ForceTorqSensorRight,ForceTorqSensorLeft;
     void StopNode(int devID);
     void SwitchOn(int devID, int canID=1);
     void SwitchOff(int devID, int canID=1);
+    void InitErrorMap();
     EPOSErrors ResetNode(int devID);
     unsigned char GetSDOCODE(int len);
     EPOSErrors SDOWriteCommand(int id, unsigned long input, int index, unsigned char sub_index, unsigned char len, char devID);

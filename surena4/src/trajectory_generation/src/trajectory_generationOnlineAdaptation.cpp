@@ -27,6 +27,7 @@
 #include<termios.h>
 #include<gazebo_msgs/LinkStates.h>
 #include<sensor_msgs/JointState.h>
+#include"pidcontroller.h"
 
 
 
@@ -64,6 +65,19 @@ ros::Publisher pub28 ;
 
 
 
+int getch()
+{
+  static struct termios oldt, newt;
+  tcgetattr( STDIN_FILENO, &oldt);           // save old settings
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON);                 // disable buffering
+  tcsetattr( STDIN_FILENO, TCSANOW, &newt);  // apply new settings
+
+  int c = getchar();  // read character (non-blocking)
+
+  tcsetattr( STDIN_FILENO, TCSANOW, &oldt);  // restore old settings
+  return c;
+}
 
 
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
@@ -174,9 +188,9 @@ double Offset_phi_L;
 double Offset_phi_R;
 
 int qc_offset[12];
-double roll_absoulte[2];
+double roll_absoulte[4];
 bool qc_initial_bool;
-
+bool qc_initial_bool_roll;
 //
 void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 {
@@ -279,28 +293,47 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 }
 
 
-void qc_initial(){
+void qc_initial(const sensor_msgs::JointState & msg){
     if (qc_initial_bool){
         for (int i = 0; i < 12; ++i) {
             qc_offset[i]=int(msg.position[i+1]);
 
         }
-        ROS_INFO("Offset=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\nInitialized!",
-                 qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
-                qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
-                qc_offset[10],qc_offset[11]);
 
         qc_initial_bool=false;
-    }
+        //qc_initial_bool_roll=true;
 
+
+    ROS_INFO("Offset=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\nInitialized!",
+             qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
+            qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
+            qc_offset[10],qc_offset[11]);}
+ //getch();
 }
 
 void roll_absolute_correction(const sensor_msgs::JointState & msg){
-    roll_absoulte[0]= msg.position[10];
-    roll_absoulte[1]= msg.position[11];
+    roll_absoulte[2]=roll_absoulte[0];
+    roll_absoulte[3]=roll_absoulte[1];
+    roll_absoulte[0]= -msg.position[10];
+    roll_absoulte[1]= -msg.position[11];
 }
 
+//void roll_qc_init(const sensor_msgs::JointState & msg){
+//    if (!qc_initial_bool && qc_initial_bool_roll){
 
+//        qc_offset[9]=int(msg.position[10]);
+//        qc_offset[10]=int(msg.position[11]);
+
+
+//        ROS_INFO("Offset=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\nInitialized!",
+//                 qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
+//                qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
+//                qc_offset[10],qc_offset[11]);
+
+//        qc_initial_bool_roll=false;
+//        getch();
+//    }
+//}
 
 
 
@@ -386,19 +419,6 @@ h=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
 
 
 
-int getch()
-{
-  static struct termios oldt, newt;
-  tcgetattr( STDIN_FILENO, &oldt);           // save old settings
-  newt = oldt;
-  newt.c_lflag &= ~(ICANON);                 // disable buffering
-  tcsetattr( STDIN_FILENO, TCSANOW, &newt);  // apply new settings
-
-  int c = getchar();  // read character (non-blocking)
-
-  tcsetattr( STDIN_FILENO, TCSANOW, &oldt);  // restore old settings
-  return c;
-}
 
 
 
@@ -416,9 +436,10 @@ int main(int argc, char **argv)
     QCgenerator QC;
     for (int i = 0; i < 12; ++i) {
          qc_offset[i]=0;
-         qc_corretction[i]=0;
+         //qc_corretction[i]=0;
     }
     qc_initial_bool=true;
+    qc_initial_bool_roll=false;
 
     //check _timesteps
     QElapsedTimer timer;
@@ -512,7 +533,8 @@ int main(int argc, char **argv)
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
  ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
  ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-ros::Subscriber roll_absolute = nh.subscribe("/surena/inc_joint_state",1000,roll_absolute_correction);
+ros::Subscriber roll_absolute_sub = nh.subscribe("/surena/abs_joint_state",1000,roll_absolute_correction);
+//ros::Subscriber roll_qc_init_sub = nh.subscribe("/surena/abs_joint_num",1000,roll_qc_init);
 
 
 //    pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
@@ -628,6 +650,11 @@ bool firstcontact=true;
 
         // for robot test musbe uncommented
        if (qc_initial_bool) {
+            ROS_INFO("qc is initializing!");
+               ros::spinOnce();
+    continue;
+        }
+       if (qc_initial_bool_roll) {
             ROS_INFO("qc is initializing!");
                ros::spinOnce();
     continue;
@@ -1099,6 +1126,7 @@ MinimumJerkInterpolation CoefOffline;
         //-----------------------------------------------------------------------------------------------------//
 
         if (endPhase==true &&  StartTime>=(DurationOfStartPhase+SURENAOnlineTaskSpace1.MotionTime) && StartTime<=DurationOfendPhase+DurationOfStartPhase+SURENAOnlineTaskSpace1.MotionTime) {
+
             MinimumJerkInterpolation Coef;
             MatrixXd ZPosition(1,2);
             //ZPosition<<Pz(0,0),Pz(0,0)-SURENAOnlineTaskSpace1.ReferencePelvisHeight+SURENAOnlineTaskSpace1.InitialPelvisHeight;//this one should be edited
@@ -1176,9 +1204,10 @@ MinimumJerkInterpolation CoefOffline;
 
         //        else {//else  is for situation that sensor is contacting and adapting ground
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
+double k_roll_corr=1;
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
-        cntrl[2]=(links[2].JointAngle+1*RollModified(0,0));
+        cntrl[2]=(links[2].JointAngle+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])+1*RollModified(0,0));
         cntrl[3]=links[3].JointAngle+1*PitchModified;
         cntrl[4]=links[4].JointAngle;
 //        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*teta_motor_R+Offset_teta_R);//pitch
@@ -1187,7 +1216,7 @@ double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring 
         cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*phi_motor_R;//roll
 
         cntrl[7]=links[7].JointAngle;
-        cntrl[8]=links[8].JointAngle+1*RollModified(1,0);
+        cntrl[8]=links[8].JointAngle+k_roll_corr*(links[8].JointAngle-roll_absoulte[1])+1*RollModified(1,0);
         cntrl[9]=links[9].JointAngle+1*PitchModified;
         cntrl[10]=links[10].JointAngle;
 //        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*teta_motor_L+Offset_teta_L);
@@ -1218,12 +1247,20 @@ double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring 
 
         msg_contact_flag.data.clear();
         msg_contact_flag.data.push_back(contact_flag_timing);
-         msg_contact_flag.data.push_back(contact_flag_sensor);
-msg_contact_flag.data.push_back(contact_flag_sensor2);
+        msg_contact_flag.data.push_back(contact_flag_sensor);
+        msg_contact_flag.data.push_back(contact_flag_sensor2);
 
         contact_flag.publish(msg_contact_flag);
         //  ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
-
+       if(count%20==0){
+           ROS_INFO("right:des=%f,abs=%f,diff=%f (inc=%d),left:des=%f,abs=%f,diff=%f (inc=%d)",links[2].JointAngle,
+                   roll_absoulte[0],links[2].JointAngle-roll_absoulte[0],int((links[2].JointAngle-roll_absoulte[0])*120*2340/2/M_PI),
+                   links[8].JointAngle,roll_absoulte[1],
+                   links[8].JointAngle-roll_absoulte[1],int((links[8].JointAngle-roll_absoulte[1])*120*2340/2/M_PI));
+//       ROS_INFO("RollModifiedRight=%f RollModifiedLeft=%f",RollModified(0,0)*180/M_PI,RollModified(1,0)*180/M_PI);
+       }
+    //    ROS_INFO("q=%d",qref[9]);
+        //ROS_INFO("q=%d",qref[9]);
         ros::spinOnce();
         loop_rate.sleep();
         ++count;

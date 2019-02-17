@@ -28,8 +28,8 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
     RightHipRollModification=4;//3;//4;//5;//degree;
-    LeftHipRollModification=4;//4;//4;//4;//degree
-    HipPitchModification=4;
+    LeftHipRollModification=6;//4;//4;//4;//degree
+    HipPitchModification=3;
 
     toeOff=true;
     HipRollModification=true;
@@ -99,10 +99,12 @@ void TaskSpaceOnline2::SetParameters(){
     YpMax=Rm*0.5*_pelvisLength*1.2;//*1.1;//distace between pelvis to global coord in the middle of single support
     Yd=1*Rd*YpMax;//distace between pelvis to global coord at the begining of single support
  //***********************ok in test
-YpMax=0.15;
+YpMax=0.08;
   Yd =0.08;
-    YStMax=.10;//1.0*YpMax/.9;///1.1;
-    YEndMax=.10;//1.0*YpMax/.9;///1.1;
+//    YStMax=.10;//1.0*YpMax/.9;///1.1;
+//    YEndMax=.10;//1.0*YpMax/.9;///1.1;
+  YStMax=1.0*YpMax/.9;///1.1;
+  YEndMax=1.0*YpMax/.9;///1.1;
 
 
     cout<<" Xe="<<Xe<<" Xs="<< Xs <<" YpMax="<<YpMax<<" Yd="<<Yd<<" YStMax="<<YStMax<<" YEndMax="<<YEndMax<<endl;
@@ -163,7 +165,7 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
     double  D_time=R_1*TDs;
     double D_teta_r=-1*RightHipRollModification*(M_PI/180);
     double D_teta_l=LeftHipRollModification*(M_PI/180);
-
+double extra_D_theta_l=0*M_PI/180;
     if (t<=T_st_p_sx){
         D_time=T_st_p_sx-T_st_p_sy;
         MatrixXd Ct_roll_st(1,2);
@@ -287,7 +289,7 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
         MatrixXd Ct_rollL_ds1(1,2);
         Ct_rollL_ds1<<0 ,D_time;
         MatrixXd Cp_rollL_ds1(1,2);
-        Cp_rollL_ds1<<0, D_teta_l;
+        Cp_rollL_ds1<<0, D_teta_l+extra_D_theta_l;
         MatrixXd Cv_rollL_ds1(1,2);
         Cv_rollL_ds1<<0 ,0;
         MatrixXd Ca_rollL_ds1(1,2);
@@ -305,14 +307,14 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
     }
     else if (t>=(TGait+TDs) && t<T_end_p_sx){
         rollR=0;
-        rollL=D_teta_l;
+        rollL=D_teta_l+extra_D_theta_l;
     }
     else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
         D_time=(T_end_p_ey-T_end_p_sx);
         MatrixXd Ct_roll_st(1,2);
         Ct_roll_st<<-1*D_time ,0;
         MatrixXd Cp_roll_st(1,2);
-        Cp_roll_st<<D_teta_l, 0;
+        Cp_roll_st<<D_teta_l+extra_D_theta_l, 0;
         MatrixXd Cv_roll_st(1,2);
         Cv_roll_st<<0 ,0;
         MatrixXd Ca_roll_st(1,2);
@@ -324,7 +326,7 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
             rollL=output(0,0);
             rollR=0;
         }
-
+//qDebug()<<"D_teta_l="<<D_teta_l<<"\t D_teta_r="<<D_teta_r;
 
     }
 MatrixXd RollMat(2,1);

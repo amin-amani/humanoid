@@ -1,4 +1,75 @@
 #include "epos.h"
+void Epos::InitErrorMap()
+{
+  ErrorCodes.insert(  0x0,"OK");
+  ErrorCodes.insert(  0x1000,"Generic error");
+  ErrorCodes.insert(  0x1080,"Generic initialization error");
+  ErrorCodes.insert(  0x1081,"Generic initialization error");
+  ErrorCodes.insert(  0x1082,"Generic initialization error");
+  ErrorCodes.insert(  0x1083,"Generic initialization error");
+  ErrorCodes.insert(0x1090,"Firmware incompatibility error");
+  ErrorCodes.insert(0x2310,"Overcurrent error");
+  ErrorCodes.insert(0x2320,"Power stage protection error");
+  ErrorCodes.insert(0x3210,"Overvoltage error");
+  ErrorCodes.insert(0x3220,"Undervoltage error");
+  ErrorCodes.insert(0x4210,"Thermal overload error");
+  ErrorCodes.insert(0x5113,"Logic supply voltage too low error");
+  ErrorCodes.insert(0x5280,"Hardware defect error");
+  ErrorCodes.insert(0x5281,"Hardware incompatibility error");
+  ErrorCodes.insert(0x5480,"Hardware error");
+  ErrorCodes.insert(0x5481,"Hardware error");
+  ErrorCodes.insert(0x5482,"Hardware error");
+  ErrorCodes.insert(0x5483,"Hardware error");
+  ErrorCodes.insert(0x6080,"Sign of life error");
+  ErrorCodes.insert(0x6081,"Extension 1 watchdog error");
+  ErrorCodes.insert(0x6320,"Software parameter error");
+  ErrorCodes.insert(0x7320,"Position sensor error");
+  ErrorCodes.insert(0x7380,"Position sensor breach error");
+  ErrorCodes.insert(0x7381,"Position sensor resolution error");
+  ErrorCodes.insert(0x7382,"Position sensor index error");
+  ErrorCodes.insert(0x7388,"Hall sensor error");
+  ErrorCodes.insert(0x7389,"Hall sensor not found error");
+  ErrorCodes.insert(0x738A,"Hall angle detection error");
+  ErrorCodes.insert(0x738C,"SSI sensor error");
+  ErrorCodes.insert(0x7390,"Missing main sensor error");
+  ErrorCodes.insert(0x7391,"Missing commutation sensor error");
+  ErrorCodes.insert(0x7392,"Main sensor direction error");
+  ErrorCodes.insert(0x8110,"CAN overrun error (object lost)");
+  ErrorCodes.insert(0x8111,"CAN overrun error");
+  ErrorCodes.insert(0x8120,"CAN passive mode error");
+  ErrorCodes.insert(0x8130,"CAN heartbeat error");
+  ErrorCodes.insert(0x8150,"CAN PDO COB-ID collision");
+  ErrorCodes.insert(0x8180,"EtherCAT communication error");
+  ErrorCodes.insert(0x8181,"EtherCAT initialization error");
+  ErrorCodes.insert(0x81FD,"CAN bus turned off");
+  ErrorCodes.insert(0x81FE,"CAN Rx queue overflow");
+  ErrorCodes.insert(0x81FF,"CAN Tx queue overflow");
+  ErrorCodes.insert(0x8210,"CAN PDO length error");
+  ErrorCodes.insert(0x8250,"RPDO timeout");
+  ErrorCodes.insert(0x8280,"EtherCAT PDO communication error");
+  ErrorCodes.insert(0x8281,"EtherCAT SDO communication error");
+  ErrorCodes.insert(0x8611,"Following error");
+  ErrorCodes.insert(0x8A80,"Negative limit switch error");
+  ErrorCodes.insert(0x8A81,"Positive limit switch error");
+  ErrorCodes.insert(0x8A82,"Software position limit error");
+  ErrorCodes.insert(0x8A88,"STO error");
+  ErrorCodes.insert(0xFF01,"System overloaded error");
+  ErrorCodes.insert(0xFF02,"Watchdog error");
+  ErrorCodes.insert(0xFF0B,"System peak overloaded error");
+  ErrorCodes.insert(0xFF10,"Controller gain error");
+  ErrorCodes.insert(0xFF12,"Auto tuning current limit error");
+  ErrorCodes.insert(0xFF13,"Auto tuning identification current error");
+  ErrorCodes.insert(0xFF14,"Auto tuning buffer overflow error");
+  ErrorCodes.insert(0xFF15,"Auto tuning sample mismatch error");
+  ErrorCodes.insert(0xFF16,"Auto tuning parameter error");
+  ErrorCodes.insert(0xFF17,"Auto tuning amplitude mismatch error");
+  ErrorCodes.insert(0xFF18,"Auto tuning period length error");
+  ErrorCodes.insert(0xFF19,"Auto tuning timeout error");
+  ErrorCodes.insert(0xFF20,"Auto tuning standstill error");
+  ErrorCodes.insert(0xFF21,"Auto tuning torque invalid error");
+}
+//====================================================================================
+
 //========================================================================
 Epos::Epos(QObject *parent) : QObject(parent)
 {
@@ -19,7 +90,7 @@ imu_data_list.append((char)0x00);
   ft.append((char)0x00);
     }
 
-
+InitErrorMap();
     qDebug()<<"all printed values are hex";
    // connect(&tcp,SIGNAL(NewDataReceived()),this,SIGNAL(NewDataReady()));
     connect(&tcp,SIGNAL(NewDataReceived(QByteArray)),this,SLOT(DataReceived(QByteArray)));
@@ -600,8 +671,8 @@ QString Epos::ReadCurrentError(int canID,int devID)
     // status= ReadRegister(0x1001,0,canID,devID,value);
     status= ReadRegister(0x603f,0,canID,devID,value,10,3);
     if(status!=OK){ return "read error";}
-    qDebug()<<"error="<<QString::number( value,16);
-    return "ok";
+    //qDebug()<<"error="<<QString::number( value,16);
+    return ErrorCodes[value];
 }
 //========================================================================
 bool Epos::SetPosition(int canID,int devId,int position,int velocity)
@@ -756,7 +827,7 @@ void Epos::SetAllPositionCST(QList<int> all_position, int motor_num)
   // send 4 data can(each can 10 byte) (40 byte)
     ///////////////////////for 4 maxon motors
 if(handDeviceID<4){
-//right hand
+//right hand 12 13 14 15
     data.append(0x4);
     data.append(1+handDeviceID);
 
@@ -770,7 +841,7 @@ if(handDeviceID<4){
     data.append((char)00);
     data.append((char)0x00);
 
-    ///left hand
+    ///left hand 20 21 22 23
     data.append(0x4);
     data.append(0x01+handDeviceID);
 
@@ -794,11 +865,11 @@ else if(handDeviceID> 3 && handDeviceID<7)
     //motor2 from
     //motor3  from
 
-data.append(0x05);
+data.append(0x05);//id from 1 t0 3 right hand 24 25 26
 data.append(0x81);
 
 
-data.append(handDeviceID-3);//id from 1 t0 3 left hand 24 25 26
+data.append(handDeviceID-3);
 data.append((all_position[12+handDeviceID] >> 8) & 0xff); //pos hi
 data.append((all_position[12+handDeviceID] >> 0) & 0xff); //pos low
 data.append(40);  //speed
@@ -807,7 +878,7 @@ data.append((char)0x00);
 data.append((char)00);
 data.append((char)0x00);
 
-///left hand
+///left hand id from 1 t0 3 left hand 24 25 26
 data.append(0x05);
 data.append(0x81);
 
@@ -836,7 +907,8 @@ else if(handDeviceID==7){
     data.append((char)0x00);
     data.append((char)0x00);
 
-    ///left palm
+        ///left palm
+
     data.append(0x3);
     data.append(0x52);
     data.append(all_position[27] &0xff);
@@ -1212,7 +1284,7 @@ ForceTorqSensorLeft.torque.z/=(65535*gainFTLeft[5]*sensitivityFTLeft[5]*ExFTLeft
 
 
 
-tf2::Quaternion myQuaternion;
+        tf2::Quaternion myQuaternion;
 myQuaternion.setRPY( incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
 //--------------------orientation
 IMU.orientation.x=myQuaternion.getX();
@@ -1227,22 +1299,11 @@ IMU.linear_acceleration.y=incommingPacket->IMU.ay;
  IMU.angular_velocity.x=incommingPacket->IMU.wx;
  IMU.angular_velocity.y=incommingPacket->IMU.wy;
  IMU.angular_velocity.z=incommingPacket->IMU.wz;
-
-// ROS_INFO("%f%f%f",incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
-
- //Roll, Pitch, and Yaw from IMU====================NEW
- IMURPY.angular_velocity.x = incommingPacket->IMU.roll;
- IMURPY.angular_velocity.y = incommingPacket->IMU.pitch;
- IMURPY.angular_velocity.z = incommingPacket->IMU.yaw;
- //mx, my, and mz from IMU====================NEW
- IMURPY.linear_acceleration.x = incommingPacket->IMU.mx;
- IMURPY.linear_acceleration.y = incommingPacket->IMU.my;
- IMURPY.linear_acceleration.z = incommingPacket->IMU.mz;
-
  //free acc
  Acceleration.linear.x=incommingPacket->IMU.fax;
  Acceleration.linear.y=incommingPacket->IMU.fay;
  Acceleration.linear.z=incommingPacket->IMU.faz;
+
 
  //mag feild
 MagneticSensor.magnetic_field.x=incommingPacket->IMU.mx;

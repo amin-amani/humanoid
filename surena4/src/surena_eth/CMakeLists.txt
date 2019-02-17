@@ -40,7 +40,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 #SET(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Network)
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Network Qt5Test)
 
 ##############################################################################
 # Sections
@@ -59,6 +59,7 @@ include_directories(
     ${Qt5Gui_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5PrintSupport_INCLUDE_DIRS}
+    ${Qt5Test_INCLUDE_DIRS}
     )
 
 add_definitions( -std=c++11 -fPIC)
@@ -97,6 +98,7 @@ target_link_libraries(surena_eth
     Qt5::Network
     Qt5::Widgets
     Qt5::PrintSupport
+    ${QT_QTTEST_LIBRARY}
     ${LIBUSB_1_LIBRARIES}
 )
 install(TARGETS surena_eth RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

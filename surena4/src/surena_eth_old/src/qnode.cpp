@@ -77,9 +77,7 @@ bool QNode::Init() {
     _leftFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_l_state", 1000);
     _imuPublisher =    n.advertise<sensor_msgs::Imu>("surena/imu_state", 1000);
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
-
     _absPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_num", 1000);
-
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
 

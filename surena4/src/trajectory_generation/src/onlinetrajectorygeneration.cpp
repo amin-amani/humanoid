@@ -72,6 +72,7 @@ ros::Publisher pub27 ;
 ros::Publisher pub28 ;
 
 double q0, q1, q2, q3; // x~q1 y~q2 z~q3 w~q0
+double Roll, Pitch, Yaw;
 bool QcInitialBool;
 
 void RecieveIMUOrientation(const sensor_msgs::Imu & msg)
@@ -81,6 +82,10 @@ void RecieveIMUOrientation(const sensor_msgs::Imu & msg)
     q1 = msg.orientation.x;
     q2 = msg.orientation.y;
     q3 = msg.orientation.z;
+
+    Roll = msg.orientation.x;
+    Pitch = msg.orientation.y;
+    Yaw = msg.orientation.z;
 }
 
 void QcInitial(const sensor_msgs::JointState & msg){
@@ -133,7 +138,7 @@ int main(int argc, char **argv)
         //        q1 = 0.25;
         //        q2 = 0.25;
         //        q3 = 0.25;
-        MatrixXd RotationMatrix = StateEstimation.MatrixRotationPelvis(q0,q1,q2,q3);
+        MatrixXd RotationMatrix = StateEstimation.MatrixRotationPelvisRPY(Roll,Pitch,0); //yaw is zero intentionally because the real value contains drift.
         MatrixXd LocalPosition(3,1);
 //        LocalPosition << 113-30, 115, 0;
         LocalPosition << 0, 0, 10;
@@ -149,8 +154,9 @@ int main(int argc, char **argv)
         {
             msgTilt.data.push_back(DeltaPosition(j-1,0));
         }
-        SendJointData.publish(msg);
+        //SendJointData.publish(msg);
         SendDeltaPosition.publish(msgTilt);
+        //ROS_INFO("%f%f%f",msgTilt(0,0),msgTilt(1,0),msgTilt(2,0));
         ros::spinOnce();
         loop_rate.sleep();
     }
