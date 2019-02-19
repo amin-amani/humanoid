@@ -67,14 +67,16 @@ bool QNode::Init(const std::string &master_url, const std::string &host_url) {
 bool QNode::Init() {
     ros::init(init_argc,init_argv,"surena");
 	if ( ! ros::master::check() ) {
-        qDebug()<<"init error!";
+        //qDebug()<<"init error!";
 		return false;
 	}
+
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
     ros::NodeHandle n;
 
     VisualizeInit(&n);
-    //all ros publishers
+
+    QLOG_TRACE()<<"Initializing all ros publishers";
     _jointsSubscriber = n.subscribe("jointdata/qc", 1000, &QNode::SendDataToMotors, this);
     chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     _rigthtFtPublisher= n.advertise<geometry_msgs::Wrench>("surena/ft_r_state", 1000);
@@ -83,7 +85,8 @@ bool QNode::Init() {
     _jointPublisher =    n.advertise<sensor_msgs::JointState>("surena/abs_joint_state", 1000);
     _incJointPublisher = n.advertise<sensor_msgs::JointState>("surena/inc_joint_state", 1000);
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
-    //all ros services
+
+    QLOG_TRACE()<<"Initializing all ros services";
     _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
@@ -96,19 +99,21 @@ bool QNode::Init() {
 
     }
 
-    //start thread
+    QLOG_TRACE()<<"Start ROS::OK loop";
     start();
 	return true;
 }
 //================================================================================================================================================================
 bool QNode::GetRobotStatus(std_srvs::TriggerRequest &req,std_srvs::TriggerResponse &res)
 {
+        QLOG_TRACE()<<"get Robot Status";
     _lastOperationResult=-1;
         Q_EMIT DoReadError();
        // QThread::msleep(1);
         //===============================
     if(!WaitExternalOperation(6000))
     {
+      QLOG_TRACE()<<"Wait for external signal failed";
     res.success=false;
     res.message="response timeout!";
     //qDebug()<<"lor:"<<_lastOperationResult;
@@ -117,6 +122,7 @@ bool QNode::GetRobotStatus(std_srvs::TriggerRequest &req,std_srvs::TriggerRespon
     }
     if(_lastOperationResult!=0)
     {
+        QLOG_TRACE()<<"Operation error";
         res.success=false;
         res.message="response with error";
         //qDebug()<<"lor:"<<_lastOperationResult;
@@ -135,12 +141,13 @@ bool QNode::GetRobotStatus(std_srvs::TriggerRequest &req,std_srvs::TriggerRespon
 
 }
 //================================================================================================================================================================
-bool QNode::ActiveCSP(surena_eth::active_csp::Request  &req,surena_eth::active_csp::Response &res)
+bool QNode::ActiveCSP(robot_teleop::active_csp::Request  &req,robot_teleop::active_csp::Response &res)
 {
 
-    teststr="";
+
     _lastOperationResult=-1;
-    Q_EMIT SetActiveCSP();
+
+    Q_EMIT SetActiveCSP(req.nodeID);
     if(!WaitExternalOperation(10000))
     {
             return false;
@@ -152,29 +159,22 @@ bool QNode::ActiveCSP(surena_eth::active_csp::Request  &req,surena_eth::active_c
     return true;
 }
 //================================================================================================================================================================
-bool QNode::Home(surena_eth::home::Request  &req,surena_eth::home::Response &res)
+bool QNode::Home(robot_teleop::home::Request  &req,robot_teleop::home::Response &res)
 {
 
     _lastOperationResult=-1;
-    Q_EMIT SetHome();
+    Q_EMIT SetHome(req.nodeID);
     if(!WaitExternalOperation(30000))
     {
-   // res.success=false;
-  //  res.message="home timeout!";
     return false;
 
     }
     if(_lastOperationResult!=0)
     {
-     //   res.success=false;
-      //  res.message="home error";
 
         return false;
 
     }
-  //  res.success=true;
-  //  res.message="home ok";
-
     return true;
 
 }
@@ -195,12 +195,10 @@ bool QNode::WaitExternalOperation(int timeoutms=60000)
 //================================================================================================================================================================
 bool QNode::ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
 {
-    //if(!_nodeInitialized)return false;
-    // QSignalSpy spysig(this,SIGNAL(ExternalOperationComleted(int)));
 
 _lastOperationResult=-1;
-    Q_EMIT DoResetAllNodes();
-   // QThread::msleep(1);
+    Q_EMIT DoResetAllNodes(req.data);
+
     //===============================
 if(!WaitExternalOperation(6000))
 {
@@ -281,8 +279,22 @@ void QNode::run() {
     ros::Rate loop_rate(200);
     _jointsSubscriber = n.subscribe("jointdata/qc", 1000, &QNode::SendDataToMotors, this);
     //  std_msgs::Int32MultiArray msg;
+//    while (ros::ok()) //Endless loop until Ctrl+c
+//        {
+//            ROS_DEBUG("This is a DEBUG message");
+//            ROS_INFO("This is a INFO message");
+//            ROS_WARN("This is a WARN message");
+//            ROS_ERROR("This is a ERROR message");
+//            ROS_FATAL("This is a FATAL message");
 
+//            loop_rate.sleep();
+//            ros::spinOnce();
+//        }
     while ( ros::ok() ) {
+
+
+
+
    // std_msgs::String msg;
     sensor_msgs::JointState ActualJointState,IncJointState;
     std_msgs::Int32MultiArray BumpSensorState;

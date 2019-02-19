@@ -2,16 +2,20 @@
 //=================================================================================================
 Robot::Robot(QObject *parent, int argc, char **argv)
 {
-    qDebug()<<"start..";
 
+    QLOG_TRACE()<<"Reset all motor position values";
     for(int ii=0; ii<12+8+8 ; ii++)
    {
       _motorPosition.append(100);
    }
-
+    QLOG_TRACE()<<"Create Ros Node";
     _rosNode=new QNode(argc,argv);
-    if(!_rosNode->Init())exit(0);
-
+    if(!_rosNode->Init())
+    {
+    QLOG_FATAL()<<"Ros node init error please check ros master!";
+        exit(0);
+    }
+    QLOG_TRACE()<<"Ros node successfuly created";
     _rosNode->RobotStatus="Initialize";
 //if(Epos4.Init(2)==OK){qDebug()<<"ok";return;}
  //   connect(&_statusCheckTimer,SIGNAL(timeout()),this,SLOT(StatusCheck()));
@@ -20,13 +24,15 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     pos=0;
     connect(_rosNode,SIGNAL(rosShutdown()),this,SLOT(CleanAndExit()));
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
-    connect(_rosNode,SIGNAL(SetActiveCSP()),this,SLOT(ActiveCSP()));
-    connect(_rosNode,SIGNAL(DoResetAllNodes()),this,SLOT(ResetAllNodes()));
+    connect(_rosNode,SIGNAL(SetActiveCSP(int)),this,SLOT(ActiveCSP(int)));
+    connect(_rosNode,SIGNAL(DoResetAllNodes(int)),this,SLOT(ResetAllNodes(int)));
     connect(_rosNode,SIGNAL(DoReadError()),this,SLOT(ReadErrors()));
-    connect(_rosNode,SIGNAL(SetHome()),this,SLOT(Home()));
+    connect(_rosNode,SIGNAL(SetHome(int)),this,SLOT(Home(int)));
     connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
     connect(&_initialTimer,SIGNAL(timeout()),this,SLOT(Initialize()));
-          _initialTimer.start(2000);
+
+     QLOG_TRACE()<<"Start initial timer";
+    _initialTimer.start(2000);
 
          return;
 
@@ -153,6 +159,7 @@ return false;
 //=================================================================================================
 bool Robot::ReadAllInitialPositions()
 {
+    QLOG_TRACE()<<"Read inc and absoulute encoders";
     int numberOfSuccess=0;
 
    ///////////read right hand offsets
@@ -308,20 +315,27 @@ _rosNode->LeftFtSensorMessage=Epos4.ForceTorqSensorLeft;
 
 }
 //=================================================================================================
-void Robot::ActiveCSP()
+void Robot::ActiveCSP(int id)
 {
 
     ////////////hand test
     _rosNode->RobotStatus="Motor Activating";
-    qDebug()<<"active csp slot...";
+    qDebug()<<"active csp slot..."<<id;
     _rosNode->teststr="OK";
-
     timer.stop();
 
+    if(id==255){
     QThread::msleep(5);
     Epos4.ActiveAllCSP();
     QThread::msleep(5);
     Epos4.ActiveHand();
+    }
+    else
+    {
+    Epos4.ActiveCSP(id);
+    }
+
+
     _rosNode->OperationCompleted(0);
     _rosNode->RobotStatus="Ready";
             }
@@ -341,13 +355,13 @@ _rosNode->OperationCompleted(0); //all good
 
 }
 //=================================================================================================
-void Robot::ResetAllNodes()
+void Robot::ResetAllNodes(int id)
 {
     _hommingTimer.stop();
     _rosNode->RobotStatus="Reseting Nodes";
     qDebug()<<"Reset all slot...";
     _rosNode->teststr="OK";
-
+if(id==255){
     for(int i=0;i<14;i++)
     { Epos4.ResetNode(i);
     QThread::msleep(5);
@@ -355,7 +369,11 @@ void Robot::ResetAllNodes()
 
 
     }
+}
+else{
+Epos4.ResetNode(id);
 
+}
     for(int i=0;i<12;i++){
         //checking status word
           int32_t val;
@@ -383,7 +401,7 @@ void Robot::ResetAllNodes()
 
 }
 //=================================================================================================
-void Robot::Home()
+void Robot::Home(int id)
 {
 
         _rosNode->RobotStatus="Homming";

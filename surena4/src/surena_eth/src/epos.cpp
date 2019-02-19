@@ -1,4 +1,5 @@
 #include "epos.h"
+//====================================================================================
 void Epos::InitErrorMap()
 {
   ErrorCodes.insert(  0x0,"OK");
@@ -68,13 +69,12 @@ void Epos::InitErrorMap()
   ErrorCodes.insert(0xFF20,"Auto tuning standstill error");
   ErrorCodes.insert(0xFF21,"Auto tuning torque invalid error");
 }
-//====================================================================================
-
 //========================================================================
 Epos::Epos(QObject *parent) : QObject(parent)
 {
 //    while (!tcp.IsConnected) {
 //    }
+
     for(int i=0;i<8;i++)
     {
 
@@ -92,7 +92,7 @@ imu_data_list.append((char)0x00);
 
 InitErrorMap();
     qDebug()<<"all printed values are hex";
-    Debug()<<"all printed values are hex too";
+    qDebug()<<"all printed values are hex too";
    // connect(&tcp,SIGNAL(NewDataReceived()),this,SIGNAL(NewDataReady()));
     connect(&tcp,SIGNAL(NewDataReceived(QByteArray)),this,SLOT(DataReceived(QByteArray)));
 
@@ -254,7 +254,6 @@ void Epos::SetPreoperationalMode(int devID,int nodeID)
     data.append((char)0x00);
     can.WriteMessage(00,devID,data);
 }
-
 //========================================================================
 void  Epos::ResetComunication(int devID)
 {
@@ -444,7 +443,6 @@ bool Epos::ActiveHand() //13,2
     WaitMs(700);
     return OK;
 }
-
 //========================================================================
 bool Epos::ActivePPMPDO(int nodeID,int canID) //13,2
 {
@@ -477,8 +475,6 @@ bool Epos::ActiveCSP(int nodeID)
     WaitMs(700);
     return OK;
 }
-
-
 //========================================================================
 bool Epos::AllActiveCSP()
 {
