@@ -204,16 +204,16 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     int tempInt[8];
 
 
-    temp[0]=msg.data[0]-1005;
-    temp[1]=-1*(msg.data[1]-937);
-    temp[2]=msg.data[2]-3037;
-    temp[3]=-1*(msg.data[3]-3099);
+    temp[0]=msg.data[0]-1012;
+    temp[1]=-1*(msg.data[1]-924);
+    temp[2]=msg.data[2]-3038;
+    temp[3]=-1*(msg.data[3]-3098);
 
     //normalizing data of sensors
-    temp[0]=temp[0]*(100.0/(1105-1005));
-    temp[1]=temp[1]*(100.0/(937-833));
-    temp[2]=temp[2]*(100.0/(3150-3037));
-    temp[3]=temp[3]*(100.0/(3099-2987));
+    temp[0]=temp[0]*(100.0/(1097-1011));
+    temp[1]=temp[1]*(100.0/(925-841));
+    temp[2]=temp[2]*(100.0/(3131-3038));
+    temp[3]=temp[3]*(100.0/(3098-3001));
 
     tempInt[0]=temp[0];
     tempInt[1]=temp[1];
@@ -228,16 +228,16 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 
 
 
-    temp[4]=msg.data[4]-3041;
-    temp[5]=-1*(msg.data[5]-3006);
-    temp[6]=msg.data[6]-1128;
-    temp[7]=-1*(msg.data[7]-1014);
+    temp[4]=msg.data[4]-3042;
+    temp[5]=-1*(msg.data[5]-3008);
+    temp[6]=msg.data[6]-1133;
+    temp[7]=-1*(msg.data[7]-1016);
 
     //normalizing data of sensors
-    temp[4]=temp[4]*(100.0/(3144-3041));
-    temp[5]=temp[5]*(100.0/(3006-2898));
-    temp[6]=temp[6]*(100.0/(1229-1128));
-    temp[7]=temp[7]*(100.0/(1014-909));
+    temp[4]=temp[4]*(100.0/(3126-3042));
+    temp[5]=temp[5]*(100.0/(3008-2914));
+    temp[6]=temp[6]*(100.0/(1225-1133));
+    temp[7]=temp[7]*(100.0/(1016-920));
 
 
 
@@ -568,13 +568,15 @@ ros::Subscriber roll_absolute_sub = nh.subscribe("/surena/abs_joint_state",1000,
 
     ros::Subscriber ankleStates = nh.subscribe("/gazebo/link_states", 10, ankle_states);
 
+
+
 int32_t contact_flag_timing=1000;
 int32_t contact_flag_sensor=1000;
 int32_t contact_flag_sensor2=1000;
 
     ros::Rate loop_rate(200);
     std_msgs::Int32MultiArray msg;
-
+std_msgs::Int32MultiArray roll_modif_msg;
     std_msgs::Int32MultiArray msg_contact_flag;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -648,17 +650,13 @@ bool firstcontact=true;
     while (ros::ok())
     {
 
-        // for robot test musbe uncommented
+       //  for robot test musbe uncommented
        if (qc_initial_bool) {
             ROS_INFO("qc is initializing!");
                ros::spinOnce();
     continue;
         }
-       if (qc_initial_bool_roll) {
-            ROS_INFO("qc is initializing!");
-               ros::spinOnce();
-    continue;
-        }
+
 
 
 //
@@ -1022,9 +1020,9 @@ MinimumJerkInterpolation CoefOffline;
                 }
 
 //replace false with following commented for activing sensor
-                if (  /*(RightFootLanded==true)*/ false &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
+              //  if (  /*(RightFootLanded==true)*/ false &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
 
-              //  if (  (RightFootLanded==true)  &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
+                if (  (RightFootLanded==true)  &&  ( SURENAOnlineTaskSpace1.StepNumber==1 || SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2)   /*|| SURENAOnlineTaskSpace1.StepNumber==(SURENAOnlineTaskSpace1.NStep+2)*/)) {
 
                     SURENAOnlineTaskSpace1.oldRightFootX2= SURENAOnlineTaskSpace1.currentRightFootX2;
                     SURENAOnlineTaskSpace1.oldRightFootY2= SURENAOnlineTaskSpace1.currentRightFootY2;
@@ -1046,8 +1044,8 @@ MinimumJerkInterpolation CoefOffline;
 
 
 //replace false with following commented for activing sensro
-               if ((  /*(LeftFootLanded==true)*/ false && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
-             //       if ((  (LeftFootLanded==true) && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
+              // if ((  /*(LeftFootLanded==true)*/ false && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
+                    if ((  (LeftFootLanded==true) && SURENAOnlineTaskSpace1.localTiming>(SURENAOnlineTaskSpace1.TDs+SURENAOnlineTaskSpace1.TSS/2) )) {
 
                     SURENAOnlineTaskSpace1.oldLeftFootX2= SURENAOnlineTaskSpace1.currentLeftFootX2;
                     SURENAOnlineTaskSpace1.oldLeftFootY2= SURENAOnlineTaskSpace1.currentLeftFootY2;
@@ -1204,37 +1202,54 @@ MinimumJerkInterpolation CoefOffline;
 
         //        else {//else  is for situation that sensor is contacting and adapting ground
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-double k_roll_corr=1;
+double k_roll_corr=0;
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
         cntrl[2]=(links[2].JointAngle+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])+1*RollModified(0,0));
-        cntrl[3]=links[3].JointAngle+1*PitchModified;
+        cntrl[3]=links[3].JointAngle+1.25*PitchModified;
         cntrl[4]=links[4].JointAngle;
 //        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*teta_motor_R+Offset_teta_R);//pitch
 //        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.RightFootOrientationAdaptator==true)*phi_motor_R+Offset_phi_R);//roll
         cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*teta_motor_R;//pitch
-        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*phi_motor_R;//roll
+        cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*(phi_motor_R);//roll
 
         cntrl[7]=links[7].JointAngle;
         cntrl[8]=links[8].JointAngle+k_roll_corr*(links[8].JointAngle-roll_absoulte[1])+1*RollModified(1,0);
-        cntrl[9]=links[9].JointAngle+1*PitchModified;
+        cntrl[9]=links[9].JointAngle+1.25*PitchModified;
         cntrl[10]=links[10].JointAngle;
 //        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*teta_motor_L+Offset_teta_L);
 //        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*((SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true)*phi_motor_L+Offset_phi_L);
         cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*teta_motor_L;
-        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*phi_motor_L;
+        cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
 
         //        }
        // ROS_INFO("teta_R=%f,Offset_teta_R=%f,phi_R=%f,Offset_phi_R=%f,teta_L=%f,Offset_teta_L=%f,phi_L=%f,Offset_phi_L=%f",teta_motor_R,Offset_teta_R,phi_motor_R,Offset_phi_R,teta_motor_L,Offset_teta_L,phi_motor_L,Offset_phi_L);
 //please uncomment /*SURENAOnlineTaskSpace1.LeftFootOrientationAdaptator==true* for activing sensor and also replace 0 with  1 in above code
 
+
         vector<int> qref(12);
         qref=QC.ctrldata2qc(cntrl);
 
         msg.data.clear();
-        for(int  i = 0;i < 12;i++)
-        {
-            msg.data.push_back(qref[i]+qc_offset[i]);
+        bool left_first=true;//right support in first step
+        if(left_first){
+            for(int  i = 0;i < 12;i++)
+            {
+                msg.data.push_back(qref[i]+qc_offset[i]);
+            }}
+        else{
+            msg.data.push_back(-qref[5]+qc_offset[0]);
+            msg.data.push_back(-qref[4]+qc_offset[1]);
+            msg.data.push_back(-qref[6]+qc_offset[2]);
+            msg.data.push_back(-qref[7]+qc_offset[3]);
+            msg.data.push_back(-qref[1]+qc_offset[4]);
+            msg.data.push_back(-qref[0]+qc_offset[5]);
+            msg.data.push_back(-qref[2]+qc_offset[6]);
+            msg.data.push_back(-qref[3]+qc_offset[7]);
+            msg.data.push_back(-qref[11]+qc_offset[8]);
+            msg.data.push_back(-qref[10]+qc_offset[9]);
+            msg.data.push_back(-qref[9]+qc_offset[10]);
+            msg.data.push_back(-qref[8]+qc_offset[11]);
         }
 
         for(int  i = 12;i < 28;i++)
@@ -1242,7 +1257,7 @@ double k_roll_corr=1;
             msg.data.push_back(0);
         }
 
-        //SendGazebo(links,RollModified,PitchModified,teta_motor_R+0*Offset_teta_R,phi_motor_R+0*Offset_phi_R,teta_motor_L+0*Offset_teta_L,phi_motor_L+0*Offset_phi_L);
+       // SendGazebo(links,RollModified,PitchModified,teta_motor_R+0*Offset_teta_R,phi_motor_R+0*Offset_phi_R,teta_motor_L+0*Offset_teta_L,phi_motor_L+0*Offset_phi_L);
         chatter_pub.publish(msg);
 
         msg_contact_flag.data.clear();
@@ -1253,11 +1268,12 @@ double k_roll_corr=1;
         contact_flag.publish(msg_contact_flag);
         //  ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
        if(count%20==0){
-           ROS_INFO("right:des=%f,abs=%f,diff=%f (inc=%d),left:des=%f,abs=%f,diff=%f (inc=%d)",links[2].JointAngle,
-                   roll_absoulte[0],links[2].JointAngle-roll_absoulte[0],int((links[2].JointAngle-roll_absoulte[0])*120*2340/2/M_PI),
-                   links[8].JointAngle,roll_absoulte[1],
-                   links[8].JointAngle-roll_absoulte[1],int((links[8].JointAngle-roll_absoulte[1])*120*2340/2/M_PI));
-//       ROS_INFO("RollModifiedRight=%f RollModifiedLeft=%f",RollModified(0,0)*180/M_PI,RollModified(1,0)*180/M_PI);
+//           ROS_INFO("right:des=%f,abs=%f,diff=%f (inc=%d),left:des=%f,abs=%f,diff=%f (inc=%d)",links[2].JointAngle,
+//                   roll_absoulte[0],links[2].JointAngle-roll_absoulte[0],int((links[2].JointAngle-roll_absoulte[0])*120*2340/2/M_PI),
+//                   links[8].JointAngle,roll_absoulte[1],
+//                   links[8].JointAngle-roll_absoulte[1],int((links[8].JointAngle-roll_absoulte[1])*120*2340/2/M_PI));
+       //ROS_INFO("time=%f\tRollModifiedRight=%f RollModifiedLeft=%f",StartTime,RollModified(0,0)*180/M_PI,RollModified(1,0)*180/M_PI);
+//ROS_INFO("rightpitch=%f , leftpitch=%f",cntrl[3],cntrl[9]);
        }
     //    ROS_INFO("q=%d",qref[9]);
         //ROS_INFO("q=%d",qref[9]);

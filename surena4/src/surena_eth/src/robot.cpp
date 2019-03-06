@@ -49,8 +49,8 @@ void Robot::Initialize()
 //}
 
 
-//if(! ReadAllInitialPositions())
-//{return; }
+if(! ReadAllInitialPositions())
+{return; }
 
 
 //_initialTimer.stop();

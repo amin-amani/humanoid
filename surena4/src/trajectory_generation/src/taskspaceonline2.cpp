@@ -27,9 +27,9 @@ TaskSpaceOnline2::TaskSpaceOnline2()
 
 void TaskSpaceOnline2::SetParameters(){
     YOffsetOfAnkletrajectory=0.000;//for compensating the clearance of the hip roll in experiment
-    RightHipRollModification=4;//3;//4;//5;//degree;
-    LeftHipRollModification=6;//4;//4;//4;//degree
-    HipPitchModification=3;
+    RightHipRollModification=3;//3;//4;//5;//degree;
+    LeftHipRollModification=3;//4;//4;//4;//degree
+    HipPitchModification=1;
 
     toeOff=true;
     HipRollModification=true;
@@ -48,9 +48,9 @@ void TaskSpaceOnline2::SetParameters(){
     _heelLength=0.1;
     _toeLength=0.15;
     _pelvisLength=0.23;
-    ReferencePelvisHeight=0.86;
+    ReferencePelvisHeight=.9;//0.86;
     InitialPelvisHeight=0.95100;
-    NStride=2;
+    NStride=1;
     NStep=NStride*2;
     DesiredVelocity=0.10000;
     StepLength=0.0840000;
@@ -99,12 +99,12 @@ void TaskSpaceOnline2::SetParameters(){
     YpMax=Rm*0.5*_pelvisLength*1.2;//*1.1;//distace between pelvis to global coord in the middle of single support
     Yd=1*Rd*YpMax;//distace between pelvis to global coord at the begining of single support
  //***********************ok in test
-YpMax=0.08;
-  Yd =0.08;
+YpMax=0.12;
+  Yd =0.11;
 //    YStMax=.10;//1.0*YpMax/.9;///1.1;
 //    YEndMax=.10;//1.0*YpMax/.9;///1.1;
-  YStMax=1.0*YpMax/.9;///1.1;
-  YEndMax=1.0*YpMax/.9;///1.1;
+  YStMax=1.1*YpMax;///.9;
+  YEndMax=1.3*YpMax;///.9;
 
 
     cout<<" Xe="<<Xe<<" Xs="<< Xs <<" YpMax="<<YpMax<<" Yd="<<Yd<<" YStMax="<<YStMax<<" YEndMax="<<YEndMax<<endl;
@@ -136,7 +136,44 @@ YpMax=0.08;
 
 }
 
+double TaskSpaceOnline2::RollCharge(double t,double t_start,double t_end,double magnitude){
+    double D_time_charge = t_end-t_start;
+    MatrixXd Ct(1,2);
+    Ct<<0 ,D_time_charge;
+    MatrixXd Cp(1,2);
+    Cp<<0, magnitude;
+    MatrixXd Cv(1,2);
+    Cv<<0 ,0;
+    MatrixXd Ca(1,2);
+    Ca<<0 ,0;
+    MatrixXd C_roll=CoefOffline.Coefficient(Ct,Cp,Cv,Ca);
+    if(t<=t_start){return 0;}
+    if((t-t_start)>=D_time_charge ){return magnitude;}
+    if (t>t_start && (t-t_start)<D_time_charge ){
+    MatrixXd output=GetAccVelPos(C_roll,t-t_start,0,5);
+    return output(0,0);}
 
+}
+
+double TaskSpaceOnline2::RollDecharge(double t,double t_start,double t_end,double magnitude){
+    double D_time_decharge = t_end-t_start;
+    MatrixXd Ct(1,2);
+    Ct<<0 ,D_time_decharge;
+    MatrixXd Cp(1,2);
+    Cp<< 0, -magnitude;
+    MatrixXd Cv(1,2);
+    Cv<<0 ,0;
+    MatrixXd Ca(1,2);
+    Ca<<0 ,0;
+    MatrixXd C_roll=CoefOffline.Coefficient(Ct,Cp,Cv,Ca);
+    if(t<=t_start){return 0;}
+    if((t-t_start)>=D_time_decharge ){return -magnitude;}
+    if (t>t_start && (t-t_start)<D_time_decharge ){
+    MatrixXd output=GetAccVelPos(C_roll,t-t_start,0,5);
+    return output(0,0);}
+
+
+}
 
 
 
@@ -147,7 +184,25 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
     double rollR=0;
     double rollL=0;
 
-    if (time<=TStart||time>TGait){
+    double ChargeCoeffLeftStart =.4;// 0.4;          //after DS start
+    double ChargeCoeffLeftEnd =1;// 1.5;              //<1 before DS ends; >1 after SS start
+    double DechargeCoeffLeftStart = 0.4;//.4;        //after DS start
+    double DechargeCoeffLeftEnd = 1;            //<1 before DS ends; >1 after SS start
+    double ChargeCoeffLeftStartEndPhase = 0.4;  //after DS start
+    double ChargeCoeffLeftEndEndPhase = 1;      //<1 before DS ends; >1 after SS start
+    double DechargeCoeffLeftStartEndPhase = 0.6;//must be bigger than 0.5; end foot pairing DS
+    double DechargeCoeffLeftEndEndPhase = 0.8;  //must be greata
+
+    double ChargeCoeffRightStartStartPhase = 0.3;   //while reducing height(0.5 means minimum height)
+    double ChargeCoeffRightEndStartPhase = 0.7;     //almot maximum ankle height
+    double DechargeCoeffRightStartStartPhase = 0.4; //after DS start
+    double DechargeCoeffRightEndStartPhase = 1;     //<1 before DS ends; >1 after SS start
+    double ChargeCoeffRightStart =.4;// 0.4;             //after DS start
+    double ChargeCoeffRightEnd = 1;// 1.5;                 //<1 before DS ends; >1 after SS start
+    double DechargeCoeffRightStart = 0.4;//.4;           //after DS start
+    double DechargeCoeffRightEnd = 1;               //<1 before DS ends; >1 after SS start
+
+    if (time<=TStart){
         N=0;
         t=time;
     }
@@ -155,9 +210,8 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
         N=floor((time-TStart)/(2*Tc));
         t=fmod((time-TStart),2*Tc)+TStart;
     }
-    else if (time==TGait){
-        N=NStride;
-        t=0;
+    else if (time>=TGait){
+        t = TStart + 2*Tc + time - TGait;
     }
 
 
@@ -165,180 +219,42 @@ MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double loca
     double  D_time=R_1*TDs;
     double D_teta_r=-1*RightHipRollModification*(M_PI/180);
     double D_teta_l=LeftHipRollModification*(M_PI/180);
+
 double extra_D_theta_l=0*M_PI/180;
-    if (t<=T_st_p_sx){
-        D_time=T_st_p_sx-T_st_p_sy;
-        MatrixXd Ct_roll_st(1,2);
-        Ct_roll_st<<0 ,D_time;
-        MatrixXd Cp_roll_st(1,2);
-        Cp_roll_st<<0, D_teta_r;
-        MatrixXd Cv_roll_st(1,2);
-        Cv_roll_st<<0 ,0;
-        MatrixXd Ca_roll_st(1,2);
-        Ca_roll_st<<0 ,0;
-        MatrixXd C_roll_st=CoefOffline.Coefficient(Ct_roll_st,Cp_roll_st,Cv_roll_st,Ca_roll_st);
 
-        if (t>(T_st_p_sx-D_time) && t<=T_st_p_sx){
-            MatrixXd output=GetAccVelPos(C_roll_st,t-(T_st_p_sx-D_time),0,5);
-            rollR=output(0,0);
-            rollL=0;
-        }
-
-    }
-    else if (t>T_st_p_sx  && t<=TStart){
-        rollR=D_teta_r;
-        rollL=0;
-
-    }
-    else if (t>TStart &&  t<=(TDs+TStart)){
+//VectorXd t_left_charge;
+//VectorXd t_left_decharge;
+//VectorXd t_right_charge;
+//VectorXd t_right_decharge;
 
 
-        rollR=D_teta_r;
-        rollL=0;
+//for (int i = 0; i <t_left_charge.rows() ; ++i) {rollL=rollL+RollCharge(t,t_left_charge(i),D_teta_l);}
+//for (int i = 0; i <t_left_decharge.rows() ; ++i) {rollL=rollL+RollCharge(t,t_left_decharge(i),D_teta_l);}
+//for (int i = 0; i <t_right_charge.rows() ; ++i) {rollR=rollR+RollCharge(t,t_right_charge(i),D_teta_r);}
+//for (int i = 0; i <t_right_decharge.rows() ; ++i) {rollR=rollR+RollCharge(t,t_right_decharge(i),D_teta_r);}
+rollL=rollL+RollCharge(t,TStart+ChargeCoeffLeftStart*TDs,TStart+ChargeCoeffLeftEnd*TDs,D_teta_l)+
+        RollDecharge(t,TStart+Tc+DechargeCoeffLeftStart*TDs,TStart+Tc+DechargeCoeffLeftEnd*TDs,D_teta_l)+
+        RollCharge(t,TStart+2*Tc+ChargeCoeffLeftStartEndPhase*TDs,TStart+2*Tc+ChargeCoeffLeftEndEndPhase*TDs,D_teta_l)+
+        RollDecharge(t,TStart+2*Tc+TDs+DechargeCoeffLeftStartEndPhase*TEnd,TStart+2*Tc+TDs+DechargeCoeffLeftEndEndPhase*TEnd,D_teta_l);
 
-        MatrixXd Ct_rollR_ds1(1,2);
-        Ct_rollR_ds1<<0 ,D_time;
-        MatrixXd Cp_rollR_ds1(1,2);
-        Cp_rollR_ds1<<0, D_teta_r;
-        MatrixXd Cv_rollR_ds1(1,2);
-        Cv_rollR_ds1<<0 ,0;
-        MatrixXd Ca_rollR_ds1(1,2);
-        Ca_rollR_ds1<<0 ,0;
-        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
-
-
-        MatrixXd Ct_rollL_ds1(1,2);
-        Ct_rollL_ds1<<0 ,D_time;
-        MatrixXd Cp_rollL_ds1(1,2);
-        Cp_rollL_ds1<<0, D_teta_l;
-        MatrixXd Cv_rollL_ds1(1,2);
-        Cv_rollL_ds1<<0 ,0;
-        MatrixXd Ca_rollL_ds1(1,2);
-        Ca_rollL_ds1<<0 ,0;
-        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
+rollR=rollR+RollCharge(t,ChargeCoeffRightStartStartPhase*TStart,ChargeCoeffRightEndStartPhase*TStart,D_teta_r)+
+        RollDecharge(t,TStart+DechargeCoeffRightStartStartPhase*TDs,TStart+DechargeCoeffRightEndStartPhase*TDs,D_teta_r)+
+        RollCharge(t,TStart+Tc+ChargeCoeffRightStart*TDs,TStart+Tc+ChargeCoeffRightEnd*TDs,D_teta_r)+
+        RollDecharge(t,TStart+2*Tc+DechargeCoeffRightStart*TDs,TStart+2*Tc+DechargeCoeffRightEnd*TDs,D_teta_r);
 
 
-        if (t>(TDs+TStart-D_time) && t<=(TDs+TStart)){
-            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(TDs+TStart-D_time),0,5);
-            rollL=rollL+outputl(0,0);
-
-            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(TDs+TStart-D_time),0,5);
-            rollR=rollR-outputR(0,0);
-        }
-
-
-    }
-    else if (t>(TDs+TStart) && t<=(Tc+TStart)){
-        rollR=0;
-        rollL=D_teta_l;
-    }
-    else if (t>(Tc+TStart) && t<=(Tc+TDs+TStart)){
-
-        rollR=0;
-        rollL=D_teta_l;
-
-        MatrixXd Ct_rollR_ds1(1,2);
-        Ct_rollR_ds1<<0 ,D_time;
-        MatrixXd Cp_rollR_ds1(1,2);
-        Cp_rollR_ds1<<0, D_teta_r;
-        MatrixXd Cv_rollR_ds1(1,2);
-        Cv_rollR_ds1<<0 ,0;
-        MatrixXd Ca_rollR_ds1(1,2);
-        Ca_rollR_ds1<<0 ,0;
-        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
-
-
-        MatrixXd Ct_rollL_ds1(1,2);
-        Ct_rollL_ds1<<0 ,D_time;
-        MatrixXd Cp_rollL_ds1(1,2);
-        Cp_rollL_ds1<<0, D_teta_l;
-        MatrixXd Cv_rollL_ds1(1,2);
-        Cv_rollL_ds1<<0 ,0;
-        MatrixXd Ca_rollL_ds1(1,2);
-        Ca_rollL_ds1<<0 ,0;
-        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
-
-
-        if (t>(Tc+TDs+TStart-D_time) && t<=(Tc+TDs+TStart)){
-            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(Tc+TDs+TStart-D_time),0,5);
-            rollL=rollL-outputl(0,0);
-
-            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(Tc+TDs+TStart-D_time),0,5);
-            rollR=rollR+outputR(0,0);
-        }
-    }
-    else if (t>(Tc+TDs+TStart) && t<=(2*Tc+TStart)){
-        rollR=D_teta_r;
-        rollL=0;
-    }
-    else if (t>=TGait && t<(TGait+TDs)){
-        rollR=D_teta_r;
-        rollL=0;
-
-        MatrixXd Ct_rollR_ds1(1,2);
-        Ct_rollR_ds1<<0 ,D_time;
-        MatrixXd Cp_rollR_ds1(1,2);
-        Cp_rollR_ds1<<0, D_teta_r;
-        MatrixXd Cv_rollR_ds1(1,2);
-        Cv_rollR_ds1<<0 ,0;
-        MatrixXd Ca_rollR_ds1(1,2);
-        Ca_rollR_ds1<<0 ,0;
-        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
-
-
-        MatrixXd Ct_rollL_ds1(1,2);
-        Ct_rollL_ds1<<0 ,D_time;
-        MatrixXd Cp_rollL_ds1(1,2);
-        Cp_rollL_ds1<<0, D_teta_l+extra_D_theta_l;
-        MatrixXd Cv_rollL_ds1(1,2);
-        Cv_rollL_ds1<<0 ,0;
-        MatrixXd Ca_rollL_ds1(1,2);
-        Ca_rollL_ds1<<0 ,0;
-        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
-
-
-        if (t>(TGait+TDs-D_time) && t<=(TGait+TDs)){
-            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(TDs+TGait-D_time),0,5);
-            rollL=rollL+outputl(0,0);
-
-            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(TDs+TGait-D_time),0,5);
-            rollR=rollR-outputR(0,0);
-        }
-    }
-    else if (t>=(TGait+TDs) && t<T_end_p_sx){
-        rollR=0;
-        rollL=D_teta_l+extra_D_theta_l;
-    }
-    else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
-        D_time=(T_end_p_ey-T_end_p_sx);
-        MatrixXd Ct_roll_st(1,2);
-        Ct_roll_st<<-1*D_time ,0;
-        MatrixXd Cp_roll_st(1,2);
-        Cp_roll_st<<D_teta_l+extra_D_theta_l, 0;
-        MatrixXd Cv_roll_st(1,2);
-        Cv_roll_st<<0 ,0;
-        MatrixXd Ca_roll_st(1,2);
-        Ca_roll_st<<0 ,0;
-        MatrixXd C_roll_st=CoefOffline.Coefficient(Ct_roll_st,Cp_roll_st,Cv_roll_st,Ca_roll_st);
-
-        if (t>(T_end_p_sx) && t<=T_end_p_sx+D_time){
-            MatrixXd output=GetAccVelPos(C_roll_st,t-(T_end_p_sx+1*D_time),-1*D_time,5);
-            rollL=output(0,0);
-            rollR=0;
-        }
-//qDebug()<<"D_teta_l="<<D_teta_l<<"\t D_teta_r="<<D_teta_r;
-
-    }
 MatrixXd RollMat(2,1);
 RollMat<<rollR,rollL;
 return RollMat;
 }
 
 
-//double TaskSpaceOnline2::PitchAngleModification(double time, int n, double localtiming,bool LastDSIndex){
+
+//MatrixXd TaskSpaceOnline2::RollAngleModification(double time, int n, double localtiming,bool LastDSIndex){
 //    double N;
 //    double t;
-//    double pitch=0;
+//    double rollR=0;
+//    double rollL=0;
 
 //    if (time<=TStart||time>TGait){
 //        N=0;
@@ -353,50 +269,180 @@ return RollMat;
 //        t=0;
 //    }
 
-//    double D_pitch=-1*HipPitchModification*(M_PI/180);
-//    double TstartofPitchModify=TStart/6;
-//    double TendofPitchModify=TStart/2;
-//    double D_time=TendofPitchModify-TstartofPitchModify;
 
+//    double R_1=0.6;
+//    double  D_time=R_1*TDs;
+//    double D_teta_r=-1*RightHipRollModification*(M_PI/180);
+//    double D_teta_l=LeftHipRollModification*(M_PI/180);
+//double extra_D_theta_l=0*M_PI/180;
+//    if (t<=T_st_p_sx){
+//        D_time=T_st_p_sx-T_st_p_sy;
+//        MatrixXd Ct_roll_st(1,2);
+//        Ct_roll_st<<0 ,D_time;
+//        MatrixXd Cp_roll_st(1,2);
+//        Cp_roll_st<<0, D_teta_r;
+//        MatrixXd Cv_roll_st(1,2);
+//        Cv_roll_st<<0 ,0;
+//        MatrixXd Ca_roll_st(1,2);
+//        Ca_roll_st<<0 ,0;
+//        MatrixXd C_roll_st=CoefOffline.Coefficient(Ct_roll_st,Cp_roll_st,Cv_roll_st,Ca_roll_st);
 
-//    if (t<=TendofPitchModify){
-
-//        MatrixXd Ct_pitch_st(1,2);
-//        Ct_pitch_st<<0 ,D_time;
-//        MatrixXd Cp_pitch_st(1,2);
-//        Cp_pitch_st<<0, D_pitch;
-//        MatrixXd Cv_pitch_st(1,2);
-//        Cv_pitch_st<<0 ,0;
-//        MatrixXd Ca_pitch_st(1,2);
-//        Ca_pitch_st<<0 ,0;
-//        MatrixXd C_pitch_st=CoefOffline.Coefficient(Ct_pitch_st,Cp_pitch_st,Cv_pitch_st,Ca_pitch_st);
-
-
-//        if (t>(TstartofPitchModify) && t<=TendofPitchModify){
-//            MatrixXd output=GetAccVelPos(C_pitch_st,t-(TstartofPitchModify),0,5);
-//            pitch=output(0,0);
-//        }
-//    }
-//    else if (t>TendofPitchModify && t<=TGait+TDs+TEnd/2){
-//        pitch=D_pitch;
-//    }
-//       else if (t>=TGait+TDs+TEnd/2  && t<=(TGait+TDs+TEnd)){
-//        MatrixXd Ct_pitch_st(1,2);
-//        Ct_pitch_st<<-TEnd/2 ,0 ;
-//        MatrixXd Cp_pitch_st(1,2);
-//        Cp_pitch_st<< D_pitch ,0;
-//        MatrixXd Cv_pitch_st(1,2);
-//        Cv_pitch_st<<0 ,0;
-//        MatrixXd Ca_pitch_st(1,2);
-//        Ca_pitch_st<<0 ,0;
-//        MatrixXd C_pitch_st=CoefOffline.Coefficient(Ct_pitch_st,Cp_pitch_st,Cv_pitch_st,Ca_pitch_st);
-
-//        MatrixXd output=GetAccVelPos(C_pitch_st,t-(TGait+TDs+TEnd),-TEnd/2,5);
-//        pitch=output(0,0);
+//        if (t>(T_st_p_sx-D_time) && t<=T_st_p_sx){
+//            MatrixXd output=GetAccVelPos(C_roll_st,t-(T_st_p_sx-D_time),0,5);
+//            rollR=output(0,0);
+//            rollL=0;
 //        }
 
-//return pitch;
+//    }
+//    else if (t>T_st_p_sx  && t<=TStart){
+//        rollR=D_teta_r;
+//        rollL=0;
+
+//    }
+//    else if (t>TStart &&  t<=(TDs+TStart)){
+
+
+//        rollR=D_teta_r;
+//        rollL=0;
+
+//        MatrixXd Ct_rollR_ds1(1,2);
+//        Ct_rollR_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollR_ds1(1,2);
+//        Cp_rollR_ds1<<0, D_teta_r;
+//        MatrixXd Cv_rollR_ds1(1,2);
+//        Cv_rollR_ds1<<0 ,0;
+//        MatrixXd Ca_rollR_ds1(1,2);
+//        Ca_rollR_ds1<<0 ,0;
+//        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
+
+
+//        MatrixXd Ct_rollL_ds1(1,2);
+//        Ct_rollL_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollL_ds1(1,2);
+//        Cp_rollL_ds1<<0, D_teta_l;
+//        MatrixXd Cv_rollL_ds1(1,2);
+//        Cv_rollL_ds1<<0 ,0;
+//        MatrixXd Ca_rollL_ds1(1,2);
+//        Ca_rollL_ds1<<0 ,0;
+//        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
+
+
+//        if (t>(TDs+TStart-D_time) && t<=(TDs+TStart)){
+//            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(TDs+TStart-D_time),0,5);
+//            rollL=rollL+outputl(0,0);
+
+//            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(TDs+TStart-D_time),0,5);
+//            rollR=rollR-outputR(0,0);
+//        }
+
+
+//    }
+//    else if (t>(TDs+TStart) && t<=(Tc+TStart)){
+//        rollR=0;
+//        rollL=D_teta_l;
+//    }
+//    else if (t>(Tc+TStart) && t<=(Tc+TDs+TStart)){
+
+//        rollR=0;
+//        rollL=D_teta_l;
+
+//        MatrixXd Ct_rollR_ds1(1,2);
+//        Ct_rollR_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollR_ds1(1,2);
+//        Cp_rollR_ds1<<0, D_teta_r;
+//        MatrixXd Cv_rollR_ds1(1,2);
+//        Cv_rollR_ds1<<0 ,0;
+//        MatrixXd Ca_rollR_ds1(1,2);
+//        Ca_rollR_ds1<<0 ,0;
+//        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
+
+
+//        MatrixXd Ct_rollL_ds1(1,2);
+//        Ct_rollL_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollL_ds1(1,2);
+//        Cp_rollL_ds1<<0, D_teta_l;
+//        MatrixXd Cv_rollL_ds1(1,2);
+//        Cv_rollL_ds1<<0 ,0;
+//        MatrixXd Ca_rollL_ds1(1,2);
+//        Ca_rollL_ds1<<0 ,0;
+//        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
+
+
+//        if (t>(Tc+TDs+TStart-D_time) && t<=(Tc+TDs+TStart)){
+//            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(Tc+TDs+TStart-D_time),0,5);
+//            rollL=rollL-outputl(0,0);
+
+//            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(Tc+TDs+TStart-D_time),0,5);
+//            rollR=rollR+outputR(0,0);
+//        }
+//    }
+//    else if (t>(Tc+TDs+TStart) && t<=(2*Tc+TStart)){
+//        rollR=D_teta_r;
+//        rollL=0;
+//    }
+//    else if (t>=TGait && t<(TGait+TDs)){
+//        rollR=D_teta_r;
+//        rollL=0;
+
+//        MatrixXd Ct_rollR_ds1(1,2);
+//        Ct_rollR_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollR_ds1(1,2);
+//        Cp_rollR_ds1<<0, D_teta_r;
+//        MatrixXd Cv_rollR_ds1(1,2);
+//        Cv_rollR_ds1<<0 ,0;
+//        MatrixXd Ca_rollR_ds1(1,2);
+//        Ca_rollR_ds1<<0 ,0;
+//        MatrixXd C_rollR_ds1=CoefOffline.Coefficient(Ct_rollR_ds1,Cp_rollR_ds1,Cv_rollR_ds1,Ca_rollR_ds1);
+
+
+//        MatrixXd Ct_rollL_ds1(1,2);
+//        Ct_rollL_ds1<<0 ,D_time;
+//        MatrixXd Cp_rollL_ds1(1,2);
+//        Cp_rollL_ds1<<0, D_teta_l+extra_D_theta_l;
+//        MatrixXd Cv_rollL_ds1(1,2);
+//        Cv_rollL_ds1<<0 ,0;
+//        MatrixXd Ca_rollL_ds1(1,2);
+//        Ca_rollL_ds1<<0 ,0;
+//        MatrixXd C_rollL_ds1=CoefOffline.Coefficient(Ct_rollL_ds1,Cp_rollL_ds1,Cv_rollL_ds1,Ca_rollL_ds1);
+
+
+//        if (t>(TGait+TDs-D_time) && t<=(TGait+TDs)){
+//            MatrixXd outputl=GetAccVelPos(C_rollL_ds1,t-(TDs+TGait-D_time),0,5);
+//            rollL=rollL+outputl(0,0);
+
+//            MatrixXd outputR=GetAccVelPos(C_rollR_ds1,t-(TDs+TGait-D_time),0,5);
+//            rollR=rollR-outputR(0,0);
+//        }
+//    }
+//    else if (t>=(TGait+TDs) && t<T_end_p_sx){
+//        rollR=0;
+//        rollL=D_teta_l+extra_D_theta_l;
+//    }
+//    else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
+//        D_time=(T_end_p_ey-T_end_p_sx);
+//        MatrixXd Ct_roll_st(1,2);
+//        Ct_roll_st<<-1*D_time ,0;
+//        MatrixXd Cp_roll_st(1,2);
+//        Cp_roll_st<<D_teta_l+extra_D_theta_l, 0;
+//        MatrixXd Cv_roll_st(1,2);
+//        Cv_roll_st<<0 ,0;
+//        MatrixXd Ca_roll_st(1,2);
+//        Ca_roll_st<<0 ,0;
+//        MatrixXd C_roll_st=CoefOffline.Coefficient(Ct_roll_st,Cp_roll_st,Cv_roll_st,Ca_roll_st);
+
+//        if (t>(T_end_p_sx) && t<=T_end_p_sx+D_time){
+//            MatrixXd output=GetAccVelPos(C_roll_st,t-(T_end_p_sx+1*D_time),-1*D_time,5);
+//            rollL=output(0,0);
+//            rollR=0;
+//        }
+////qDebug()<<"D_teta_l="<<D_teta_l<<"\t D_teta_r="<<D_teta_r;
+
+//    }
+//MatrixXd RollMat(2,1);
+//RollMat<<rollR,rollL;
+//return RollMat;
 //}
+
 
 
 
@@ -440,6 +486,15 @@ void TaskSpaceOnline2::CoeffArrayPelvis(){
     Cy_p.block(0,30,1,6)=Cy_p_i.row(5);
     Cy_p.block(0,36,1,6)=Cy_p_i.row(6);
     Cy_p.block(0,42,1,6)=Cy_p_i.row(7);
+
+         qDebug()<<"cp="<<Cy_p_i(0,0)<<"\t"<<Cy_p_i(0,1)<<"\t"<<Cy_p_i(0,2)<<"\t"<<Cy_p_i(0,3)<<"\t"<<Cy_p_i(0,4)<<"\t"<<Cy_p_i(0,5);
+         qDebug()<<"cp="<<Cy_p_i(1,0)<<"\t"<<Cy_p_i(1,1)<<"\t"<<Cy_p_i(1,2)<<"\t"<<Cy_p_i(1,3)<<"\t"<<Cy_p_i(1,4)<<"\t"<<Cy_p_i(1,5);
+         qDebug()<<"cp="<<Cy_p_i(2,0)<<"\t"<<Cy_p_i(2,1)<<"\t"<<Cy_p_i(2,2)<<"\t"<<Cy_p_i(2,3)<<"\t"<<Cy_p_i(2,4)<<"\t"<<Cy_p_i(2,5);
+         qDebug()<<"cp="<<Cy_p_i(3,0)<<"\t"<<Cy_p_i(3,1)<<"\t"<<Cy_p_i(3,2)<<"\t"<<Cy_p_i(3,3)<<"\t"<<Cy_p_i(3,4)<<"\t"<<Cy_p_i(3,5);
+         qDebug()<<"cp="<<Cy_p_i(4,0)<<"\t"<<Cy_p_i(4,1)<<"\t"<<Cy_p_i(4,2)<<"\t"<<Cy_p_i(4,3)<<"\t"<<Cy_p_i(4,4)<<"\t"<<Cy_p_i(4,5);
+         qDebug()<<"cp="<<Cy_p_i(5,0)<<"\t"<<Cy_p_i(5,1)<<"\t"<<Cy_p_i(5,2)<<"\t"<<Cy_p_i(5,3)<<"\t"<<Cy_p_i(5,4)<<"\t"<<Cy_p_i(5,5);
+         qDebug()<<"cp="<<Cy_p_i(6,0)<<"\t"<<Cy_p_i(6,1)<<"\t"<<Cy_p_i(6,2)<<"\t"<<Cy_p_i(6,3)<<"\t"<<Cy_p_i(6,4)<<"\t"<<Cy_p_i(6,5);
+         qDebug()<<"cp="<<Cy_p_i(7,0)<<"\t"<<Cy_p_i(7,1)<<"\t"<<Cy_p_i(7,2)<<"\t"<<Cy_p_i(7,3)<<"\t"<<Cy_p_i(7,4)<<"\t"<<Cy_p_i(7,5);
 
 
 
@@ -825,12 +880,14 @@ MatrixXd TaskSpaceOnline2::PelvisTrajectory(double time, int n, double localtimi
     else if (t>T_st_p_sy && t<=T_st_p_dy){
         MatrixXd output=GetAccVelPos(Cy_st_pa,t,T_st_p_sy,5);
         yp=output(0,0);
+      //  qDebug()<<"yp1 is "<<output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
         // polyval(Cy_st_a,t);
     }
     else if (t>T_st_p_dy && t<=T_st_p_ey){
         yp=-1*YStMax;
+      //  qDebug()<<"yp2 is "<<yp;
         dyp=0;
         ddyp=0;
     }
@@ -838,6 +895,7 @@ MatrixXd TaskSpaceOnline2::PelvisTrajectory(double time, int n, double localtimi
 
         MatrixXd output=GetAccVelPos(Cy_st_pb,t,T_st_p_ey,5);
         yp=output(0,0);
+      //  qDebug()<<"yp3 is "<<output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
@@ -845,6 +903,7 @@ MatrixXd TaskSpaceOnline2::PelvisTrajectory(double time, int n, double localtimi
     else if (t>TStart && t<=(TMinPelvisY+TStart)){
         MatrixXd output=GetAccVelPos(Cy_p_i.row(0),t-TStart,0,5);
         yp=output(0,0);
+        //qDebug()<<"yp4 is "<<output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
         // yp=-polyval(Cy_p(6:10),t+Tc-TStart);

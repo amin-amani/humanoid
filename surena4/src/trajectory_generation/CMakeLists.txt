@@ -238,6 +238,7 @@ set( QT_SOURCES
     src/left_hand.cpp
     src/taskspaceofflineRamp.cpp
     src/taskspaceonline2.cpp
+    src/taskspaceonline3.cpp
     src/surenastateestimation.cpp
 
 #    src/hand_gui.cpp
@@ -289,6 +290,15 @@ target_link_libraries(trajectory_generationOnlineAdaptation
     Qt5::PrintSupport
 )
 install(TARGETS trajectory_generationOnlineAdaptation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(trajectory_generationOnlineAdaptation2 src/trajectory_generationOnlineAdaptation2.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(trajectory_generationOnlineAdaptation2
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS trajectory_generationOnlineAdaptation2 RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(hand_trajectory src/hand_trajectory.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(hand_trajectory

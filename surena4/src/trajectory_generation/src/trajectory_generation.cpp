@@ -25,6 +25,7 @@
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
 #include <gazebo_msgs/LinkStates.h>
+#include "QTime"
 
 using namespace  std;
 using namespace  Eigen;
@@ -324,7 +325,10 @@ int main(int argc, char **argv)
     //check _timesteps
     QElapsedTimer timer;
     Robot SURENA;
+    //QTime myTimer2;
+    //myTimer2.start();
     TaskSpaceOffline SURENAOffilneTaskSpace;
+    //ROS_INFO("time2 = %d",myTimer2.elapsed());
     QList<LinkM> links;
     MatrixXd PoseRoot;
     MatrixXd PoseRFoot;
@@ -422,6 +426,8 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
+        //QTime myTimer;
+        //myTimer.start();
         //-------------for detecting the full contact of foot with ground-------------//
         if ((a)>=footSensorSaturation && (b)>=footSensorSaturation && (c)>=footSensorSaturation && (d)>=footSensorSaturation){
             qDebug("swing foot landing is successful");
@@ -759,9 +765,11 @@ int main(int argc, char **argv)
         SendGazebo(links);
         chatter_pub.publish(msg);
         //  ROS_INFO("t={%d} c={%d}",timer.elapsed(),count);
+//        ROS_INFO("time = %d", myTimer.elapsed());
 
         ros::spinOnce();
         loop_rate.sleep();
+        //ROS_INFO("time = %d", myTimer.elapsed());
         ++count;
     }
 

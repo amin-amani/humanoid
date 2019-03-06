@@ -129,11 +129,11 @@ int main(int argc, char **argv)
     ROS_INFO("started!");
     while (ros::ok())
     {
-        if (QcInitialBool) {
-            ROS_INFO("qc is initializing!");
-            ros::spinOnce();
-            continue;
-        }
+//        if (QcInitialBool) {
+//            ROS_INFO("qc is initializing!");
+//            ros::spinOnce();
+//            continue;
+//        }
         //        q0 = 0.25;
         //        q1 = 0.25;
         //        q2 = 0.25;
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
         {
             msgTilt.data.push_back(DeltaPosition(j-1,0));
         }
-        //SendJointData.publish(msg);
+        SendJointData.publish(msg);
         SendDeltaPosition.publish(msgTilt);
         //ROS_INFO("%f%f%f",msgTilt(0,0),msgTilt(1,0),msgTilt(2,0));
         ros::spinOnce();

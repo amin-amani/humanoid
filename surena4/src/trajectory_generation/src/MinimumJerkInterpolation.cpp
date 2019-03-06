@@ -368,3 +368,31 @@ MatrixXd MinimumJerkInterpolation::diff(MatrixXd E){
     MatrixXd E2 = E.block(0,1,E.rows(),E.cols()-1);
     return (E2 - E1);
 }
+MatrixXd MinimumJerkInterpolation::GetAccVelPos(MatrixXd Coef,double time,double ti,int PolynomialOrder)
+{
+    int PolyNomialDegree=PolynomialOrder;
+    MatrixXd T(PolyNomialDegree+1,1);
+    T.fill(0);
+    MatrixXd Diag(PolyNomialDegree+1,PolyNomialDegree+1);
+    Diag.fill(0);
+    for (int var = 0; var < PolyNomialDegree+1; var++) {
+        T(var,0)=pow((time-ti),PolyNomialDegree-var);
+        if (var!=0) {
+            Diag.diagonal(1)(var-1,0)=PolyNomialDegree-var+1;
+
+        }
+    }
+
+    MatrixXd x=Coef*T;
+    double X=x(0,0);
+
+    MatrixXd v=Coef*Diag*T;
+    double V=v(0,0);
+
+    MatrixXd a=Coef*Diag*Diag*T;
+    double A=a(0,0);
+
+    MatrixXd Output(1,3);
+    Output<<X,V,A;
+    return Output;
+}

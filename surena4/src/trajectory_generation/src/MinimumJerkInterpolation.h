@@ -24,6 +24,7 @@ void PrintArray(MatrixXd array, QString filename);
     MatrixXd isinf(MatrixXd in);
     MatrixXd isnan(MatrixXd in);
     double SUM1(int first, int last, MatrixXd Mat);
+    MatrixXd GetAccVelPos(MatrixXd Coef, double time, double ti, int PolynomialOrder);
 };
 
 #endif // MINIMUMJERKINTERPOLATION_H
