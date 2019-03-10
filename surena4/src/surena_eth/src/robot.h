@@ -29,7 +29,7 @@ class Robot : public QObject
 //    const double offset[12]={ -93 ,-136, 294, 454, 687, -288, -3 ,332, -263, 604, 765, 352};
 //    const double offset[12]={ -78 ,-99, 325, 449, 636, -274, -12 ,366, -264, 583, 741, 353};
 //    const double offset[12]={ -1314 ,-123+42, 326, 449, 666+42, -273, -13 ,365, -265, 586, 744, 353};//42 is becouse of offset behind ankle pitch mechanism
-    const double offset[12]={ -1304, -86, 315, 433, 614, -266, -33, 374, -277, 593, 748, 339};
+    const double offset[12]={ -790, -86, 315, 433, 614, -266, -33, 374, -277, 593, 748, 339};
 
     const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1};
     //const double Direction[12]={1,-1,1,-1,1,1,-1,1,-1,1,1,-1};

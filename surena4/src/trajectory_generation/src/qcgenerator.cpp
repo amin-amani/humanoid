@@ -220,7 +220,7 @@ vector<int> qref(12);
     qref[1]=int(ankle_pitch(cntrl[5],ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
     qref[2]=int((cntrl[4])*(1/(2*M_PI))*(2304)*50);
     qref[3]=int((cntrl[3])*1*(1/(2*M_PI))*(2304)*80);
-   // qref[4]=int((cntrl[11])*(1/(2*M_PI))*(2304)*100);
+    //qref[4]=int((cntrl[11])*(1/(2*M_PI))*(2304)*100);
     qref[4]=int(ankle_pitch(cntrl[11],ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
    // qDebug()<<"R: before:"<<qref[1]<<"now:"<<qref1_test<<"L: before:"<<qref[4]<<"now:"<<qref4_test;
     qref[5]=int((cntrl[12])*(1/(2*M_PI))*(2304)*100);
@@ -277,7 +277,8 @@ vector<int> qref(12);
 
 
     for (int i = 0; i < 12; ++i) {
-        if(qref[i]<minimumQC[i]){qref[i]=minimumQC[i];}
+        if(qref[i]<minimumQC[i]){qref[i]=minimumQC[i];
+        }
         if(qref[i]>maximumQC[i]){qref[i]=maximumQC[i];}
     }
     qref[1] = -qref[1];

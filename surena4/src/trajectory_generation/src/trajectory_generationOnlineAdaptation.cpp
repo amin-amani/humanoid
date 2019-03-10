@@ -430,15 +430,15 @@ h=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
 
 int main(int argc, char **argv)
 {
-
-
+double min_test=0;
+double max_test=0;
     vector<double> cntrl(13);
     QCgenerator QC;
     for (int i = 0; i < 12; ++i) {
          qc_offset[i]=0;
          //qc_corretction[i]=0;
     }
-    qc_initial_bool=true;
+    qc_initial_bool=!true;
     qc_initial_bool_roll=false;
 
     //check _timesteps
@@ -1193,6 +1193,9 @@ MinimumJerkInterpolation CoefOffline;
 
 
         links = SURENA.GetLinks();
+        if(links[5].JointAngle<min_test){min_test=links[5].JointAngle;}
+        if(links[5].JointAngle>max_test){max_test=links[5].JointAngle;}
+        ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
 
 
 

@@ -48,7 +48,7 @@ void TaskSpaceOnline2::SetParameters(){
     _heelLength=0.1;
     _toeLength=0.15;
     _pelvisLength=0.23;
-    ReferencePelvisHeight=.9;//0.86;
+    ReferencePelvisHeight=0.86;
     InitialPelvisHeight=0.95100;
     NStride=1;
     NStep=NStride*2;

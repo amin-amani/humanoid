@@ -28,8 +28,15 @@
 #include<sensor_msgs/JointState.h>
 #include"pidcontroller.h"
 
+
 using namespace  std;
 using namespace  Eigen;
+
+double saturate(double a, double min, double max){
+    if(a<min){return min;}
+    else if(a>max){return max;}
+    else{return a;}
+}
 
 ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
 ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
@@ -48,13 +55,15 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModified
     data.data=links[2].JointAngle+RollModifieds(0,0);    pub2.publish(data);
     data.data=links[3].JointAngle+PitchModifieds;    pub3.publish(data);
     data.data=links[4].JointAngle;    pub4.publish(data);
-    data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
+   // data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
+    data.data=saturate(links[5].JointAngle,-M_PI/5.4,M_PI/4)+theta_r;    pub5.publish(data);
     data.data=links[6].JointAngle+phi_r;    pub6.publish(data);
     data.data=links[7].JointAngle;    pub7.publish(data);
     data.data=links[8].JointAngle+RollModifieds(1,0);    pub8.publish(data);
     data.data=links[9].JointAngle+PitchModifieds;    pub9.publish(data);
     data.data=links[10].JointAngle;    pub10.publish(data);
-    data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
+    //data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
+    data.data=saturate(links[11].JointAngle,-M_PI/5.4,M_PI/4)+theta_l;    pub11.publish(data);
     data.data=links[12].JointAngle+phi_l;    pub12.publish(data);
     data.data=links[13].JointAngle;    pub13.publish(data);
     data.data=links[14].JointAngle;    pub14.publish(data);
@@ -76,6 +85,8 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModified
     data.data=0;    pub30.publish(data);
     data.data=0;    pub31.publish(data);
 }
+
+
 
 int getch()
 {
@@ -203,7 +214,7 @@ void WrenchHomming(){
     }
     if((abs(Mxl)<threshold) && (abs(Mxr)<threshold)){
     wrench_init_bool=false;
-    ROS_INFO_ONCE("initilalzed!");
+    ROS_INFO_ONCE("ankles initilalzed!");
     }
 }
 
@@ -267,7 +278,7 @@ void ankle_states(const gazebo_msgs::LinkStates& msg){
     //    ROS_INFO("x_left=%f,x_right=%f,y_left=%f,y_right=%fz_left=%f,z_right=%f",x_left,x_right,y_left,y_right,z_left,z_right);
 }
 
-
+bool simulation;
 Robot SURENA;//model of robot & kinematics funcs(IK & FK)
 TaskSpaceOnline3 OnlineTaskSpace;
 QList<LinkM> links;
@@ -513,14 +524,18 @@ void ankleAdaptationDischarge(){
 
 int main(int argc, char **argv)
 {
+
+    simulation=false;
+    qc_initial_bool=!simulation;
+    bump_initialize=false;
+    wrench_init_bool=false;
+
     vector<double> cntrl(13);
     QCgenerator QC;
     for (int i = 0; i < 12; ++i) {
         qc_offset[i]=0;
     }
-    qc_initial_bool=true;
-    bump_initialize=true;
-    wrench_init_bool=true;
+
 
     teta_motor_L=0;
     teta_motor_R=0;
@@ -531,7 +546,7 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=2;
+    DurationOfStartPhase=6;
     DurationOfendPhase=6;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
@@ -551,7 +566,7 @@ int main(int argc, char **argv)
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-    if(true){//gazebo publishers
+    if(simulation){//gazebo publishers
             pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
             pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
             pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
@@ -583,8 +598,8 @@ int main(int argc, char **argv)
             pub29 = nh.advertise<std_msgs::Float64>("rrbot/joint29_position_controller/command",1000);
             pub30 = nh.advertise<std_msgs::Float64>("rrbot/joint30_position_controller/command",1000);
             pub31 = nh.advertise<std_msgs::Float64>("rrbot/joint31_position_controller/command",1000);
+            ros::Subscriber ankleStates = nh.subscribe("/gazebo/link_states", 10, ankle_states);
     }
-    ros::Subscriber ankleStates = nh.subscribe("/gazebo/link_states", 10, ankle_states);
 
     int32_t contact_flag_timing=1000;    int32_t contact_flag_sensor=1000;    int32_t contact_flag_sensor2=1000;
 
@@ -618,9 +633,7 @@ int main(int argc, char **argv)
     {
 
         //  for robot test musbe uncommented
-        qc_initial_bool=false;
-        bump_initialize=false;
-        wrench_init_bool=false;
+
 
         if (qc_initial_bool) {
             ROS_INFO_ONCE("qc is initializing!");
@@ -789,21 +802,23 @@ int main(int argc, char **argv)
 
         links = SURENA.GetLinks();
 
+//        if(links[5].JointAngle<min_test){min_test=links[5].JointAngle;}
+//        if(links[5].JointAngle>max_test){max_test=links[5].JointAngle;}
 
         double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-        double k_roll_corr=0;
+        double k_roll=1;
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
-        cntrl[2]=(links[2].JointAngle+1*RollModified(0,0));//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])
-        cntrl[3]=links[3].JointAngle+PitchModified;
+        cntrl[2]=(links[2].JointAngle+k_roll*RollModified(0,0));//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])
+        cntrl[3]=links[3].JointAngle+0*PitchModified;
         cntrl[4]=links[4].JointAngle;
-        cntrl[5]=links[5].JointAngle+ankle_adaptation_switch*teta_motor_R;//pitch
+        cntrl[5]=saturate(links[5].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_R;//pitch
         cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*(phi_motor_R);//roll
         cntrl[7]=links[7].JointAngle;
-        cntrl[8]=links[8].JointAngle+1*RollModified(1,0);//+k_roll_corr*(links[8].JointAngle-roll_absoulte[1])
-        cntrl[9]=links[9].JointAngle+PitchModified;
+        cntrl[8]=links[8].JointAngle+k_roll*RollModified(1,0);//+k_roll_corr*(links[8].JointAngle-roll_absoulte[1])
+        cntrl[9]=links[9].JointAngle+0*PitchModified;
         cntrl[10]=links[10].JointAngle;
-        cntrl[11]=links[11].JointAngle+ankle_adaptation_switch*teta_motor_L;
+        cntrl[11]=saturate(links[11].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_L;
         cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
 
 
@@ -839,7 +854,7 @@ int main(int argc, char **argv)
 
         chatter_pub.publish(msg);
 
-        SendGazebo(links,0*RollModified,0*PitchModified,0*teta_motor_R,0*phi_motor_R,0*teta_motor_L,0*phi_motor_L);
+       if (simulation){SendGazebo(links,0*RollModified,0*PitchModified,0*teta_motor_R,0*phi_motor_R,0*teta_motor_L,0*phi_motor_L);}
 
 
         msg_contact_flag.data.clear();
@@ -851,9 +866,13 @@ int main(int argc, char **argv)
 
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
-             ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-             ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
+//            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
+//             ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
+         //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
+
         }
+
+      // if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){break;}
 
         ros::spinOnce();
         loop_rate.sleep();

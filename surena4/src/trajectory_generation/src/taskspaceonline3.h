@@ -22,23 +22,38 @@ class TaskSpaceOnline3
 {
 public:
 
-    double LeftHipRollModification=3;
-    double RightHipRollModification=3;
-    double HipPitchModification=3;
+    double LeftHipRollModification=4;
+    double RightHipRollModification=4;
+    double HipPitchModification=2;
 
     double YpMax=.12;//Rm*0.5*_pelvisLength*1.2;
-    double Yd=.11;//1*Rd*YpMax
+    double Yd=.12;//1*Rd*YpMax
     double YStMax;// Start motion parameter in y direction
     double YEndMax;//End motion parameter in y direction
     double Xe=0.04;// Distance of pelvis and rear ankle in DS Xe=Sc*StepLength/(Rse+1)*1.2;
     double Xs=0;// Distance of pelvis and front ankle in DSP Xs=Rse*Xe*.90;
 
-    double NStride=10;
+    double NStride=2;
     double NStep;
     int StepNumber=1;
 
     double TStart=6;
     double TEnd=6;
+
+    double StepLength;//0.0840000;
+    double DesiredVelocity;//0.050;
+
+    double _lengthOfThigh=0.3700;
+    double _lengthOfShank=0.3600;
+    double _lenghtOfAnkle=0.112;
+    double _lengthOfHip=0.10900;
+    double _pelvisLength=0.23;
+
+    double ReferencePelvisHeight=0.86;
+    double InitialPelvisHeight=0.95100;
+    double za_c=0.07;
+    double OldPelvisZ;
+    double NewPlevisZ;
     double T_end_of_SS;
     double T_end_of_first_SS;
     double T_end_of_last_SS;
@@ -89,20 +104,7 @@ public:
     double T_s_st;
 
     MinimumJerkInterpolation CoefOffline;
-    double StepLength=0.0840000;
-    double DesiredVelocity=0.10;
 
-    double _lengthOfThigh=0.3700;
-    double _lengthOfShank=0.3600;
-    double _lenghtOfAnkle=0.112;
-    double _lengthOfHip=0.10900;
-    double _pelvisLength=0.23;
-
-    double ReferencePelvisHeight=0.86;
-    double InitialPelvisHeight=0.95100;
-    double za_c=0.07;
-    double OldPelvisZ;
-    double NewPlevisZ;
 
     bool LeftSupport;
     bool Leftmoves;
