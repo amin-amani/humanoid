@@ -810,13 +810,13 @@ int main(int argc, char **argv)
         cntrl[0]=0.0;
         cntrl[1]=(links[1].JointAngle);
         cntrl[2]=(links[2].JointAngle+k_roll*RollModified(0,0));//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])
-        cntrl[3]=links[3].JointAngle+0*PitchModified;
+        cntrl[3]=links[3].JointAngle+PitchModified;
         cntrl[4]=links[4].JointAngle;
         cntrl[5]=saturate(links[5].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_R;//pitch
         cntrl[6]=links[6].JointAngle+ankle_adaptation_switch*(phi_motor_R);//roll
         cntrl[7]=links[7].JointAngle;
         cntrl[8]=links[8].JointAngle+k_roll*RollModified(1,0);//+k_roll_corr*(links[8].JointAngle-roll_absoulte[1])
-        cntrl[9]=links[9].JointAngle+0*PitchModified;
+        cntrl[9]=links[9].JointAngle+PitchModified;
         cntrl[10]=links[10].JointAngle;
         cntrl[11]=saturate(links[11].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_L;
         cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
@@ -872,7 +872,7 @@ int main(int argc, char **argv)
 
         }
 
-      // if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){break;}
+      if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){break;}
 
         ros::spinOnce();
         loop_rate.sleep();

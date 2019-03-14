@@ -25,9 +25,11 @@
 #include <QStringListModel>
 #include <std_msgs/Bool.h>
 #include "std_msgs/String.h"
-#include "surena_eth/active_csp.h"
-#include "surena_eth/reset_node.h"
-#include "surena_eth/home.h"
+#include "robot_teleop/active_csp.h"
+#include "robot_teleop/reset_node.h"
+#include "robot_teleop/node.h"
+
+#include "robot_teleop/home.h"
 #include <std_srvs/Empty.h>
 #include <std_srvs/SetBool.h>
 #include <sensor_msgs/JointState.h>
@@ -45,7 +47,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <QtTest/QSignalSpy>
 #include <std_srvs/Trigger.h>
-
+#include "QsLog/QsLog.h"
 
 /*****************************************************************************
 ** Namespaces
@@ -117,11 +119,11 @@ public:
     //=================================================================================================
     void SendDataToMotors(const std_msgs::Int32MultiArray &msg);
     //=================================================================================================
-    bool ActiveCSP(surena_eth::active_csp::Request &req, surena_eth::active_csp::Response &res);
+    bool ActiveCSP(robot_teleop::active_csp::Request &req, robot_teleop::active_csp::Response &res);
     //=================================================================================================
-    bool Home(surena_eth::home::Request &req, surena_eth::home::Response &res);
+    bool Home(robot_teleop::home::Request &req, robot_teleop::home::Response &res);
     //=================================================================================================
-    bool ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+    bool ResetAllNodes(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
     //=================================================================================================
     void OperationCompleted(int status);
     bool WaitExternalOperation(int timeoutms);
@@ -135,11 +137,11 @@ Q_SIGNALS:
     //=================================================================================================
     void NewjointDataReceived();
     //=================================================================================================
-    void SetActiveCSP();
+    void SetActiveCSP(int id);
     //=================================================================================================
-    void DoResetAllNodes();
+    void DoResetAllNodes(int id);
     //=================================================================================================
-    void SetHome();
+    void SetHome(int id);
    // =================================================================================================
         void DoReadError();
     //=================================================================================================

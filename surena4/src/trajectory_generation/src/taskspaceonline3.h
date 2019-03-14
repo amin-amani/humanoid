@@ -22,18 +22,18 @@ class TaskSpaceOnline3
 {
 public:
 
-    double LeftHipRollModification=4;
-    double RightHipRollModification=4;
-    double HipPitchModification=2;
+    double LeftHipRollModification;
+    double RightHipRollModification;
+    double HipPitchModification;
 
-    double YpMax=.12;//Rm*0.5*_pelvisLength*1.2;
-    double Yd=.12;//1*Rd*YpMax
+    double YpMax;//Rm*0.5*_pelvisLength*1.2;
+    double Yd;//1*Rd*YpMax
     double YStMax;// Start motion parameter in y direction
     double YEndMax;//End motion parameter in y direction
-    double Xe=0.04;// Distance of pelvis and rear ankle in DS Xe=Sc*StepLength/(Rse+1)*1.2;
-    double Xs=0;// Distance of pelvis and front ankle in DSP Xs=Rse*Xe*.90;
+    double Xe;// Distance of pelvis and rear ankle in DS Xe=Sc*StepLength/(Rse+1)*1.2;
+    double Xs;// Distance of pelvis and front ankle in DSP Xs=Rse*Xe*.90;
 
-    double NStride=2;
+    double NStride;
     double NStep;
     int StepNumber=1;
 
@@ -49,9 +49,8 @@ public:
     double _lengthOfHip=0.10900;
     double _pelvisLength=0.23;
 
-    double ReferencePelvisHeight=0.86;
+    double ReferencePelvisHeight;
     double InitialPelvisHeight=0.95100;
-    double za_c=0.07;
     double OldPelvisZ;
     double NewPlevisZ;
     double T_end_of_SS;
@@ -106,21 +105,21 @@ public:
     MinimumJerkInterpolation CoefOffline;
 
 
-    bool LeftSupport;
-    bool Leftmoves;
-    bool LeftSS;
-    bool Rightmoves;
-    bool RightSS;
-    bool RightSupport;
+//    bool LeftSupport;
+//    bool Leftmoves;
+//    bool LeftSS;
+//    bool Rightmoves;
+//    bool RightSS;
+//    bool RightSupport;
     bool DoubleSupport;
-    bool RightSensorActive;
-    bool LeftSensorActive;
+//    bool RightSensorActive;
+//    bool LeftSensorActive;
 
     bool toeOff;
 
     int footIndex;
-    int kbumpL;
-    int kbumpR;
+//    int kbumpL;
+//    int kbumpR;
     double currentRightFootZ;
     double currentRightFootX2;
     double currentRightFootY2;
@@ -129,72 +128,72 @@ public:
     double currentLeftFootX2;
     double currentLeftFootY2;
 
-    double oldLeftFootZ;
-    double oldLeftFootX2;
-    double oldLeftFootY2;
+//    double oldLeftFootZ;
+//    double oldLeftFootX2;
+//    double oldLeftFootY2;
 
-    double oldRightFootZ;
-    double oldRightFootX2;
-    double oldRightFootY2;
+//    double oldRightFootZ;
+//    double oldRightFootX2;
+//    double oldRightFootY2;
 
     bool HipRollModification;
-    double HeelLandingAnglePitch;
+//    double HeelLandingAnglePitch;
 
     bool RightFootOrientationAdaptator;
     bool LeftFootOrientationAdaptator;
-    double ToeOffAnglePitch;
+//    double ToeOffAnglePitch;
 
     double YOffsetOfAnkletrajectory;
 
-    double RollTimeSS;
-    double RollTimeDs;
+//    double RollTimeSS;
+//    double RollTimeDs;
 
-    bool firstStep;
+//    bool firstStep;
 
-    double xa_st_m;
-    double er;
+//    double xa_st_m;
+//    double er;
 
 
-    double localTime;
-    double localTime1;
+//    double localTime;
+//    double localTime1;
     double localTiming;
     int localtimingInteger;
-    double Delta;
-    double L_2leg_Ds;
-    double Rzp;
+//    double Delta;
+//    double L_2leg_Ds;
+//    double Rzp;
 
     double XofAnkleMaximumHeight;
 
     double AnkleMaximumHeight;
-    double MinHeightPelvis;
-    double MaxHeightPelvis;
+//    double MinHeightPelvis;
+//    double MaxHeightPelvis;
 
-    double za_st_m;
-    double za_end_m;
-    double xa_end_m;
-
-
-
-    double Rqa;
-    double  Ra_i;
-    double  Ra_f;
-    double  Rla_i;
-    double  Rla_f;
+//    double za_st_m;
+//    double za_end_m;
+//    double xa_end_m;
 
 
-    double Ra_st_i;
-    double  Ra_st_f;
+
+//    double Rqa;
+//    double  Ra_i;
+//    double  Ra_f;
+//    double  Rla_i;
+//    double  Rla_f;
 
 
-    double  Ra_end_i;
-    double Ra_end_f;
+//    double Ra_st_i;
+//    double  Ra_st_f;
 
 
-    double Rla_st_i;
-    double  Rla_st_f;
+//    double  Ra_end_i;
+//    double Ra_end_f;
 
-    double  Rla_end_i;
-    double  Rla_end_f;
+
+//    double Rla_st_i;
+//    double  Rla_st_f;
+
+//    double  Rla_end_i;
+//    double  Rla_end_f;
     double globalTime;
     double time;
     double _timeStep=.005;
@@ -202,37 +201,37 @@ public:
 
 
 
-    QVector<double> RightFootXTrajectory;
-    QVector<double> RightFootYTrajectory;
-    QVector<double> RightFootZTrajectory;
+//    QVector<double> RightFootXTrajectory;
+//    QVector<double> RightFootYTrajectory;
+//    QVector<double> RightFootZTrajectory;
 
-    QVector<double> RightFootAlphaTrajectory;
-    QVector<double> RightFootBethaTrajectory;
-    QVector<double> RightFootGamaTrajectory;
+//    QVector<double> RightFootAlphaTrajectory;
+//    QVector<double> RightFootBethaTrajectory;
+//    QVector<double> RightFootGamaTrajectory;
 
-    QVector<double> LeftFootXTrajectory;
-    QVector<double> LeftFootYTrajectory;
-    QVector<double> LeftFootZTrajectory;
+//    QVector<double> LeftFootXTrajectory;
+//    QVector<double> LeftFootYTrajectory;
+//    QVector<double> LeftFootZTrajectory;
 
-    QVector<double> LeftFootAlphaTrajectory;
-    QVector<double> LeftFootBethaTrajectory;
-    QVector<double> LeftFootGamaTrajectory;
+//    QVector<double> LeftFootAlphaTrajectory;
+//    QVector<double> LeftFootBethaTrajectory;
+//    QVector<double> LeftFootGamaTrajectory;
 
-    QVector<double> RightFootXVelocity;
-    QVector<double> RightFootYVelocity;
-    QVector<double> RightFootZVelocity;
+//    QVector<double> RightFootXVelocity;
+//    QVector<double> RightFootYVelocity;
+//    QVector<double> RightFootZVelocity;
 
-    QVector<double> LeftFootXVelocity;
-    QVector<double> LeftFootYVelocity;
-    QVector<double> LeftFootZVelocity;
+//    QVector<double> LeftFootXVelocity;
+//    QVector<double> LeftFootYVelocity;
+//    QVector<double> LeftFootZVelocity;
 
-    QVector<double> RightFootXAcceleration;
-    QVector<double> RightFootYAcceleration;
-    QVector<double> RightFootZacceleration;
+//    QVector<double> RightFootXAcceleration;
+//    QVector<double> RightFootYAcceleration;
+//    QVector<double> RightFootZacceleration;
 
-    QVector<double> LeftFootXAcceleration;
-    QVector<double> LeftFootYAcceleration;
-    QVector<double> LeftFootZAcceleration;
+//    QVector<double> LeftFootXAcceleration;
+//    QVector<double> LeftFootYAcceleration;
+//    QVector<double> LeftFootZAcceleration;
 
 
 
@@ -269,17 +268,17 @@ public:
     MatrixXd Cx_end_p;
     MatrixXd Cx_p_i;
     MatrixXd Cy_p_i;
-    QVector<double> CoMXVector;
-    QVector<double> CoMYVector;
-    QVector<double> CoMZVector;
+//    QVector<double> CoMXVector;
+//    QVector<double> CoMYVector;
+//    QVector<double> CoMZVector;
 
-    QVector<double> CoMXVelocityVector;
-    QVector<double> CoMYVelocityVector;
-    QVector<double> CoMZVelocityVector;
+//    QVector<double> CoMXVelocityVector;
+//    QVector<double> CoMYVelocityVector;
+//    QVector<double> CoMZVelocityVector;
 
-    QVector<double> CoMXAccelerationVector;
-    QVector<double> CoMYAccelerationVector;
-    QVector<double> CoMZAccelerationVector;
+//    QVector<double> CoMXAccelerationVector;
+//    QVector<double> CoMYAccelerationVector;
+//    QVector<double> CoMZAccelerationVector;
 
     MatrixXd Cx_p;
     MatrixXd Cy_p;
@@ -303,8 +302,8 @@ public:
     void CoeffArrayAnkle();
     void CoeffArrayPelvis();
     MatrixXd PelvisTrajectory(double time);
-    void CoeffArrayFootAngle();
-    MatrixXd ModificationOfPelvisHeight(double time, int n, double localtiming, bool RFT_state, bool LFT_state, bool LastDSIndex);
+    //void CoeffArrayFootAngle();
+   // MatrixXd ModificationOfPelvisHeight(double time, int n, double localtiming, bool RFT_state, bool LFT_state, bool LastDSIndex);
     void CoeffArrayPelvisZMod();
 
     double RollCharge(double t, double t_start, double t_end, double magnitude);

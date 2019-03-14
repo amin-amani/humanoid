@@ -8,6 +8,8 @@
 #include "Eigen/Core"
 #include "Eigen/Cholesky"
 #include "Eigen/LU"
+#include<qdebug.h>
+
 #include<math.h>
 
 using namespace Eigen;
@@ -31,8 +33,8 @@ public:
     double d_orient=0.2;
     double power=1e-4;
     double Right_palm_position_power=1e6;
-    double Right_palm_orientation_power=1e2;
-       double qdot_max=.2;
+    double Right_palm_orientation_power=1e6;
+       double qdot_max=.5;
     VectorXd qdot;
     //    double q1_ra;
     //    double q2_ra;
@@ -123,6 +125,7 @@ public:
     double velocity(double d, double d0);
     
 
+    right_hand(VectorXd q_ra, VectorXd v, VectorXd r_target, MatrixXd R_target);
 };
 
 #endif // RIGHT_HAND_H

@@ -3,18 +3,38 @@
 TaskSpaceOnline3::TaskSpaceOnline3()
 {
 
-    XofAnkleMaximumHeight=StepLength;
-    AnkleMaximumHeight=za_c;
+//    XofAnkleMaximumHeight=StepLength;
+//    qDebug()<<XofAnkleMaximumHeight;
+    NStride=1;
+    LeftHipRollModification=5;
+    RightHipRollModification=7;
+    HipPitchModification=2;
+
+    YpMax=.1;
+    Yd=.1;
+//    Xe=0.04;
+//    Xs=0;
+//    StepLength=0.084;//0.0840000;
+//    DesiredVelocity=.05;//0.050;
+
+    Xe=0.05*1;
+    Xs=0;
+    StepLength=0.0840000;
+    DesiredVelocity=0.050;
+
+
+    ReferencePelvisHeight=0.86;
+    AnkleMaximumHeight=0.07;
     YStMax=1.0*YpMax;///.9 Start motion parameter in y direction
     YEndMax=1.0*YpMax;///.9End motion parameter in y direction
     NStep=NStride*2;
 
-    StepLength=0.084;//0.0840000;
-    DesiredVelocity=.05;//0.050;
+
 
     Tc=StepLength*3.6/DesiredVelocity;
     TDs=.4*Tc;
     TSS=Tc-TDs;
+    XofAnkleMaximumHeight=StepLength;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
@@ -408,7 +428,7 @@ void TaskSpaceOnline3::CoeffArrayPelvis(){
 MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
 
 
-    double N,t,xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp;
+    double N,t,xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
 //determining N
     if (time<=TStart||time>TGait){
         N=0;
@@ -610,8 +630,8 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
 
     //qDebug()<<"t="<<localtiming<<"xp="<<xp<<"  yp="<<yp<<"  zp="<<zp;
 
-    MatrixXd pelvis(9,1);
-    pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp;
+    MatrixXd pelvis(10,1);
+    pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
     return pelvis;
 }
 
@@ -623,8 +643,8 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
     double y_ar=-0.5*_pelvisLength;
     double y_al=0.5*_pelvisLength;
     double x_ar,x_al,z_ar,z_al;
-    double pitch_al=0;
-    double pitch_ar=0;
+    double yaw_al=0;
+    double yaw_ar=0;
 
 
     if (n==1){//left foot moves in first step
@@ -840,7 +860,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
     }
 }
     MatrixXd footpos(8,1);
-    footpos<<x_al,y_al,z_al,pitch_al,x_ar,y_ar,z_ar,pitch_ar;
+    footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
 
     return footpos;
 

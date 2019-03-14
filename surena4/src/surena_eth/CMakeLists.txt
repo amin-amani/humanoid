@@ -12,6 +12,7 @@ project(surena_eth)
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
 find_package(catkin REQUIRED COMPONENTS  roscpp sensor_msgs interactive_markers  visualization_msgs  tf   message_generation message_runtime)
 set(LIBUSB_1_LIBRARIES "/usr/lib/x86_64-linux-gnu/libusb-1.0.so")
+set(QSLOG_LIBRARIES  ${PROJECT_SOURCE_DIR}/src/QsLog/build-QsLogShared/libQsLog.so)
 include_directories(include ${catkin_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
@@ -20,7 +21,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 #add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES num.msg)
 add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES active_csp.srv)
 add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES reset_node.srv)
-add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES home.srv)
+add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES  home.srv)
 ### Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
@@ -38,6 +39,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 #SET(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport Network Qt5Test)
@@ -76,8 +78,8 @@ set( QT_SOURCES
     src/can.h
     src/epos.cpp
     src/epos.h
-    src/tcphandler.cpp
-    src/tcphandler.h
+    src/udphandler.cpp
+    src/udphandler.h
     src/robot.cpp
     src/robot.h
     src/qnode.h
@@ -98,8 +100,8 @@ target_link_libraries(surena_eth
     Qt5::Network
     Qt5::Widgets
     Qt5::PrintSupport
-    ${QT_QTTEST_LIBRARY}
     ${LIBUSB_1_LIBRARIES}
+    ${QSLOG_LIBRARIES}
 )
 install(TARGETS surena_eth RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

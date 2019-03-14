@@ -240,7 +240,7 @@ set( QT_SOURCES
     src/taskspaceonline2.cpp
     src/taskspaceonline3.cpp
     src/surenastateestimation.cpp
-
+    src/taskspaceturning
 #    src/hand_gui.cpp
 
     )
@@ -409,7 +409,32 @@ install(TARGETS onlinetrajectorygeneration RUNTIME DESTINATION ${CATKIN_PACKAGE_
 #)
 #install(TARGETS hand_gui RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(key_control_of_legs src/key_control_of_legs.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(key_control_of_legs
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS key_control_of_legs RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(hand_trajectory_func_path src/hand_trajectory_func_path.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_func_path
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_func_path RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(trajectory_generation_turning src/trajectory_generation_turning.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(trajectory_generation_turning
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS trajectory_generation_turning RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 #add_executable(random_driver src/myNode.cpp )

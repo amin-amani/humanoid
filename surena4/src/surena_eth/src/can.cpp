@@ -1,145 +1,113 @@
 #include "can.h"
+#include"QsLog/QsLogDisableForThisFile.h"
 
+//========================================================================
 Can::Can(QObject *parent ) : QObject(parent)
 {
-
+connect(&_udp,SIGNAL(NewDataReceived(QByteArray)),this,SIGNAL(NewDataReceived(QByteArray)));
 }
-QByteArray Can::Int2QbyteArray(int value)
-{
-    QByteArray ba;
-
-
-    for(int i = 0; i != sizeof(value); ++i)
-    {
-        ba.append((char)((value & (0xFF << (i*8))) >> (i*8)));
-    }
-    return ba;
-
-}
+//========================================================================
 bool Can::Init()
 {
-    //if(hid.Connect(pid,vid,handle))
-    tcp.Connected();
-    // ui->statusBar->showMessage("Device connected.");
-    //  connect(&_timer,SIGNAL(timeout()),this,SLOT(Timeout()));
-    // _timer.start(100);
-    return true;
-}
-
-void Can::WaitMs(int timeout)
-{
-    QEventLoop q;
-    QTimer tT;
-    tT.setSingleShot(true);
-    connect(&tT, SIGNAL(timeout()), &q, SLOT(quit()));
-    tT.start(timeout); // 5s timeout
-    q.exec();
-    if(tT.isActive()){
-      // download complete
-      tT.stop();
-    } else {
-
-    }
+    _udp.Connect("192.168.1.10",7);
 
 }
-
-void Can::WriteMessage(uint16_t canID,unsigned char devID,QByteArray data)
+//========================================================================
+QByteArray Can::WriteMessage(uint16_t canID,unsigned char devID,QByteArray data)throw(std::runtime_error)
 {
+    try{
     QByteArray buffer;
-    buffer.append(0x02);  // mode 2: Can Write
-    buffer.append(0xAA);  // header 1
-    buffer.append(0x55);  // header 2
-    buffer.append(0xAA);  // header 3
-
-    if(devID==255){
-        buffer.append(devID);
-        buffer.append((canID & 0xff)); //low
-        buffer.append(((canID>>8)& 0xff));//hi
-        buffer.append(data);
-
-        buffer.append(0xFF);  // Tailer 1
-        buffer.append(0xCC);  // Tailer 2
-        buffer.append(0x33);  // Tailer 3
-        buffer.append(0xCC);  // Tailer 4
-
-        tcp.WriteData(buffer);
-        return;
-    }
-
-
+    QByteArray response;
+    buffer.append(CanWriteCommand);
+    buffer.insert(buffer.length(),(const char*)_UDPHeader,sizeof(_UDPHeader));
     buffer.append(devID);
     buffer.append((canID & 0xff)); //low
     buffer.append(((canID>>8)& 0xff));//hi
-
-
-    for(int i=0; i<8; i++)
-    {
-        buffer.append(data[i]);
+    buffer.append(data);
+    if(devID==255){
+        buffer.insert(buffer.length(),(const char*)_UDPTail,sizeof(_UDPTail));
     }
+    response= _udp.SendCommand(buffer,1000);
+       return response;
+    }
+    catch(const std::runtime_error e)
+    {
+        QLOG_ERROR()<<e.what();
+        throw std::runtime_error(e.what());
+        return QByteArray(((devID==255)?160:10), Qt::Initialization::Uninitialized);
 
-    tcp.WriteData(buffer);
-
+    }
 }
-
- void Can::ReadMessage(uint8_t devID, QByteArray &response)
+//========================================================================
+ QByteArray Can::ReadMessage(uint8_t devID)throw(std::runtime_error)
 {
+    try {
+    QByteArray buffer,response;
+    buffer.append(CanReadMessageCommand);
+    buffer.insert(buffer.length(),(const char*)_UDPHeader,sizeof(_UDPHeader));
+    buffer.append(devID);
+    buffer.insert(buffer.length(),QByteArray(((devID==255)?160:10), Qt::Initialization::Uninitialized));
+    buffer.insert(buffer.length(),(const char*)_UDPTail,sizeof(_UDPTail));
+    response = _udp.SendCommand(buffer,10);
+    if(response.length()<((devID==255)?164:14))
+    {
+        throw std::runtime_error("Invalid UDP Can Packet");
+        return QByteArray(((devID==255)?160:10), Qt::Initialization::Uninitialized);
+    }
+    response=response.mid(4,((devID==255)?160:10));
+    QLOG_TRACE()<<"Read Replay:"<<response.toHex();
+  return response;
+
+    }
+     catch (const std::runtime_error e)
+    {
+        QLOG_ERROR()<<e.what();
+        return QByteArray(((devID==255)?160:10), Qt::Initialization::Uninitialized);
+    }
+ }
+ //========================================================================
+ void Can::WriteRunCommand(QByteArray data)
+ {
      QByteArray buffer;
-     int index_a =10;
-     response.clear();
-     buffer.append(0x03);  // mode 3: Can Read
-     buffer.append(0xAA);  // header 1
-     buffer.append(0x55);  // header 2
-     buffer.append(0xAA);  // header 3
-     buffer.append(devID);
+     buffer.append(CanRunMessageCommand);  // mode 1: Run
+     buffer.insert(buffer.length(),(const char*)_UDPHeader,sizeof(_UDPHeader));
+     buffer.append(data);
+     buffer.insert(buffer.length(),(const char*)_UDPTail,sizeof(_UDPTail));
+     _udp.WriteData(buffer);
+ }
+ //========================================================================
+ void Can::SendUDPMessage(QByteArray data)
+ {
+     _udp.WriteData(data);
+ }
+ //========================================================================
 
-if(devID==255)
-{
-    index_a = 160;
-}
+ void Can::CheckCanBoardRequest()
+ {
+     int i=0;
+     QByteArray data;
+     data.append(0x08);  // mode 8: Test
+     data.append(0xAA);  // Header check
+     data.append(0x55);  // Header check
+     data.append(0xAA);  // Header check
 
-     for (int i = 0; i < index_a; ++i) {
-         buffer.append(0x1);  // 10 byte for data payload
+
+
+     for(i = 0 ; i < 32; i++)
+     {
+         data.append(0x01);  // fill data packet with 01 byte
      }
-     buffer.append(0xFF);  // Tailer 1
-     buffer.append(0xCC);  // Tailer 2
-     buffer.append(0x33);  // Tailer 3
-     buffer.append(0xCC);  // Tailer 4
 
-    //tcp.WriteData(buffer);
-    //WaitMs(5);
-    response = tcp.SendCommand(buffer);
-    response=response.mid(4,index_a);
+     data.append(0xFF);  // Parity | 0xFF
+     data.append(0xCC);  // Tailer
+     data.append(0x33);  // Tailer
+     data.append(0xCC);  // Tailer
+     //qDebug()<<"packet size="<<data.length();
+     SendUDPMessage(data);
+     //tcp.WriteData(data);  // send 128 Byte Packet
 
-    if (response.length() != 0)
-    {
-      //  qDebug() << " len: " << response.length() << "; incomming data is: " << response.toHex();
-    }
-    else
-    {
-       //qDebug() << "no data read!";
-    }
-}
+     // just for test
+     // qDebug() << "send data: " << data.toHex();
+ }
+ //========================================================================
 
-
-void Can::SetPosition(QList<int>positionList)
-{
-    QByteArray buffer;
-    buffer.append(0x01);  // mode 1: Run
-    buffer.append(0xAA);  // header 1
-    buffer.append(0x55);  // header 2
-    buffer.append(0xAA);  // header 3
-    for(int i=0;i<positionList.length();i++)
-    {
-      buffer.append(Int2QbyteArray(positionList[i]));
-    }
-
-    tcp.WriteData(buffer);
-}
-
-QByteArray Can::CanReceiveData()
-{
-    QByteArray buffer;
-    //qDebug()<< tcp.Receive_data();
-    buffer = tcp.Receive_data();
-    return buffer;
-}

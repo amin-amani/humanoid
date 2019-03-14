@@ -53,6 +53,7 @@ public:
     MatrixXd IKAnalytical(LinkM Body, double D, double E, double A, double B, LinkM Foot);
     MatrixXd RPitch(double theta);
     MatrixXd RRoll(double phi);
+    void doIK(QString link, MatrixXd PoseLink, MatrixXd RotLink, QString root, MatrixXd PoseRoot, MatrixXd RotRoot);
 private:
     int Sign(double v);
     void ForwardKinematicPrimary(int input);

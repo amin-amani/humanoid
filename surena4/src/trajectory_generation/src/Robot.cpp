@@ -470,3 +470,45 @@ void Robot::doIK(QString link,MatrixXd PoseLink,QString root,MatrixXd PoseRoot){
 //qDebug()<<2;
 
 }
+
+
+void Robot::doIK(QString link,MatrixXd PoseLink,MatrixXd RotLink,QString root,MatrixXd PoseRoot,MatrixXd RotRoot){
+
+    LinkM foot=Links[MapingName2ID.value(link)-1];
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(0)=PoseRoot(0,0);
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(1)=PoseRoot(1,0);
+    Links[MapingName2ID.value(root)-1].PositionInWorldCoordinate(2)=PoseRoot(2,0);
+//    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate(0)=PoseRoot(3,0);
+//    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate(1)=PoseRoot(4,0);
+//    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate(2)=PoseRoot(5,0);
+
+    Links[MapingName2ID.value(root)-1].AttitudeInWorldCoordinate=RotRoot;
+    foot.PositionInWorldCoordinate(0)=PoseLink(0,0);
+    foot.PositionInWorldCoordinate(1)=PoseLink(1,0);
+    foot.PositionInWorldCoordinate(2)=PoseLink(2,0);//just specify X
+    //foot.AttitudeInWorldCoordinate(0)=PoseLink(3,0);
+    //foot.AttitudeInWorldCoordinate(0)=PoseLink(4,0);
+    //foot.AttitudeInWorldCoordinate(0)=PoseLink(5,0);
+    foot.AttitudeInWorldCoordinate=RotLink;
+    //qDebug()<<x(var);
+    //double milad=IKLevenbergMarquardt(foot,link);
+    MatrixXi Route;
+    double D;
+    if (link=="LLeg_AnkleR_J6") {
+         D=0.115;
+        Route= GetLeftLegRoute();
+    }
+    else if(link=="RLeg_AnkleR_J6") {
+         D=-1*0.115;
+         Route= GetRightLegRoute();
+    }
+    MatrixXd Q= IKAnalytical(Links[MapingName2ID.value(root)-1],D,-0.109,0.37,0.36,foot);
+    MatrixXd LegAngle(1,6);
+   LegAngle<<Q(0,0) ,Q(1,0) ,Q(2,0),Q(3,0), Q(4,0), Q(5,0);
+
+
+    SetJointAngle(LegAngle,Route);
+
+//qDebug()<<2;
+
+}

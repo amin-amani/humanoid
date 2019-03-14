@@ -87,10 +87,7 @@ while (ros::ok())
 int p=0;
 //p=int(1000*sin(t*2*M_PI/4));
 
-for(int  i = 0;i < 12;i++)
-{
-    msg.data.push_back(p);
-}
+
 
 //int q;
 // int dq;
@@ -112,15 +109,20 @@ if(count>20) {
 }
 
 if(c==113){break;}
-if(c==97){q[0]+=4;}if(c==122){q[0]-=4;}
+if(c==97) {q[0]+=4;}if(c==122){q[0]-=4;}
 if(c==115){q[1]+=4;}if(c==120){q[1]-=4;}
-if(c==100){q[2]+=4;}if(c==99){q[2]-=4;}
+if(c==100){q[2]+=4;} if(c==99){q[2]-=4;}
 if(c==102){q[3]+=4;}if(c==118){q[3]-=4;}
-if(c==103){q[4]+=4;}if(c==98){q[4]-=4;}
+if(c==103){q[4]+=4;} if(c==98){q[4]-=4;}
 if(c==104){q[5]+=4;}if(c==110){q[5]-=4;}
 if(c==106){q[6]+=4;}if(c==109){q[6]-=4;}
-if(c==107){q[7]+=4;}if(c==44){q[7]-=4;}
+if(c==107){q[7]+=4;} if(c==44){q[7]-=4;}
 
+
+for(int  i = 0;i < 12;i++)
+{
+    msg.data.push_back(p);
+}
 //right hand epose
 msg.data.push_back(q[0]);//12 -y  a,z
 msg.data.push_back(q[1]);//13 +x
@@ -132,7 +134,7 @@ msg.data.push_back(q[3]);
 msg.data.push_back(0);//16
 msg.data.push_back(0);//17
 msg.data.push_back(0);//18
-msg.data.push_back(0);//19
+msg.data.push_back(8);//19
 //left hand epose
 msg.data.push_back(q[4]);//20 +y
 msg.data.push_back(q[5]);//21 +x
@@ -142,7 +144,7 @@ msg.data.push_back(q[7]);//23 -y
 msg.data.push_back(0);//24
 msg.data.push_back(0);//25
 msg.data.push_back(0);//26
-msg.data.push_back(0);//27
+msg.data.push_back(7);//27
 
 //for(int i= 12;i < 16;i++){
 
