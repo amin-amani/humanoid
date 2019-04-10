@@ -33,6 +33,7 @@
 #include<termios.h>
 
 using namespace  std;
+using namespace Eigen;
 QTime timer;
 int count;
 
@@ -80,15 +81,24 @@ void qc_initial(const sensor_msgs::JointState & msg){
     }
 
 
-double Fzl,Fzr,Mxl,Mxr;
+double Fzl,Fzr,Mxl,Myl,Myr,Mxr;
+VectorXd CoPR(2), CoPL(2);
 void FT_left_feedback(const geometry_msgs::Wrench &msg){
  Fzl=msg.force.z;
- Mxl=msg.torque.y;
+ Mxl=-msg.torque.y;
+ Myl=msg.torque.x;
+ CoPL << Myl/Fzl,
+         Mxl/Fzl;
+
 }
 
 void FT_right_feedback(const geometry_msgs::Wrench &msg){
  Fzr=msg.force.z;
- Mxr=msg.torque.x;
+ Mxr=-msg.torque.x;
+ Myr=-msg.torque.y;
+ CoPR << Myr/Fzr,
+         Mxr/Fzr;
+
 }
 
 
@@ -177,7 +187,8 @@ if(c==104){q[19-12]+=d;}  if(c==110){q[19-12]-=d;}
 ROS_INFO("\nright: HY=%f HR=%f HP=%f K=%f AP=%f AR=%f\nleft: HY=%f HR=%f HP=%f K=%f AP=%f AR=%f",
          q[1]*180/M_PI,q[2]*180/M_PI,q[3]*180/M_PI,q[4]*180/M_PI,q[5]*180/M_PI,q[6]*180/M_PI,
         q[7]*180/M_PI,q[8]*180/M_PI,q[9]*180/M_PI,q[10]*180/M_PI,q[11]*180/M_PI,q[12]*180/M_PI);
-
+ROS_INFO("CoPL=(%f\t%f),Mxl=%f,Myl=%f,Fzl=%f",CoPL(0),CoPL(1),Mxl,Myl,Fzl);
+ROS_INFO("CoPR=(%f\t%f),MxR=%f,MyR=%f,Fzr=%f",CoPR(0),CoPR(1),Mxr,Myr,Fzr);
 vector<int> qref(12);
 qref=QC.ctrldata2qc(q);
 

@@ -25,6 +25,7 @@ public:
     double LeftHipRollModification;
     double RightHipRollModification;
     double HipPitchModification;
+    double PelvisRollRange;
 
     double YpMax;//Rm*0.5*_pelvisLength*1.2;
     double Yd;//1*Rd*YpMax
@@ -311,6 +312,7 @@ public:
     MatrixXd RollAngleModification(double time);
 
     MatrixXd AnkleTrajectory(double time, int n, double localtiming);
+    double PelvisRoll(double time);
 };
 
 #endif // TASKSPACEONLINE3_H

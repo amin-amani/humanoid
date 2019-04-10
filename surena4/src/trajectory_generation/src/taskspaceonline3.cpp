@@ -6,18 +6,20 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=1;
-    LeftHipRollModification=5;
-    RightHipRollModification=7;
-    HipPitchModification=2;
+    LeftHipRollModification=1;
+    RightHipRollModification=1;
+    HipPitchModification=1;//2;
 
-    YpMax=.1;
-    Yd=.1;
+    PelvisRollRange=10*M_PI/180;
+
+    YpMax=.1;.08;.12;
+    Yd=YpMax;.07;.12;
 //    Xe=0.04;
 //    Xs=0;
 //    StepLength=0.084;//0.0840000;
 //    DesiredVelocity=.05;//0.050;
 
-    Xe=0.05*1;
+    Xe=0.04*1;
     Xs=0;
     StepLength=0.0840000;
     DesiredVelocity=0.050;
@@ -34,7 +36,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=StepLength*3.6/DesiredVelocity;
     TDs=.4*Tc;
     TSS=Tc-TDs;
-    XofAnkleMaximumHeight=StepLength;
+    XofAnkleMaximumHeight=StepLength*1.7;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
@@ -171,10 +173,12 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
 
     MatrixXd RollMat(2,1);
     RollMat<<rollR,rollL;
-    return RollMat;
-}
+    return RollMat;}
 
-
+        double TaskSpaceOnline3::PelvisRoll(double time){
+            double x=1;
+            return x;
+            }
 
 
 void TaskSpaceOnline3::CoeffArrayAnkle(){
@@ -861,7 +865,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 }
     MatrixXd footpos(8,1);
     footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
-
+//qDebug()<<"time="<<time<<"\tzal="<<z_al-.112;
     return footpos;
 
 }

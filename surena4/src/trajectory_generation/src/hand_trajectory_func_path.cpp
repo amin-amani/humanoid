@@ -295,6 +295,17 @@ int main(int argc, char **argv)
     {
         if(initializing){
 
+            if(simulation){
+                q0<<10*M_PI/180,
+                        -4*M_PI/180,
+                        0,
+                        -20*M_PI/180,
+                        0,
+                        0,
+                        0;
+            }
+            else{q0=absolute_q0;}
+ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0(6));
             //self recognition
             if(scenario=="a"){
 
@@ -380,16 +391,6 @@ int main(int argc, char **argv)
             }
 
 
-            if(simulation){
-                q0<<10*M_PI/180,
-                        -4*M_PI/180,
-                        0,
-                        -20*M_PI/180,
-                        0,
-                        0,
-                        0;
-            }
-            else{q0=absolute_q0;}
 
             double v0=0;
             double v_target =.4;
@@ -457,6 +458,20 @@ int main(int argc, char **argv)
             //ROS_INFO("\n
             //ROS_INFO("\n
 
+            //home
+            if(scenario=="h"){
+                 qr_end=q0;
+//                qr_end<<0,
+//                        0,
+//                        0,
+//                        0,
+//                        0,
+//                        0,
+//                        0;
+            }
+
+
+
 
 
 
@@ -476,8 +491,11 @@ int main(int argc, char **argv)
 
 
             time=double(count)*.005;
+            if(scenario=="h"){time+=t(2);}
+
             VectorXd P(3);
             VectorXd V(3);
+
             if(time<t(1)){
                 P<<coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,0),
                         coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,0),
@@ -522,36 +540,43 @@ int main(int argc, char **argv)
                 else if(scenario=="f" && time<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
                 else{
 
+
+
                     ROS_INFO_ONCE("reached!");
+if(scenario=="h")
+{
+    MatrixXd t_r(1,2);
+    MatrixXd p_r(7,2);
+    MatrixXd z_r(1,2);
+    MatrixXd r_coeff;
+    t_r<<t(2),t(2)*2;
+    z_r<<0,0;
 
-                    MatrixXd t_r(1,2);
-                    MatrixXd p_r(7,2);
-                    MatrixXd z_r(1,2);
-                    MatrixXd r_coeff;
-                    t_r<<t(2),t(2)*2;
-                    z_r<<0,0;
+    p_r<<qr_end(0),10*M_PI/180,
+            qr_end(1),-4*M_PI/180,
+            qr_end(2),0,
+            qr_end(3),-20*M_PI/180,
+            qr_end(4),0,
+            qr_end(5),0,
+            qr_end(6),0;
 
-                       p_r<<qr_end(0),10*M_PI/180,
-                            qr_end(1),-4*M_PI/180,
-                            qr_end(2),0,
-                            qr_end(3),-20*M_PI/180,
-                            qr_end(4),0,
-                            qr_end(5),0,
-                            qr_end(6),0;
+    for (int i = 0; i < 7; ++i) {
+        r_coeff=coef_generator.Coefficient(t_r,p_r.row(i),z_r,z_r);
+        q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
 
-                       for (int i = 0; i < 7; ++i) {
-                           r_coeff=coef_generator.Coefficient(t_r,p_r.row(i),z_r,z_r);
-                           q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
+    }
+}
+ else{break;}
 
-                       }
-//                    r_coeff=(coef_generator.Coefficient(t_r,p_r,z_r,z_r));
-//                    q_ra(0)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
+                    //                    r_coeff=(coef_generator.Coefficient(t_r,p_r,z_r,z_r));
+                    //                    q_ra(0)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
 
-                      // ROS_INFO("  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
+                    // ROS_INFO("  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
 
-                    }
+                }
 
-                   //else{break;}
+
+                //else{break;}
             }
             else{break;}
 
@@ -566,9 +591,9 @@ int main(int argc, char **argv)
 
 
 
-                 //   ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",180/M_PI*q[15],180/M_PI*q[16],180/M_PI*q[17],180/M_PI*q[18],180/M_PI*q[19],180/M_PI*q[20],180/M_PI*q[21]);
-//            ROS_INFO("t=%f\nx=%f\ty=%f\tz=%f\t\nX_des=%f\tY_des=%f\tZ_des=%f",time,hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2),
-//                  P(0),P(1),P(2));
+            //   ROS_INFO("q1=%f\tq2=%f\tq3=%f\tq4=%f\tq5=%f\tq6=%f\tq7=%f\t",180/M_PI*q[15],180/M_PI*q[16],180/M_PI*q[17],180/M_PI*q[18],180/M_PI*q[19],180/M_PI*q[20],180/M_PI*q[21]);
+            //            ROS_INFO("t=%f\nx=%f\ty=%f\tz=%f\t\nX_des=%f\tY_des=%f\tZ_des=%f",time,hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2),
+            //                  P(0),P(1),P(2));
             //        ROS_INFO("psi=%f(%f)\ttheta=%f(%f)\tphi=%f(%f)\t",hand.sai,hand.sai_target,hand.theta,hand.theta_target,hand.phi,hand.phi_target);
 
 
@@ -582,15 +607,17 @@ int main(int argc, char **argv)
                 //         q[16]=-10*M_PI/180;
                 //         q[17]=-10*M_PI/180;
 
-                q[15]=qr1[count];
-                q[16]=qr2[count];
-                q[17]=qr3[count];
-                q[18]=qr4[count];
+                    q[15]=qr1[count];
+                    q[16]=qr2[count];
+                    q[17]=qr3[count];
+                    q[18]=qr4[count];
 
-                q[19]=qr5[count];
-                q[20]=qr6[count];
-                q[21]=qr7[count];
-             //     ROS_INFO("%f,%f,%f,%f,%f,%f,%f",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
+                    q[19]=qr5[count];
+                    q[20]=qr6[count];
+                    q[21]=qr7[count];
+
+
+                //     ROS_INFO("%f,%f,%f,%f,%f,%f,%f",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
                 //   ROS_INFO("T=%f upper:%f %f lower:%f %f qdot=%f q=%f %f",hand.T,(hand.toRad(10)+q_ra(1))/hand.T,hand.qdot_max,(hand.toRad(-90)+q_ra(1))/hand.T,-hand.qdot_max,hand.qdot(2),180/M_PI*q[16],180/M_PI*q_ra(1));
 
                 SendGazebo(q);
@@ -610,8 +637,8 @@ int main(int argc, char **argv)
             q_motor[3]=int(10*(qr4[count]-q0(3))*300/M_PI);
 
             q_motor[4]=int((qr5[count]-q0(4))*(3000-2300)*4/M_PI);
-            q_motor[5]=int((qr6[count]-q0(5))*(4000-2050)/(23*M_PI/180));
-            q_motor[6]=int((qr7[count]-q0(6))*(4000-2050)/(23*M_PI/180));
+            q_motor[5]=int((qr6[count]-q0(5))*(4000-2050)/(23*M_PI/180))-1200;
+            q_motor[6]=int((qr7[count]-q0(6))*(4000-2050)/(23*M_PI/180))-200;
 
             q_motor[7]=8;
 
