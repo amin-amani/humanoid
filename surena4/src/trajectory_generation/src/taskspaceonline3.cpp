@@ -5,24 +5,32 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=1;
-    LeftHipRollModification=1;
-    RightHipRollModification=1;
+    NStride=10;
+    LeftHipRollModification=2-.5;2.5;
+    RightHipRollModification=2;2.5;
+    FirstHipRollModification=2;3.5;
     HipPitchModification=1;//2;
 
     PelvisRollRange=10*M_PI/180;
 
-    YpMax=.1;.08;.12;
+    YpMax=.105;.08;.12;
     Yd=YpMax;.07;.12;
 //    Xe=0.04;
 //    Xs=0;
 //    StepLength=0.084;//0.0840000;
 //    DesiredVelocity=.05;//0.050;
 
-    Xe=0.04*1;
-    Xs=0;
-    StepLength=0.0840000;
+    Xe=0.02*1;
+    Xs=-.006;-.01;0;
+    StepLength=.0840000;
     DesiredVelocity=0.050;
+    Tc=StepLength*3.6/DesiredVelocity;
+    TDs=.4*Tc;
+    TSS=Tc-TDs;
+    XofAnkleMaximumHeight=StepLength*1.7;
+
+
+
 
 
     ReferencePelvisHeight=0.86;
@@ -33,10 +41,21 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
 
-    Tc=StepLength*3.6/DesiredVelocity;
-    TDs=.4*Tc;
+    //test
+    YpMax=.123;.13;.12;105;
+    Yd=YpMax;YStMax=YpMax;YEndMax=YpMax;
+    StepLength=.1;.15;.2;.12;.3;
+    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
+    TDs=3;
     TSS=Tc-TDs;
-    XofAnkleMaximumHeight=StepLength*1.7;
+    TSS=3;
+    Tc=TSS+TDs;
+
+
+    AnkleMaximumHeight=0.06;
+    ReferencePelvisHeight=.91;.89;0.86+.02-.055;
+
+
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
@@ -51,7 +70,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     // last step: timing parameter of pelvis motion
     T_end_of_first_SS=1;
     //    T_end_of_SS=.9;
-    T_end_of_SS=TSS*.3;
+    T_end_of_SS=1;//TSS*.3;
     T_end_of_last_SS=1;
 
     h_end_of_SS=.02;
@@ -64,7 +83,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     // last step: timing parameter of ankle motion
     T_end_a_s=TGait+TDs;
     T_end_a_e=TGait+TDs+0.5*TEnd;
-    T_end_a_d=TGait+TDs+0.45*(T_end_a_e-T_end_a_s);
+    T_end_a_d=TGait+TDs+.6*(T_end_a_e-T_end_a_s);0.45;
     // first step: timing parameter of pelvis motion
     T_st_p_sy=0.2*TStart;
     T_st_p_dy=0.5*TStart;//0.65*TStart;
@@ -73,6 +92,15 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     // first step: timing parameter of ankle motion
     T_s_st=.5*TStart;
     T_st_a_d=T_s_st+0.45*(TStart-T_s_st);
+
+
+
+
+
+
+
+
+
 
 
     CoeffArrayAnkle();
@@ -111,24 +139,25 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
     double t;
     double rollR=0;
     double rollL=0;
-
-    double ChargeCoeffLeftStart =.4;// 0.4;          //after DS start
-    double ChargeCoeffLeftEnd =1;// 1.5;              //<1 before DS ends; >1 after SS start
-    double DechargeCoeffLeftStart = 0.4;//.4;        //after DS start
-    double DechargeCoeffLeftEnd = 1;            //<1 before DS ends; >1 after SS start
-    double ChargeCoeffLeftStartEndPhase = 0.4;  //after DS start
-    double ChargeCoeffLeftEndEndPhase = 1;      //<1 before DS ends; >1 after SS start
+    double dt=0;
+    double dt2=-0.20;
+    double ChargeCoeffLeftStart =0.8;.4+dt;// 0.4;          //after DS start
+    double ChargeCoeffLeftEnd =1.3;1;// 1.5;              //<1 before DS ends; >1 after SS start
+    double DechargeCoeffLeftStart = 0.4+dt;//.4;        //after DS start
+    double DechargeCoeffLeftEnd = 1+dt2;            //<1 before DS ends; >1 after SS start
+    double ChargeCoeffLeftStartEndPhase =0.8; 0.4+dt;  //after DS start
+    double ChargeCoeffLeftEndEndPhase =1.3; 1;      //<1 before DS ends; >1 after SS start
     double DechargeCoeffLeftStartEndPhase = 0.6;//must be bigger than 0.5; end foot pairing DS
     double DechargeCoeffLeftEndEndPhase = 0.8;  //must be greata
 
     double ChargeCoeffRightStartStartPhase = 0.3;   //while reducing height(0.5 means minimum height)
     double ChargeCoeffRightEndStartPhase = 0.7;     //almot maximum ankle height
-    double DechargeCoeffRightStartStartPhase = 0.4; //after DS start
-    double DechargeCoeffRightEndStartPhase = 1;     //<1 before DS ends; >1 after SS start
-    double ChargeCoeffRightStart =.4;// 0.4;             //after DS start
-    double ChargeCoeffRightEnd = 1;// 1.5;                 //<1 before DS ends; >1 after SS start
-    double DechargeCoeffRightStart = 0.4;//.4;           //after DS start
-    double DechargeCoeffRightEnd = 1;               //<1 before DS ends; >1 after SS start
+    double DechargeCoeffRightStartStartPhase = 0.4+dt; //after DS start
+    double DechargeCoeffRightEndStartPhase = 1+dt2;     //<1 before DS ends; >1 after SS start
+    double ChargeCoeffRightStart =0.8;.4+dt;// 0.4;             //after DS start
+    double ChargeCoeffRightEnd =1.3; 1;// 1.5;                 //<1 before DS ends; >1 after SS start
+    double DechargeCoeffRightStart = 0.4+dt;//.4;           //after DS start
+    double DechargeCoeffRightEnd = 1+dt2;               //<1 before DS ends; >1 after SS start
 
     if (time<=TStart){
         N=0;
@@ -145,7 +174,9 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
 
     double R_1=0.6;
     double  D_time=R_1*TDs;
-    double D_teta_r=-1*RightHipRollModification*(M_PI/180);
+    double D_teta_r;
+    if(time<TStart+DechargeCoeffRightEndStartPhase*TDs){D_teta_r=-1*FirstHipRollModification*(M_PI/180);}
+    else{D_teta_r=-1*RightHipRollModification*(M_PI/180);}
     double D_teta_l=LeftHipRollModification*(M_PI/180);
 
     double extra_D_theta_l=0*M_PI/180;
@@ -169,6 +200,10 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
             RollDecharge(t,TStart+DechargeCoeffRightStartStartPhase*TDs,TStart+DechargeCoeffRightEndStartPhase*TDs,D_teta_r)+
             RollCharge(t,TStart+Tc+ChargeCoeffRightStart*TDs,TStart+Tc+ChargeCoeffRightEnd*TDs,D_teta_r)+
             RollDecharge(t,TStart+2*Tc+DechargeCoeffRightStart*TDs,TStart+2*Tc+DechargeCoeffRightEnd*TDs,D_teta_r);
+
+
+
+
 
 
     MatrixXd RollMat(2,1);
@@ -321,14 +356,14 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
 }
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
-
+double vx=DesiredVelocity/3.6/2;
     //------------------Coefficient of cyclic motion in X direction--------------------
     MatrixXd ord(1,2);
     ord << 4,4;//3,3
     MatrixXd ttt(1,3);
     ttt <<0 ,TDs, Tc;
     MatrixXd con(3,3);
-    con<<Xe, StepLength-Xs, StepLength+Xe,0, INFINITY ,0,0, INFINITY ,0;//con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY;
+    con<<Xe, StepLength-Xs, StepLength+Xe,vx, INFINITY ,vx,0, INFINITY ,0;//con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY;
 
     Cx_p_i.resize(2,6);
     Cx_p_i.fill(0);
@@ -368,7 +403,7 @@ void TaskSpaceOnline3::CoeffArrayPelvis(){
     MatrixXd Cx_st_pPos(1,2);
     Cx_st_pPos<<0, Xe;
     MatrixXd Cx_st_pVel(1,2);
-    Cx_st_pVel<<0, 0;//Cx_st_pVel<<0 ,Cx_p(0,4);
+    Cx_st_pVel<<0, vx;//Cx_st_pVel<<0 ,Cx_p(0,4);
     MatrixXd Cx_st_pAccel(1,2);
     Cx_st_pAccel<<0 ,0;//Cx_st_pAccel<<0 ,2*Cx_p(0,3);
     Cx_st_p=CoefOffline.Coefficient(Cx_st_pTime,Cx_st_pPos,Cx_st_pVel,Cx_st_pAccel);
@@ -380,7 +415,7 @@ void TaskSpaceOnline3::CoeffArrayPelvis(){
     MatrixXd Cx_end_pPos(1,2);
     Cx_end_pPos<<(NStep+1)*StepLength-Xs, (NStep+1)*StepLength;
     MatrixXd Cx_end_pVel(1,2);
-    Cx_end_pVel<<0, 0;//Cx_end_pVel<<5*Cx_p(0,0)*pow(TDs,4)+4*Cx_p(0,1)*pow(TDs,3)+3*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3)*pow(TDs,1)+Cx_p(0,4), 0;
+    Cx_end_pVel<<vx, 0;//Cx_end_pVel<<5*Cx_p(0,0)*pow(TDs,4)+4*Cx_p(0,1)*pow(TDs,3)+3*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3)*pow(TDs,1)+Cx_p(0,4), 0;
     MatrixXd Cx_end_pAccel(1,2);
     Cx_end_pAccel<<0, 0;//Cx_end_pAccel<<5*4*Cx_p(0,0)*pow(TDs,4)+4*3*Cx_p(0,1)*pow(TDs,3)+3*2*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3), 0;//like the last moment of first part of trajectory of cycle
     Cx_end_p=CoefOffline.Coefficient(Cx_end_pTime,Cx_end_pPos,Cx_end_pVel,Cx_end_pAccel);

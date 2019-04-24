@@ -394,7 +394,8 @@ MatrixXd Robot::IKAnalytical(LinkM Body, double D, double E, double A, double B,
     double c5=(C*C-A*A-B*B)/(2*A*B);
     if (c5>=1) {
         q5=0;
-        cout<<"c5 is larger than 1";
+       // cout<<"c5 is larger than 1"<<A<<","<<B<<","<<C<<","<<D<<","<<E<<"\n";
+        cout<<"c5 is larger than 1"<<"\n";
     }
     else if (c5<=-1) {
         q5=M_PI;

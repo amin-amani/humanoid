@@ -24,6 +24,7 @@ public:
 
     double LeftHipRollModification;
     double RightHipRollModification;
+    double FirstHipRollModification;
     double HipPitchModification;
     double PelvisRollRange;
 

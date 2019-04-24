@@ -25,6 +25,7 @@
 #include<std_msgs/Float64.h>
 #include "qcgenerator.h"
 #include "right_hand.h"
+
 #include<termios.h>
 #include "MinimumJerkInterpolation.h"
 
@@ -197,22 +198,31 @@ int main(int argc, char **argv)
     pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
     pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
     pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
-    pub29 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
-    pub30 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
-    pub31 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
+    pub29 = nh.advertise<std_msgs::Float64>("rrbot/joint29_position_controller/command",1000);
+    pub30 = nh.advertise<std_msgs::Float64>("rrbot/joint30_position_controller/command",1000);
+    pub31 = nh.advertise<std_msgs::Float64>("rrbot/joint31_position_controller/command",1000);
 
 
 
     right_hand hand_funcs;
 
     VectorXd r_target(3);
+    VectorXd r_middle_target(3);
 
     MatrixXd R_target(3,3);
 
 
-        r_target<<.5,
-                -0.1,
-                -0.2;
+//        r_target<<.5,
+//                -0.1,
+//                -0.2;
+
+    r_target<<.4,
+            0.1,
+            -0.15;
+  // R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(2,-40*M_PI/180,3);
+    r_middle_target<<.3,
+            -.0,
+            -.3;
 
 R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,-10*M_PI/180+atan2(r_target(1),r_target(0)),3);
 
@@ -224,7 +234,7 @@ MatrixXd R_deliver(3,3);
 
     r_deliver<<r_target(0),
             r_target(1)-.2,
-            r_target(2)+.2;
+            r_target(2)+.1;
             //R_deliver=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,-10*M_PI/180+atan2(r_deliver(1),r_deliver(0)),3);
     R_deliver=R_target;
 
@@ -240,6 +250,7 @@ q0<<10*M_PI/180,
         0,
         0;
 
+
 double v0=0;
 double v_target =.4;
 right_hand hand0(q0,r_target,R_target,0,0);
@@ -253,14 +264,91 @@ double sai_target=hand0.sai_target;
 double phi=hand0.phi;
 double phi_target=hand0.phi_target;
 
-
-
-
 double theta_deliver;
 double sai_deliver;
 double phi_deliver;
 
+MinimumJerkInterpolation coef_generator;
+MatrixXd X_coef_target;
+MatrixXd Y_coef_target;
+MatrixXd Z_coef_target;
+MatrixXd X_coef_deliver;
+MatrixXd Y_coef_deliver;
+MatrixXd Z_coef_deliver;
 
+MatrixXd t_target(1,3);
+MatrixXd t_deliver(1,2);
+MatrixXd P_x(1,3);
+MatrixXd V_x(1,3);
+MatrixXd A_x(1,3);
+
+MatrixXd P_y(1,3);
+MatrixXd V_y(1,3);
+MatrixXd A_y(1,3);
+
+MatrixXd P_z(1,3);
+MatrixXd V_z(1,3);
+MatrixXd A_z(1,3);
+
+///timing
+/// 0~t1 reach the target
+/// t1~t2 rest to grip
+/// t2~t3 move to deliver point
+/// t3~t4 rest to release
+/// t4~t_end go back to home
+
+double t1=2;
+double t2=4;
+double t3=6;
+double t4=8;
+double t_end=10;
+
+t_target<<0,t1/2,t1;
+P_x<< hand0.r_right_palm(0),r_middle_target(0),r_target(0);
+P_y<< hand0.r_right_palm(1),r_middle_target(1),r_target(1);
+P_z<< hand0.r_right_palm(2),r_middle_target(2),r_target(2);
+V_x<<0,INFINITY,0;
+V_y<<0,INFINITY,0;
+V_z<<0,INFINITY,0;
+A_x<<0,INFINITY,0;
+A_y<<0,INFINITY,0;
+A_z<<0,INFINITY,0;
+
+X_coef_target=coef_generator.Coefficient(t_target,P_x,V_x,A_x);
+Y_coef_target=coef_generator.Coefficient(t_target,P_y,V_y,A_y);
+Z_coef_target=coef_generator.Coefficient(t_target,P_z,V_z,A_z);
+ROS_INFO("test");
+t_deliver<<t2,t3;
+
+P_x.resize(1,2);P_y.resize(1,2);P_z.resize(1,2);
+ROS_INFO("test");
+P_x<<r_target(0),r_deliver(0);
+P_y<<r_target(1),r_deliver(1);
+P_z<<r_target(2),r_deliver(2);
+
+V_x.resize(1,2);V_y.resize(1,2);V_z.resize(1,2);
+A_x.resize(1,2);A_y.resize(1,2);A_z.resize(1,2);
+V_x<<0,0;
+V_y<<0,0;
+V_z<<0,0;
+A_x<<0,0;
+A_y<<0,0;
+A_z<<0,0;
+
+X_coef_deliver=coef_generator.Coefficient(t_deliver,P_x,V_x,A_x);
+Y_coef_deliver=coef_generator.Coefficient(t_deliver,P_y,V_y,A_y);
+Z_coef_deliver=coef_generator.Coefficient(t_deliver,P_z,V_z,A_z);
+
+
+
+
+
+
+
+//ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
+//ROS_INFO("\ncoeff_x=%f\t%f\t%f\t%f\t%f\t%f",X_coef(0)
+//ROS_INFO("\n
+//ROS_INFO("\
 
 
 
@@ -283,6 +371,7 @@ QVector<double> qr7;
 
 int i=0;
 VectorXd q_ra;
+VectorXd qr_end;
 q_ra=q0;
 
 qr1.append(q_ra(0));
@@ -321,24 +410,111 @@ vector<double> q(31);
 
 ros::Rate loop_rate(200);
 int count = 1;
-int endofdeliver;
-bool reaching=true;
-bool gripping=false;
-bool delivering=false;
-bool getting_back=false;
+double time;
+//int endofdeliver;
+//bool getting_back=false;
 
 
     while (ros::ok())
     {
-if(reaching){
-        if ((d>d_des)   || (abs(theta-theta_target)>.02)   || (abs(sai-sai_target)>.02)  || (abs(phi-phi_target)>.02)  )
+     time=double(count)*.005;
+     VectorXd P(3);
+     VectorXd V(3);
+if(time<t_target(1))
 {
+    P<<coef_generator.GetAccVelPos(X_coef_target.row(0),time,0,5)(0,0),
+       coef_generator.GetAccVelPos(Y_coef_target.row(0),time,0,5)(0,0),
+       coef_generator.GetAccVelPos(Z_coef_target.row(0),time,0,5)(0,0);
 
-        right_hand hand(q_ra,r_target,R_target,i,d0);
+
+    V<<coef_generator.GetAccVelPos(X_coef_target.row(0),time,0,5)(0,1),
+       coef_generator.GetAccVelPos(Y_coef_target.row(0),time,0,5)(0,1),
+       coef_generator.GetAccVelPos(Z_coef_target.row(0),time,0,5)(0,1);
+    right_hand hand(q_ra,V,r_target,R_target);
+    hand.doQP(q_ra);
+    q_ra=hand.q_next;
+    d=hand.dist;
+    theta=hand.theta;
+    sai=hand.sai;
+    phi=hand.phi;
+  }
+
+if(time>=t_target(1) && time<t_target(2))
+{
+    P<<coef_generator.GetAccVelPos(X_coef_target.row(1),time,t_target(1),5)(0,0),
+       coef_generator.GetAccVelPos(Y_coef_target.row(1),time,t_target(1),5)(0,0),
+       coef_generator.GetAccVelPos(Z_coef_target.row(1),time,t_target(1),5)(0,0);
 
 
-        hand.doQP(q_ra);
-        q_ra=hand.q_next;
+    V<<coef_generator.GetAccVelPos(X_coef_target.row(1),time,t_target(1),5)(0,1),
+       coef_generator.GetAccVelPos(Y_coef_target.row(1),time,t_target(1),5)(0,1),
+       coef_generator.GetAccVelPos(Z_coef_target.row(1),time,t_target(1),5)(0,1);
+    right_hand hand(q_ra,V,r_target,R_target);
+    hand.doQP(q_ra);
+    q_ra=hand.q_next;
+    d=hand.dist;
+    theta=hand.theta;
+    sai=hand.sai;
+    phi=hand.phi;
+  }
+if(time>=t_deliver(0) && time<t_deliver(1))
+{
+    P<<coef_generator.GetAccVelPos(X_coef_deliver.row(0),time,t_deliver(0),5)(0,0),
+       coef_generator.GetAccVelPos(Y_coef_deliver.row(0),time,t_deliver(0),5)(0,0),
+       coef_generator.GetAccVelPos(Z_coef_deliver.row(0),time,t_deliver(0),5)(0,0);
+
+
+    V<<coef_generator.GetAccVelPos(X_coef_deliver.row(0),time,t_deliver(0),5)(0,1),
+       coef_generator.GetAccVelPos(Y_coef_deliver.row(0),time,t_deliver(0),5)(0,1),
+       coef_generator.GetAccVelPos(Z_coef_deliver.row(0),time,t_deliver(0),5)(0,1);
+
+    right_hand hand(q_ra,V,r_target,R_target);
+    hand.doQP(q_ra);
+    q_ra=hand.q_next;
+    d=hand.dist;
+    theta=hand.theta;
+    sai=hand.sai;
+    phi=hand.phi;
+
+
+
+    qr_end=q_ra;
+
+
+
+}
+
+
+
+if(time>=t4 && time<t_end)
+{
+    MatrixXd t_r(1,2);
+    MatrixXd p_r(7,2);
+    MatrixXd z_r(1,2);
+    MatrixXd r_coeff;
+    t_r<<t4,t_end;
+    z_r<<0,0;
+
+    p_r<<qr_end(0),10*M_PI/180,
+            qr_end(1),-4*M_PI/180,
+            qr_end(2),0,
+            qr_end(3),-20*M_PI/180,
+            qr_end(4),0,
+            qr_end(5),0,
+            qr_end(6),0;
+
+    for (int i = 0; i < 7; ++i) {
+        r_coeff=coef_generator.Coefficient(t_r,p_r.row(i),z_r,z_r);
+        q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
+
+    }
+}
+
+if(time>=t_end){break;}
+
+
+ROS_INFO("time=%f",time);
+
 
         qr1.append(q_ra(0));
         qr2.append(q_ra(1));
@@ -349,91 +525,86 @@ if(reaching){
         qr7.append(q_ra(6));
 
 count=qr1.size()-1;
-        d=hand.dist;
-        theta=hand.theta;
-        sai=hand.sai;
-        phi=hand.phi;
-               ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
 
         i++;
-}
-        else{
-            ROS_INFO("reached to target!");
-            reaching=false;
-        delivering=true;
-        right_hand hand(q_ra,r_deliver,R_deliver,0,0);
-        double d0=hand0.dist;
-         d=d0;
-                    theta_deliver=hand.theta_target;
-                 sai_deliver=hand.sai_target;
-                 phi_deliver=hand.phi_target;
-                 i=0;
+
+//        else{
+//            ROS_INFO("reached to target!");
+//            reaching=false;
+//        delivering=true;
+//        right_hand hand(q_ra,r_deliver,R_deliver,0,0);
+//        double d0=hand0.dist;
+//         d=d0;
+//                    theta_deliver=hand.theta_target;
+//                 sai_deliver=hand.sai_target;
+//                 phi_deliver=hand.phi_target;
+//                 i=0;
 
 
-        }
-}
+//        }
+//}
 
-if(delivering){
+//if(delivering){
 
-    if ((d>d_des)   || (abs(theta-theta_deliver)>.02)   || (abs(sai-sai_deliver)>.02)  || (abs(phi-phi_deliver)>.02)  )
-{
-
-
-    right_hand hand(q_ra,r_deliver,R_deliver,i,d0);
+//    if ((d>d_des)   || (abs(theta-theta_deliver)>.02)   || (abs(sai-sai_deliver)>.02)  || (abs(phi-phi_deliver)>.02)  )
+//{
 
 
-    hand.doQP(q_ra);
-    q_ra=hand.q_next;
-
-    qr1.append(q_ra(0));
-    qr2.append(q_ra(1));
-    qr3.append(q_ra(2));
-    qr4.append(q_ra(3));
-    qr5.append(q_ra(4));
-    qr6.append(q_ra(5));
-    qr7.append(q_ra(6));
-
-count=qr1.size()-1;
-    d=hand.dist;
-    theta=hand.theta;
-    sai=hand.sai;
-    phi=hand.phi;
-
-    i++;
-    ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
-
-    }
-
-    else{
-ROS_INFO("delivered the object!");
-    delivering=false;
-
-    getting_back=true;
-  endofdeliver=count;
-
-    }
-
-}
- if(getting_back && (abs(q_ra(0)-q0(0))>.0001)){
-
-    q_ra(0)+=(q0(0)-qr1[endofdeliver])/5*hand0.T;
-    q_ra(1)+=(q0(1)-qr2[endofdeliver])/5*hand0.T;
-    q_ra(2)+=(q0(2)-qr3[endofdeliver])/5*hand0.T;
-    q_ra(3)+=(q0(3)-qr4[endofdeliver])/5*hand0.T;
-    q_ra(4)+=(q0(4)-qr5[endofdeliver])/5*hand0.T;
-    q_ra(5)+=(q0(5)-qr6[endofdeliver])/5*hand0.T;
-    q_ra(6)+=(q0(6)-qr7[endofdeliver])/5*hand0.T;
+//    right_hand hand(q_ra,r_deliver,R_deliver,i,d0);
 
 
-    qr1.append(q_ra(0));
-    qr2.append(q_ra(1));
-    qr3.append(q_ra(2));
-    qr4.append(q_ra(3));
-    qr5.append(q_ra(4));
-    qr6.append(q_ra(5));
-    qr7.append(q_ra(6));
-    count=qr1.size()-1;
-}
+//    hand.doQP(q_ra);
+//    q_ra=hand.q_next;
+
+//    qr1.append(q_ra(0));
+//    qr2.append(q_ra(1));
+//    qr3.append(q_ra(2));
+//    qr4.append(q_ra(3));
+//    qr5.append(q_ra(4));
+//    qr6.append(q_ra(5));
+//    qr7.append(q_ra(6));
+
+//count=qr1.size()-1;
+//    d=hand.dist;
+//    theta=hand.theta;
+//    sai=hand.sai;
+//    phi=hand.phi;
+
+//    i++;
+//    ROS_INFO("x=%f\ty=%f\tz=%f\t",hand.r_right_palm(0),hand.r_right_palm(1),hand.r_right_palm(2));
+
+//    }
+
+//    else{
+//ROS_INFO("delivered the object!");
+//    delivering=false;
+
+//    getting_back=true;
+//  endofdeliver=count;
+
+//    }
+
+//}
+// if(getting_back && (abs(q_ra(0)-q0(0))>.0001)){
+
+//    q_ra(0)+=(q0(0)-qr1[endofdeliver])/5*hand0.T;
+//    q_ra(1)+=(q0(1)-qr2[endofdeliver])/5*hand0.T;
+//    q_ra(2)+=(q0(2)-qr3[endofdeliver])/5*hand0.T;
+//    q_ra(3)+=(q0(3)-qr4[endofdeliver])/5*hand0.T;
+//    q_ra(4)+=(q0(4)-qr5[endofdeliver])/5*hand0.T;
+//    q_ra(5)+=(q0(5)-qr6[endofdeliver])/5*hand0.T;
+//    q_ra(6)+=(q0(6)-qr7[endofdeliver])/5*hand0.T;
+
+
+//    qr1.append(q_ra(0));
+//    qr2.append(q_ra(1));
+//    qr3.append(q_ra(2));
+//    qr4.append(q_ra(3));
+//    qr5.append(q_ra(4));
+//    qr6.append(q_ra(5));
+//    qr7.append(q_ra(6));
+//    count=qr1.size()-1;
+//}
 
 
 
@@ -500,10 +671,10 @@ ROS_INFO("delivered the object!");
         ros::spinOnce();
         loop_rate.sleep();
 
+}
 
 
 
 
-           }
     return 0;
 }

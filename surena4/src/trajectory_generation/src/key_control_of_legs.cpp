@@ -81,7 +81,7 @@ void qc_initial(const sensor_msgs::JointState & msg){
     }
 
 
-double Fzl,Fzr,Mxl,Myl,Myr,Mxr;
+double Fxl,Fyr, Fzl,Fzr,Mxl,Myl,Myr,Mxr;
 VectorXd CoPR(2), CoPL(2);
 void FT_left_feedback(const geometry_msgs::Wrench &msg){
  Fzl=msg.force.z;

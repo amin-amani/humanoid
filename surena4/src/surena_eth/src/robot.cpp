@@ -201,9 +201,9 @@ for(int ii=0; ii<28 ; ii++)
 _motorPosition[24]+=3000;
 _motorPosition[25]+=2050;
 _motorPosition[26]+=2050;
-_motorPosition[17]+=2300;
+_motorPosition[16]+=2300;
+_motorPosition[17]+=2050;
 _motorPosition[18]+=2050;
-_motorPosition[19]+=2050;
 Epos4.SetAllPositionCST(_motorPosition);
 }
 //=================================================================================================

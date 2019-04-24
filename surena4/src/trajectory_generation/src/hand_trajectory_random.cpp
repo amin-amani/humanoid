@@ -67,6 +67,33 @@ ros::Publisher pub30 ;
 ros::Publisher pub31 ;
 
 
+void matrix_view(MatrixXd M){
+
+
+    std_msgs::String str;
+    str.data="\n";
+for (int i = 0; i <M.rows() ; ++i) {
+
+    for (int j = 0; j <M.cols() ; ++j) {
+   str.data+=std::to_string(M(i,j));
+   str.data+="\t";
+    }
+    str.data+="\n";
+}
+ROS_INFO("%s",str.data.c_str());
+}
+
+
+void matrix_view(VectorXd M){
+    std_msgs::String str;
+    str.data="\n";
+
+for (int i = 0; i <M.rows() ; ++i) {
+    str.data+=std::to_string(M(i));str.data+="\t";}
+ROS_INFO("%s",str.data.c_str());
+}
+
+
 int getch()
 {
     static struct termios oldt, newt;
@@ -95,9 +122,6 @@ void abs_read(const sensor_msgs::JointState & msg){
     absolute_q0(2)=double(absolute_sensor(2)-4051)/8192*2*M_PI;
     absolute_q0(3)=double(absolute_sensor(3)-2355)/8192*2*M_PI;
 }
-
-
-
 
 void  SendGazebo(vector<double> q){
 
@@ -171,20 +195,19 @@ void  SendGazebo(vector<double> q){
 bool simulation;
 int main(int argc, char **argv)
 {
-    simulation=!true;
+    simulation=true;
 
     if (simulation){    ros::init(argc, argv, "rrbot");}
     else{ros::init(argc, argv, "jointdata");}
 
     ros::NodeHandle nh("~");
 
+    int movenum;
+    nh.getParam("movenum", movenum);
 
-    std::string scenario;
-    nh.getParam("scenario", scenario);
+ //   ROS_INFO("scenario: %s",scenario.c_str());
 
-    ROS_INFO("scenario: %s",scenario.c_str());
-
-    ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("qc",1000);
+    ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("/qc",1000);
     ros::Subscriber abs_sensor = nh.subscribe("/surena/abs_joint_state", 1000, abs_read);
 
     std_msgs::Int32MultiArray msg;
@@ -230,10 +253,141 @@ int main(int argc, char **argv)
     }
 
     right_hand hand_funcs;
+    int n=5;
 
-    VectorXd r_target(3);
-    VectorXd r_middle(3);
-    MatrixXd R_target(3,3);
+    VectorXd r_target[n];
+
+   // VectorXd r_middle(3);
+    MatrixXd R_target[n];
+
+    //**********************
+    for (int i = 0; i < n; ++i) {
+        r_target[i].resize(3,1);
+        R_target[i].resize(3,3);
+    }
+
+//    r_target[0]<<.2,
+//            -0.1,
+//            -0.45;
+//    R_target[0]=hand_funcs.rot(2,-70*M_PI/180,3)*hand_funcs.rot(3,-70*M_PI/180,3)*hand_funcs.rot(2,-20*M_PI/180,3);
+    r_target[0]<<.2,
+            -0.1,
+            -0.4;
+    R_target[0]=hand_funcs.rot(2,-70*M_PI/180,3)*hand_funcs.rot(1,-25*M_PI/180,3)*hand_funcs.rot(3,-25*M_PI/180,3);
+
+
+    r_target[1]<<.35,
+            -0.1,
+            -0.35;
+    R_target[1]=hand_funcs.rot(2,-70*M_PI/180,3)*hand_funcs.rot(3,-70*M_PI/180,3)*hand_funcs.rot(2,-20*M_PI/180,3);
+
+    r_target[2]<<.4,
+            -0.0,
+            -0.15;
+    R_target[2]=hand_funcs.rot(2,-100*M_PI/180,3)*hand_funcs.rot(3,-40*M_PI/180,3)*hand_funcs.rot(2,-10*M_PI/180,3);
+
+    r_target[3]<<.2,
+            -0.1,
+            -0.4;
+    R_target[3]=hand_funcs.rot(2,-70*M_PI/180,3)*hand_funcs.rot(1,-25*M_PI/180,3)*hand_funcs.rot(3,-25*M_PI/180,3);
+
+    r_target[3]<<.1,
+            -0.25,
+            -0.45;
+    R_target[3]=hand_funcs.rot(3,-70*M_PI/180,3)*hand_funcs.rot(2,-50*M_PI/180,3);
+
+    r_target[4]<<.25,
+            -0.25,
+            -0.35;
+    R_target[4]=hand_funcs.rot(2,-80*M_PI/180,3)*hand_funcs.rot(1,-50*M_PI/180,3);
+
+
+    //            //self recognition
+    //            if(scenario=="a"){
+
+    //                r_target<<.4,
+    //                        0.1,
+    //                        -0.15;
+    //                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(2,-40*M_PI/180,3);
+    //                r_middle<<.3,
+    //                        -.0,
+    //                        -.3;
+    //            }
+
+    //            //pointing
+    //            if(scenario=="b"){
+
+    //                r_target<<.05,
+    //                        -0.56,
+    //                        -0;
+    //                R_target=hand_funcs.rot(1,-90*M_PI/180,3)*hand_funcs.rot(2,-10*M_PI/180,3);
+    //                r_middle<<.1,
+    //                        -.35,
+    //                        -.3;
+    //            }
+
+    //            // mini touch
+    //            if(scenario=="c"){
+
+    //                r_target<<.4,
+    //                        -0.3,
+    //                        -0.2;
+    //                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(2,20*M_PI/180,3);
+    //                r_middle<<.2,
+    //                        -.25,
+    //                        -.35;
+    //            }
+
+    //            // looking at horizon
+    //            if(scenario=="d"){
+
+    //                r_target<<.33,
+    //                        0.08,
+    //                        0.24;
+    //                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(1,-28*M_PI/180,3);
+    //                r_middle<<.4,
+    //                        -.2,
+    //                        -0.05;
+    //            }
+
+    //            // respct
+    //            if(scenario=="e"){
+
+    //                r_target<<.25,
+    //                        0.15,
+    //                        -0.3;
+    //                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,65*M_PI/180,3);
+    //                r_middle<<.4,
+    //                        -0.05,
+    //                        -0.3;
+    //            }
+
+    //            // hand-shake
+    //            if(scenario=="f"){
+
+    //                r_target<<.45,
+    //                        0.0,
+    //                        -0.25;
+    //                R_target=hand_funcs.rot(2,-80*M_PI/180,3);
+    //                r_middle<<.3,
+    //                        -0.05,
+    //                        -0.4;
+    //            }
+
+    //            // waving
+    //            if(scenario=="g"){
+
+    //                r_target<<.35,
+    //                        -0.1,
+    //                        0.3;
+    //                R_target=hand_funcs.rot(2,-180*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3);
+    //                r_middle<<.4,
+    //                        -0.2,
+    //                        -0.2;
+
+
+
+
     VectorXd q0(7);
 
 
@@ -260,18 +414,18 @@ int main(int argc, char **argv)
     MatrixXd Y_coef;
     MatrixXd Z_coef;
 
-    MatrixXd t(1,3);
-    MatrixXd P_x(1,3);
-    MatrixXd V_x(1,3);
-    MatrixXd A_x(1,3);
+    MatrixXd t(1,2);
+    MatrixXd P_x(1,2);
+    MatrixXd V_x(1,2);
+    MatrixXd A_x(1,2);
 
-    MatrixXd P_y(1,3);
-    MatrixXd V_y(1,3);
-    MatrixXd A_y(1,3);
+    MatrixXd P_y(1,2);
+    MatrixXd V_y(1,2);
+    MatrixXd A_y(1,2);
 
-    MatrixXd P_z(1,3);
-    MatrixXd V_z(1,3);
-    MatrixXd A_z(1,3);
+    MatrixXd P_z(1,2);
+    MatrixXd V_z(1,2);
+    MatrixXd A_z(1,2);
 
 
     VectorXd q_ra;
@@ -288,142 +442,37 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(200);
     int count = 0;
     double time=0.0;
+    int num;
+    int move_count=0;
     bool initializing=true;
 
     VectorXd qr_end(7);
+    VectorXd P(3);
+    VectorXd V(3);
+    VectorXd A(3);
     while (ros::ok())
     {
         if(initializing){
 
             if(simulation){
-//                q0<<10*M_PI/180,
-//                        -4*M_PI/180,
-//                        0,
-//                        -20*M_PI/180,
-//                        0,
-//                        0,
-//                        0;
-
-                q0<<0,
-                        -10*M_PI/180,
+                q0<<10*M_PI/180,
+                        -4*M_PI/180,
                         0,
-                        0,
+                        -20*M_PI/180,
                         0,
                         0,
                         0;
             }
-            else{
-                  // q0=absolute_q0;
-                q0<<0,
-                        -10*M_PI/180,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0;
-             }
+            else{q0=absolute_q0;}
 ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0(6));
-            //self recognition
-            if(scenario=="a"){
 
-                r_target<<.4,
-                        0.1,
-                        -0.15;
-                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(2,-40*M_PI/180,3);
-                r_middle<<.3,
-                        -.0,
-                        -.3;
-            }
 
-            //pointing
-            if(scenario=="b"){
-
-                r_target<<.05,
-                        -0.56,
-                        -0;
-                R_target=hand_funcs.rot(1,-90*M_PI/180,3)*hand_funcs.rot(2,-10*M_PI/180,3);
-                r_middle<<.1,
-                        -.35,
-                        -.3;
-            }
-
-            // mini touch
-            if(scenario=="c"){
-
-                r_target<<.4,
-                        -0.3,
-                        -0.2;
-                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(2,20*M_PI/180,3);
-                r_middle<<.2,
-                        -.25,
-                        -.35;
-            }
-
-            // looking at horizon
-            if(scenario=="d"){
-
-                r_target<<.33,
-                        0.08,
-                        0.24;
-                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,90*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3)*hand_funcs.rot(1,-28*M_PI/180,3);
-                r_middle<<.4,
-                        -.2,
-                        -0.05;
-            }
-
-            // respct
-            if(scenario=="e"){
-
-                r_target<<.25,
-                        0.15,
-                        -0.3;
-                R_target=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,65*M_PI/180,3);
-                r_middle<<.4,
-                        -0.05,
-                        -0.3;
-            }
-
-            // hand-shake
-            if(scenario=="f"){
-
-                r_target<<.45,
-                        0.0,
-                        -0.25;
-                R_target=hand_funcs.rot(2,-80*M_PI/180,3);
-                r_middle<<.3,
-                        -0.05,
-                        -0.4;
-            }
-
-            // waving
-            if(scenario=="g"){
-
-                r_target<<.35,
-                        -0.1,
-                        0.3;
-                R_target=hand_funcs.rot(2,-180*M_PI/180,3)*hand_funcs.rot(3,90*M_PI/180,3);
-                r_middle<<.4,
-                        -0.2,
-                        -0.2;
-            }
-
-            // temp
-            if(scenario=="z"){
-
-                r_target<<.25,
-                        -0.25,
-                        -0.35;
-                R_target=hand_funcs.rot(2,-80*M_PI/180,3)*hand_funcs.rot(1,-50*M_PI/180,3);
-                r_middle<<.25,
-                        -0.25,
-                        -0.35;
-            }
 
 
 
             double v0=0;
             double v_target =.4;
-            right_hand hand0(q0,r_target,R_target,0,0);
+            right_hand hand0(q0,r_target[0],R_target[0],0,0);
             ROS_INFO("r0=%f,%f,%f",hand0.r_right_palm(0),hand0.r_right_palm(1),hand0.r_right_palm(2));
 
             d0=hand0.dist;
@@ -468,36 +517,36 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 
             //****path generation
 
-            t<<0,2,4;
-            P_x<< hand0.r_right_palm(0),r_middle(0),r_target(0);
-            P_y<< hand0.r_right_palm(1),r_middle(1),r_target(1);
-            P_z<< hand0.r_right_palm(2),r_middle(2),r_target(2);
-            V_x<<0,INFINITY,0;
-            V_y<<0,INFINITY,0;
-            V_z<<0,INFINITY,0;
-            A_x<<0,INFINITY,0;
-            A_y<<0,INFINITY,0;
-            A_z<<0,INFINITY,0;
+            t<<0,3;
+            P_x<< hand0.r_right_palm(0),r_target[0](0);
+            P_y<< hand0.r_right_palm(1),r_target[0](1);
+            P_z<< hand0.r_right_palm(2),r_target[0](2);
+            V_x<<0,INFINITY;
+            V_y<<0,INFINITY;
+            V_z<<0,INFINITY;
+            A_x<<0,INFINITY;
+            A_y<<0,INFINITY;
+            A_z<<0,INFINITY;
 
             X_coef=coef_generator.Coefficient(t,P_x,V_x,A_x);
             Y_coef=coef_generator.Coefficient(t,P_y,V_y,A_y);
             Z_coef=coef_generator.Coefficient(t,P_z,V_z,A_z);
-            ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
+           // ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
             //ROS_INFO("\ncoeff_x=%f\t%f\t%f\t%f\t%f\t%f",X_coef(0)
             //ROS_INFO("\n
             //ROS_INFO("\n
 
             //home
-            if(scenario=="h"){
-                 qr_end=q0;
-//                qr_end<<0,
-//                        0,
-//                        0,
-//                        0,
-//                        0,
-//                        0,
-//                        0;
-            }
+//            if(scenario=="h"){
+//                 qr_end=q0;
+////                qr_end<<0,
+////                        0,
+////                        0,
+////                        0,
+////                        0,
+////                        0,
+////                        0;
+//            }
 
 
 
@@ -508,94 +557,132 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 
 
             //ROS_INFO("theta_target=%f,sai_target=%f,phi_target=%f",theta_target,sai_target,phi_target);
-            ROS_INFO("\nr_target=\n%f\n%f\n%f",r_target(0),r_target(1),r_target(2));
-            ROS_INFO("\nR_target=\n%f\t%f\t%f\n%f\t%f\t%f\n%f\t%f\t%f\n",R_target(0,0),R_target(0,1),R_target(0,2),R_target(1,0),R_target(1,1),R_target(1,2),R_target(2,0),R_target(2,1),R_target(2,2));
+//            ROS_INFO("\nr_target=\n%f\n%f\n%f",r_target(0),r_target(1),r_target(2));
+//            ROS_INFO("\nR_target=\n%f\t%f\t%f\n%f\t%f\t%f\n%f\t%f\t%f\n",R_target(0,0),R_target(0,1),R_target(0,2),R_target(1,0),R_target(1,1),R_target(1,2),R_target(2,0),R_target(2,1),R_target(2,2));
+
+
             ROS_INFO("press any key to start!");
             getch();
             initializing=false;
         }
 
 
+
+
+
         else {
 
+//ROS_INFO("time=%f",time);
+            //time=double(count)*.005;
+            time+=.005;
+            if(time>t(1)){
 
-            time=double(count)*.005;
-            if(scenario=="h"){time+=t(2);}
+                time=0;
+                move_count++;
+                if (move_count>movenum){break;}
+ROS_INFO("%d",num);
+matrix_view(r_target[num]);
+                num=rand()%(n-1)+1;
+                right_hand hand_pose(q_ra,r_target[num],R_target[num]);
+                P=hand_pose.r_right_palm;
 
-            VectorXd P(3);
-            VectorXd V(3);
+matrix_view(P);
+//ROS_INFO("num=%d",num);
+                P_x<<P(0),r_target[num](0);
+                P_y<<P(1),r_target[num](1);
+                P_z<<P(2),r_target[num](2);
+                V_x<<V(0),INFINITY;
+                V_y<<V(1),INFINITY;
+                V_z<<V(2),INFINITY;
+                A_x<<A(0),INFINITY;
+                A_y<<A(1),INFINITY;
+                A_z<<A(2),INFINITY;
 
-            if(time<t(1)){
-                P<<coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef.row(0),time,0,5)(0,0);
+                X_coef=coef_generator.Coefficient(t,P_x,V_x,A_x);
+                Y_coef=coef_generator.Coefficient(t,P_y,V_y,A_y);
+                Z_coef=coef_generator.Coefficient(t,P_z,V_z,A_z);
+
+//matrix_view(X_coef);
 
 
-                V<<coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef.row(0),time,0,5)(0,1);
-                right_hand hand(q_ra,V,r_target,R_target);
+            }
+         //   if(scenario=="h"){time+=t(2);}
+
+
+
+            P<<     coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,0),
+                    coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,0),
+                    coef_generator.GetAccVelPos(Z_coef.row(0),time,0,5)(0,0);
+
+
+            V<<     coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,1),
+                    coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,1),
+                    coef_generator.GetAccVelPos(Z_coef.row(0),time,0,5)(0,1);
+            A<<     coef_generator.GetAccVelPos(X_coef.row(0),time,0,5)(0,2),
+                    coef_generator.GetAccVelPos(Y_coef.row(0),time,0,5)(0,2),
+                    coef_generator.GetAccVelPos(Z_coef.row(0),time,0,5)(0,2);
+                right_hand hand(q_ra,V,r_target[num],R_target[num]);
                 hand.doQP(q_ra);
                 q_ra=hand.q_next;
                 d=hand.dist;
                 theta=hand.theta;
                 sai=hand.sai;
                 phi=hand.phi;
-            }
-            else if (time<t(2)){
-                P<<coef_generator.GetAccVelPos(X_coef.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef.row(1),time,t(1),5)(0,0);
+
+//            else if (time<t(2)){
+//                P<<coef_generator.GetAccVelPos(X_coef.row(1),time,t(1),5)(0,0),
+//                        coef_generator.GetAccVelPos(Y_coef.row(1),time,t(1),5)(0,0),
+//                        coef_generator.GetAccVelPos(Z_coef.row(1),time,t(1),5)(0,0);
 
 
-                V<<coef_generator.GetAccVelPos(X_coef.row(1),time,t(1) ,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef.row(1),time,t(1),5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef.row(1),time,t(1),5)(0,1);
-                right_hand hand(q_ra,V,r_target,R_target);
-                hand.doQP(q_ra);
-                q_ra=hand.q_next;
-                d=hand.dist;
-                theta=hand.theta;
-                sai=hand.sai;
-                phi=hand.phi;
-                qr_end=q_ra;
-                ROS_INFO("%f\t%f\t%f\t%f\t%f\t%f\t%f\t",qr_end(0),qr_end(1),qr_end(2),qr_end(3),qr_end(4),qr_end(5),qr_end(6));
+//                V<<coef_generator.GetAccVelPos(X_coef.row(1),time,t(1) ,5)(0,1),
+//                        coef_generator.GetAccVelPos(Y_coef.row(1),time,t(1),5)(0,1),
+//                        coef_generator.GetAccVelPos(Z_coef.row(1),time,t(1),5)(0,1);
+//                right_hand hand(q_ra,V,r_target,R_target);
+//                hand.doQP(q_ra);
+//                q_ra=hand.q_next;
+//                d=hand.dist;
+//                theta=hand.theta;
+//                sai=hand.sai;
+//                phi=hand.phi;
+//                qr_end=q_ra;
+//                ROS_INFO("%f\t%f\t%f\t%f\t%f\t%f\t%f\t",qr_end(0),qr_end(1),qr_end(2),qr_end(3),qr_end(4),qr_end(5),qr_end(6));
 
 
-            }
-            else if (time<t(2)*2){
+//            }
+//            else if (time<t(2)*2){
 
-                if(scenario=="g" && time<8){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
-                else if(scenario=="f" && time<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
-                else{
+//                if(scenario=="g" && time<8){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
+//                else if(scenario=="f" && time<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
+//                else{
 
 
 
-                    ROS_INFO_ONCE("reached!");
-if(scenario=="h")
-{
-    MatrixXd t_r(1,2);
-    MatrixXd p_r(7,2);
-    MatrixXd z_r(1,2);
-    MatrixXd r_coeff;
-    t_r<<t(2),t(2)*2;
-    z_r<<0,0;
+//                    ROS_INFO_ONCE("reached!");
+//if(scenario=="h")
+//{
+//    MatrixXd t_r(1,2);
+//    MatrixXd p_r(7,2);
+//    MatrixXd z_r(1,2);
+//    MatrixXd r_coeff;
+//    t_r<<t(2),t(2)*2;
+//    z_r<<0,0;
 
-    p_r<<qr_end(0),10*M_PI/180,
-            qr_end(1),-4*M_PI/180,
-            qr_end(2),0,
-            qr_end(3),-20*M_PI/180,
-            qr_end(4),0,
-            qr_end(5),0,
-            qr_end(6),0;
+//    p_r<<qr_end(0),10*M_PI/180,
+//            qr_end(1),-4*M_PI/180,
+//            qr_end(2),0,
+//            qr_end(3),-20*M_PI/180,
+//            qr_end(4),0,
+//            qr_end(5),0,
+//            qr_end(6),0;
 
-    for (int i = 0; i < 7; ++i) {
-        r_coeff=coef_generator.Coefficient(t_r,p_r.row(i),z_r,z_r);
-        q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
+//    for (int i = 0; i < 7; ++i) {
+//        r_coeff=coef_generator.Coefficient(t_r,p_r.row(i),z_r,z_r);
+//        q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
 
-    }
-}
- else{break;}
+//    }
+//}
+ //else{break;}
 
                     //                    r_coeff=(coef_generator.Coefficient(t_r,p_r,z_r,z_r));
                     //                    q_ra(0)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
@@ -606,8 +693,8 @@ if(scenario=="h")
 
 
                 //else{break;}
-            }
-            else{break;}
+
+          //  else{break;}
 
             qr1.append(q_ra(0));
             qr2.append(q_ra(1));
@@ -648,8 +735,8 @@ if(scenario=="h")
 
                 //     ROS_INFO("%f,%f,%f,%f,%f,%f,%f",q[15],q[16],q[17],q[18],q[19],q[20],q[21]);
                 //   ROS_INFO("T=%f upper:%f %f lower:%f %f qdot=%f q=%f %f",hand.T,(hand.toRad(10)+q_ra(1))/hand.T,hand.qdot_max,(hand.toRad(-90)+q_ra(1))/hand.T,-hand.qdot_max,hand.qdot(2),180/M_PI*q[16],180/M_PI*q_ra(1));
-if(simulation){SendGazebo(q);}
 
+                SendGazebo(q);
 
             }
 
@@ -665,11 +752,11 @@ if(simulation){SendGazebo(q);}
             q_motor[2]=-int(10*(qr3[count]-q0(2))*300/M_PI);
             q_motor[3]=int(10*(qr4[count]-q0(3))*300/M_PI);
 
-            q_motor[4]=int((qr5[count]-q0(4))*(2048)/M_PI);
-            q_motor[5]=int((qr6[count]-q0(5))*(4000-2050)/(23*M_PI/180));
-            q_motor[6]=int((qr7[count]-q0(6))*(4000-2050)/(23*M_PI/180));
+            q_motor[4]=int((qr5[count]-q0(4))*(3000-2300)*4/M_PI);
+            q_motor[5]=int((qr6[count]-q0(5))*(4000-2050)/(23*M_PI/180))-1200;
+            q_motor[6]=int((qr7[count]-q0(6))*(4000-2050)/(23*M_PI/180))-200;
 
-            q_motor[7]=4;
+            q_motor[7]=8;
 
 
             //right hand epose
@@ -691,9 +778,8 @@ if(simulation){SendGazebo(q);}
             msg.data.push_back(0);//24
             msg.data.push_back(0);//25
             msg.data.push_back(0);//26
-            msg.data.push_back(6);//27
+            msg.data.push_back(8);//27
             ++count;
-
             chatter_pub.publish(msg);
         }
 
@@ -701,6 +787,6 @@ if(simulation){SendGazebo(q);}
         loop_rate.sleep();
 
 
-    }
+
     return 0;
 }

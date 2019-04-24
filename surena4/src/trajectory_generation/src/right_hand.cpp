@@ -362,20 +362,20 @@ ce0.fill(0);
 q_next.resize(7,1);
 q_next=q_ra+T*qdot;
 
-if(q_next(0)<toRad(minimum[0])){qDebug()<<"q[0] out of range"; q_next(0)=toRad(minimum[0]);}
-if(q_next(0)>toRad(maximum[0])){qDebug()<<"q[0] out of range"; q_next(0)=toRad(maximum[0]);}
-if(q_next(1)<toRad(minimum[1])){qDebug()<<"q[1] out of range"; q_next(1)=toRad(minimum[1]);}
-if(q_next(1)>toRad(maximum[1])){qDebug()<<"q[1] out of range"; q_next(1)=toRad(maximum[1]);}
-if(q_next(2)<toRad(minimum[2])){qDebug()<<"q[2] out of range"; q_next(2)=toRad(minimum[2]);}
-if(q_next(2)>toRad(maximum[2])){qDebug()<<"q[2] out of range"; q_next(2)=toRad(maximum[2]);}
-if(q_next(3)<toRad(minimum[3])){qDebug()<<"q[3] out of range"; q_next(3)=toRad(minimum[3]);}
-if(q_next(3)>toRad(maximum[3])){qDebug()<<"q[3] out of range"; q_next(3)=toRad(maximum[3]);}
-if(q_next(4)<toRad(minimum[4])){qDebug()<<"q[4] out of range"; q_next(4)=toRad(minimum[4]);}
-if(q_next(4)>toRad(maximum[4])){qDebug()<<"q[4] out of range"; q_next(4)=toRad(maximum[4]);}
-if(q_next(5)<toRad(minimum[5])){qDebug()<<"q[5] out of range"; q_next(5)=toRad(minimum[5]);}
-if(q_next(5)>toRad(maximum[5])){qDebug()<<"q[5] out of range"; q_next(5)=toRad(maximum[5]);}
-if(q_next(6)<toRad(minimum[6])){qDebug()<<"q[6] out of range"; q_next(6)=toRad(minimum[6]);}
-if(q_next(6)>toRad(maximum[6])){qDebug()<<"q[6] out of range"; q_next(6)=toRad(maximum[6]);}
+if(q_next(0)<toRad(minimum[0])){/*qDebug()<<"q[0] out of range"; */q_next(0)=toRad(minimum[0]);}
+if(q_next(0)>toRad(maximum[0])){/*qDebug()<<"q[0] out of range"; */q_next(0)=toRad(maximum[0]);}
+if(q_next(1)<toRad(minimum[1])){/*qDebug()<<"q[1] out of range"; */q_next(1)=toRad(minimum[1]);}
+if(q_next(1)>toRad(maximum[1])){/*qDebug()<<"q[1] out of range"; */q_next(1)=toRad(maximum[1]);}
+if(q_next(2)<toRad(minimum[2])){/*qDebug()<<"q[2] out of range"; */q_next(2)=toRad(minimum[2]);}
+if(q_next(2)>toRad(maximum[2])){/*qDebug()<<"q[2] out of range"; */q_next(2)=toRad(maximum[2]);}
+if(q_next(3)<toRad(minimum[3])){/*qDebug()<<"q[3] out of range"; */q_next(3)=toRad(minimum[3]);}
+if(q_next(3)>toRad(maximum[3])){/*qDebug()<<"q[3] out of range"; */q_next(3)=toRad(maximum[3]);}
+if(q_next(4)<toRad(minimum[4])){/*qDebug()<<"q[4] out of range"; */q_next(4)=toRad(minimum[4]);}
+if(q_next(4)>toRad(maximum[4])){/*qDebug()<<"q[4] out of range"; */q_next(4)=toRad(maximum[4]);}
+if(q_next(5)<toRad(minimum[5])){/*qDebug()<<"q[5] out of range"; */q_next(5)=toRad(minimum[5]);}
+if(q_next(5)>toRad(maximum[5])){/*qDebug()<<"q[5] out of range"; */q_next(5)=toRad(maximum[5]);}
+if(q_next(6)<toRad(minimum[6])){/*qDebug()<<"q[6] out of range"; */q_next(6)=toRad(minimum[6]);}
+if(q_next(6)>toRad(maximum[6])){/*qDebug()<<"q[6] out of range"; */q_next(6)=toRad(maximum[6]);}
 
 
 

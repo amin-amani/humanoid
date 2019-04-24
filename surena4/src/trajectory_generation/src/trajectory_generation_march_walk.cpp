@@ -47,6 +47,76 @@ ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher
 ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
 ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
 
+
+void numplot(double num,double min,double max){
+  //⬛
+
+  QString str;
+  int l=100;
+  int n=int((num-min)/(max-min)*l);
+  if (num<min){n=0;}
+  if (num>max){n=100;}
+  str+=QString::number(min);
+  str+="|";
+  if (n<=l/2){
+      for (int i = 0; i < n; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < l/2-n; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+  }
+  else {
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < n-l/2; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l-n; ++i) {
+          str+=" ";
+      }
+
+  }
+
+  str+="|";
+  str+=QString::number(max);
+  str+="=>";str+=QString::number(num);
+  qDebug()<<str;
+qDebug()<<"";
+
+
+}
+
+
+
+
+
+
+double move_rest_back(double max,double t_local,double T_start ,double T_move,double T_rest,double T_back){
+    double c3=(10*max)/pow(T_move,3);
+    double c4=-(15*max)/pow(T_move,4);
+    double c5=(6*max)/pow(T_move,5);
+    double c3_r=(10*max)/pow(T_back,3);
+    double c4_r=-(15*max)/pow(T_back,4);
+    double c5_r=(6*max)/pow(T_back,5);
+    double T_end=T_start+T_move+T_rest+T_back;
+    double theta=0;
+    if(t_local<T_start){theta=0;}
+    else if (t_local<T_start+T_move){theta=c3*pow(t_local-T_start,3)+c4*pow(t_local-T_start,4)+c5*pow(t_local-T_start,5);}
+    else if (t_local<T_start+T_move+T_rest){theta=max;}
+    else if (t_local<T_start+T_move+T_rest+T_back){theta=c3_r*pow(T_end-t_local,3)+c4_r*pow(T_end-t_local,4)+c5_r*pow(T_end-t_local,5);}
+    return theta;
+}
+
+
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
     if(links.count()<28){qDebug()<<"index err";return;}
     std_msgs::Float64 data;
@@ -119,6 +189,13 @@ bool qc_initial_bool;
 int bump_pushed[8];
 int bump_notpushed[8];
 bool bump_initialize;
+float InputFreq=0;
+float freq=1;
+void receiveFreq(const std_msgs::Float64 msg)
+{
+InputFreq=msg.data;
+   //qDebug()<<"InputFreq="<<InputFreq;
+}
 void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 {
     if (msg.data.size()!=8) {
@@ -605,6 +682,49 @@ MatrixXd Coef_teta_motor_R; MatrixXd Coef_phi_motor_R;
 
 int main(int argc, char **argv)
 {
+OnlineTaskSpace.NStride=10;
+OnlineTaskSpace.NStep=OnlineTaskSpace.NStride*2;
+
+    OnlineTaskSpace.YpMax=.08;
+    OnlineTaskSpace.Yd=OnlineTaskSpace.YpMax;
+    OnlineTaskSpace.YStMax=OnlineTaskSpace.YpMax;
+    OnlineTaskSpace.YEndMax=OnlineTaskSpace.YpMax;
+    OnlineTaskSpace.TStart=2;
+    OnlineTaskSpace.TDs=1;
+    OnlineTaskSpace.TSS=.1;
+    OnlineTaskSpace.AnkleMaximumHeight=0.001;
+    OnlineTaskSpace.ReferencePelvisHeight=.89+.02;
+    OnlineTaskSpace.Tc=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS;
+    OnlineTaskSpace.Tm=0.35*OnlineTaskSpace.TSS;
+    OnlineTaskSpace.TGait=OnlineTaskSpace.TStart+OnlineTaskSpace.NStride*2*OnlineTaskSpace.Tc;
+    OnlineTaskSpace.MotionTime=OnlineTaskSpace.TStart+OnlineTaskSpace.NStride*2*OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.TMinPelvisY=0.5*OnlineTaskSpace.TDs; // The time that pelvis reaches its minimum distance in y direction
+    OnlineTaskSpace.TMaxAnkle=OnlineTaskSpace.TDs+0.35*OnlineTaskSpace.TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
+    OnlineTaskSpace.TMaxPelvisY=OnlineTaskSpace.TDs+0.5*OnlineTaskSpace.TSS; // The time that pelvis reaches its maximum distance in y direction
+    OnlineTaskSpace.T_end_of_first_SS=0.01;
+    OnlineTaskSpace.T_end_of_SS=0.01;//TSS*.3;
+    OnlineTaskSpace.T_end_of_last_SS=0.01;
+    OnlineTaskSpace.h_end_of_SS=0.001;
+
+    OnlineTaskSpace.T_end_p_sx_rel=OnlineTaskSpace.TDs+0.25*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_p_sx=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.25*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_p_sy=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.2*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_p_dy=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.4*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_p_ey=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.8*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_a_s=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs;
+    OnlineTaskSpace.T_end_a_e=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.5*OnlineTaskSpace.TEnd;
+    OnlineTaskSpace.T_end_a_d=OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+.6*(OnlineTaskSpace.T_end_a_e-OnlineTaskSpace.T_end_a_s);0.45;
+    OnlineTaskSpace.T_st_p_sy=0.2*OnlineTaskSpace.TStart;
+    OnlineTaskSpace.T_st_p_dy=0.5*OnlineTaskSpace.TStart;//0.65*TStart;
+    OnlineTaskSpace.T_st_p_ey=0.8*OnlineTaskSpace.TStart;
+    OnlineTaskSpace.T_st_p_sx=0.7*OnlineTaskSpace.TStart;
+    OnlineTaskSpace.T_s_st=.5*OnlineTaskSpace.TStart;
+    OnlineTaskSpace.T_st_a_d=OnlineTaskSpace.T_s_st+0.45*(OnlineTaskSpace.TStart-OnlineTaskSpace.T_s_st);
+
+
+    OnlineTaskSpace.CoeffArrayAnkle();
+
+    OnlineTaskSpace.CoeffArrayPelvis();
 
     simulation=false;
     qc_initial_bool=!simulation;
@@ -627,7 +747,7 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=6;
+    DurationOfStartPhase=2;
     DurationOfendPhase=6;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
@@ -644,6 +764,7 @@ int main(int argc, char **argv)
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
+    ros::Subscriber frequncysub = nh.subscribe("/freq", 1000, receiveFreq);
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
@@ -732,7 +853,7 @@ int main(int argc, char **argv)
             loop_rate.sleep();
             continue;
         }
-
+if(true){
 
         if(OnlineTaskSpace.localTiming<.1){contact_flag_timing=-contact_flag_timing;}//flag to show expected contact according to timing,sign of flag changes
 
@@ -780,126 +901,127 @@ int main(int argc, char **argv)
             fullcontactR=true;
         }
 
+}
 
-
-        StartPhase();
-
-
-
-        int NumberOfTimeStep=(OnlineTaskSpace.Tc/OnlineTaskSpace._timeStep)+1;
+      //  StartPhase();
 
         //-----------------------------------------------------------------------------------------------------//
         //------------------------------- main loop of cyclic walking -----------------------------------------//
         //-----------------------------------------------------------------------------------------------------//
+if (GlobalTime<DurationOfStartPhase ){
+    for (int i = 0; i < 12; ++i) {
+      SURENA.Links[i].JointAngle=0;
+    }
+    GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;}
 
-        if (GlobalTime>DurationOfStartPhase && GlobalTime<(DurationOfStartPhase+OnlineTaskSpace.MotionTime)){
-            //Ankle Trajectory Replacement
-            double m1;//x_al
-            double m2;//y_al
-            double m3;//z_al
-            double m4;//pitch_al
-            double m5;//x_ar
-            double m6;//y_ar
-            double m7;//z_ar
-            double m8;//pitch_ar
+if (GlobalTime>DurationOfStartPhase ){
+    GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;
 
-            GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;
+    if(true){//lastcode
+//            //Ankle Trajectory Replacement
+//            double m1;//x_al
+//            double m2;//y_al
+//            double m3;//z_al
+//            double m4;//pitch_al
+//            double m5;//x_ar
+//            double m6;//y_ar
+//            double m7;//z_ar
+//            double m8;//pitch_ar
 
-            if ((OnlineTaskSpace.StepNumber==1) && (OnlineTaskSpace.localTiming>=OnlineTaskSpace.TStart) ) {
-                OnlineTaskSpace.localTiming=OnlineTaskSpace._timeStep;//0.001999999999000000;
-                OnlineTaskSpace.localtimingInteger=1;
-                OnlineTaskSpace.StepNumber=OnlineTaskSpace.StepNumber+1;
-                //   KLtemp=false;
+//            GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;
 
-            }
+//            if ((OnlineTaskSpace.StepNumber==1) && (OnlineTaskSpace.localTiming>=OnlineTaskSpace.TStart) ) {
+//                OnlineTaskSpace.localTiming=OnlineTaskSpace._timeStep;//0.001999999999000000;
+//                OnlineTaskSpace.localtimingInteger=1;
+//                OnlineTaskSpace.StepNumber=OnlineTaskSpace.StepNumber+1;
+//                //   KLtemp=false;
 
-            else if ((OnlineTaskSpace.localtimingInteger>=NumberOfTimeStep) &&   (OnlineTaskSpace.StepNumber>1    &&   OnlineTaskSpace.StepNumber<(OnlineTaskSpace.NStep+2))) {
-                OnlineTaskSpace.StepNumber=OnlineTaskSpace.StepNumber+1;
-                OnlineTaskSpace.localTiming=OnlineTaskSpace._timeStep;//0.001999999999000000;
-                OnlineTaskSpace.localtimingInteger=1;
+//            }
 
-
-            }
-
-            OnlineTaskSpace.currentLeftFootX2=links[12].PositionInWorldCoordinate(0);
-            OnlineTaskSpace.currentLeftFootY2=links[12].PositionInWorldCoordinate(1);
-            OnlineTaskSpace.currentLeftFootZ=links[12].PositionInWorldCoordinate(2);
-
-            OnlineTaskSpace.currentRightFootX2=links[6].PositionInWorldCoordinate(0);
-            OnlineTaskSpace.currentRightFootY2=links[6].PositionInWorldCoordinate(1);
-            OnlineTaskSpace.currentRightFootZ=links[6].PositionInWorldCoordinate(2);
+//            else if ((OnlineTaskSpace.localtimingInteger>=NumberOfTimeStep) &&   (OnlineTaskSpace.StepNumber>1    &&   OnlineTaskSpace.StepNumber<(OnlineTaskSpace.NStep+2))) {
+//                OnlineTaskSpace.StepNumber=OnlineTaskSpace.StepNumber+1;
+//                OnlineTaskSpace.localTiming=OnlineTaskSpace._timeStep;//0.001999999999000000;
+//                OnlineTaskSpace.localtimingInteger=1;
 
 
-            MatrixXd m=OnlineTaskSpace.AnkleTrajectory(OnlineTaskSpace.globalTime,OnlineTaskSpace.StepNumber,OnlineTaskSpace.localTiming);
+//            }
 
-            m1=m(0,0); m2=m(1,0); m3=m(2,0); m4=m(3,0);
-            m5=m(4,0); m6=m(5,0); m7=m(6,0); m8=m(7,0);
-            //ROS_INFO("g.t=%f,l.t=%f",OnlineTaskSpace.globalTime,OnlineTaskSpace.localTiming);
-            //            ROS_INFO("m1=%f,m2=%f,m3=%f,m4=%f,m5=%f,m6=%f,m7=%f,m8=%f,",m1,m2,m3,m4,m5,m6,m7,m8);
+//            OnlineTaskSpace.currentLeftFootX2=links[12].PositionInWorldCoordinate(0);
+//            OnlineTaskSpace.currentLeftFootY2=links[12].PositionInWorldCoordinate(1);
+//            OnlineTaskSpace.currentLeftFootZ=links[12].PositionInWorldCoordinate(2);
 
-            RollModified=OnlineTaskSpace.RollAngleModification(OnlineTaskSpace.globalTime);
-            P=OnlineTaskSpace.PelvisTrajectory (OnlineTaskSpace.globalTime);
-
-            OnlineTaskSpace.globalTime=OnlineTaskSpace.globalTime+OnlineTaskSpace._timeStep;
-            OnlineTaskSpace.localTiming=OnlineTaskSpace.localTiming+OnlineTaskSpace._timeStep;
-            OnlineTaskSpace.localtimingInteger= OnlineTaskSpace.localtimingInteger+1;
+//            OnlineTaskSpace.currentRightFootX2=links[6].PositionInWorldCoordinate(0);
+//            OnlineTaskSpace.currentRightFootY2=links[6].PositionInWorldCoordinate(1);
+//            OnlineTaskSpace.currentRightFootZ=links[6].PositionInWorldCoordinate(2);
 
 
-            if (round(OnlineTaskSpace.globalTime)<=round(OnlineTaskSpace.MotionTime)){
+//            MatrixXd m=OnlineTaskSpace.AnkleTrajectory(OnlineTaskSpace.globalTime,OnlineTaskSpace.StepNumber,OnlineTaskSpace.localTiming);
+
+//            m1=m(0,0); m2=m(1,0); m3=m(2,0); m4=m(3,0);
+//            m5=m(4,0); m6=m(5,0); m7=m(6,0); m8=m(7,0);
+//            //ROS_INFO("g.t=%f,l.t=%f",OnlineTaskSpace.globalTime,OnlineTaskSpace.localTiming);
+//            //            ROS_INFO("m1=%f,m2=%f,m3=%f,m4=%f,m5=%f,m6=%f,m7=%f,m8=%f,",m1,m2,m3,m4,m5,m6,m7,m8);
+
+//            RollModified=OnlineTaskSpace.RollAngleModification(OnlineTaskSpace.globalTime);
+//            P=OnlineTaskSpace.PelvisTrajectory (OnlineTaskSpace.globalTime);
+
+//            OnlineTaskSpace.globalTime=OnlineTaskSpace.globalTime+OnlineTaskSpace._timeStep;
+//            OnlineTaskSpace.localTiming=OnlineTaskSpace.localTiming+OnlineTaskSpace._timeStep;
+//            OnlineTaskSpace.localtimingInteger= OnlineTaskSpace.localtimingInteger+1;
 
 
-                //if you want to have modification of height of pelvis please active the Pz(0,0) instead of P(2,0)
-                PoseRoot<<P(0,0),
-                        P(1,0),
-                        P(2,0),// Pz(0,0)
-                        0,
-                        0,
-                        0;
-
-                PoseRFoot<<m5,
-                        m6,
-                        m7,
-                        0,
-                        -1*m8*(M_PI/180),
-                        0;
-
-                PoseLFoot<<m1,
-                        m2,
-                        m3,
-                        0,
-                        -1*m4*(M_PI/180),
-                        0;
-
-                MatrixXd R_P(3,3);  MatrixXd R_F_L(3,3);    MatrixXd R_F_R(3,3);
-                R_P=MatrixXd::Identity(3,3);
-                R_F_L=MatrixXd::Identity(3,3);
-                R_F_R=MatrixXd::Identity(3,3);
-                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180;//3 was good
-                R_P<<1,0,0,
-                      0,cos(pelvis_roll),-sin(pelvis_roll),
-                        0,sin(pelvis_roll),cos(pelvis_roll);
-
-                double pelvis_pitch=-asin(7/4*(max(m1,m5)-P(0,0)))*0;
-MatrixXd R_P2(3,3);
-R_P2<<cos(pelvis_pitch),0,sin(pelvis_pitch),
-        0,1,0,
-        -sin(pelvis_pitch),0,cos(pelvis_pitch);
-
-R_P=R_P*R_P2;
-//                R_F_L<<cos(pelvis_roll),-sin(pelvis_roll),0,
-//                        sin(pelvis_roll),cos(pelvis_roll),0,
-//                        0,0,1;
-//                R_F_R<<cos(pelvis_roll),-sin(pelvis_roll),0,
-//                        sin(pelvis_roll),cos(pelvis_roll),0,
-//                        0,0,1;
-
-                SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
-                SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
-
-                SURENA.ForwardKinematic(1);
+//            if (round(OnlineTaskSpace.globalTime)<=round(OnlineTaskSpace.MotionTime)){
 
 
+//                //if you want to have modification of height of pelvis please active the Pz(0,0) instead of P(2,0)
+//                PoseRoot<<0,
+//                        P(1,0),
+//                        P(2,0),// Pz(0,0)
+//                        0,
+//                        0,
+//                        0;
 
+//                PoseRFoot<<0,
+//                        m6,
+//                        m7,
+//                        0,
+//                        -1*m8*(M_PI/180),
+//                        0;
+
+//                PoseLFoot<<0,
+//                        m2,
+//                        m3,
+//                        0,
+//                        -1*m4*(M_PI/180),
+//                        0;
+
+//                MatrixXd R_P(3,3);  MatrixXd R_F_L(3,3);    MatrixXd R_F_R(3,3);
+//                R_P=MatrixXd::Identity(3,3);
+//                R_F_L=MatrixXd::Identity(3,3);
+//                R_F_R=MatrixXd::Identity(3,3);
+//                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*0*M_PI/180;//3 was good
+//                R_P<<1,0,0,
+//                      0,cos(pelvis_roll),-sin(pelvis_roll),
+//                        0,sin(pelvis_roll),cos(pelvis_roll);
+
+//                double pelvis_pitch=-asin(7/4*(max(m1,m5)-P(0,0)))*0;
+//MatrixXd R_P2(3,3);
+//R_P2<<cos(pelvis_pitch),0,sin(pelvis_pitch),
+//        0,1,0,
+//        -sin(pelvis_pitch),0,cos(pelvis_pitch);
+
+//R_P=R_P*R_P2;
+////                R_F_L<<cos(pelvis_roll),-sin(pelvis_roll),0,
+////                        sin(pelvis_roll),cos(pelvis_roll),0,
+////                        0,0,1;
+////                R_F_R<<cos(pelvis_roll),-sin(pelvis_roll),0,
+////                        sin(pelvis_roll),cos(pelvis_roll),0,
+////                        0,0,1;
+
+//                SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
+//                SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
+
+                //SURENA.ForwardKinematic(1);
 
                 //*****************************
 //                ROS_INFO("Root: x=%f,y=%f ,left: x=%f,y=%f  ,right: x=%f,y=%f",
@@ -951,28 +1073,66 @@ R_P=R_P*R_P2;
 //                SURENA_turning.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
 //                SURENA_turning.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
 //                //SURENA_turning.ForwardKinematic(1);
+//}
+
+}
+
+
+    double T_move=3;.7;
+    double T_rest=5;
+    double T_back=3;
+    double periodTime=2*T_move+2*T_rest+2*T_back;
+    double t_local=fmod(GlobalTime-DurationOfStartPhase,periodTime);
+    double max=10*M_PI/180;
+    double max_a=10*M_PI/180;
+    double max_pl=2*M_PI/180;
+    double max_pr=2*M_PI/180;
+    double max_p=20*M_PI/180;
+
+
+    double theta=0;
+    double psi_l = 0;
+    double psi_r = 0;
+    double phi_r = 0;
+    double phi_l = 0;
+
+    if(t_local<periodTime/2){theta=move_rest_back(max,t_local,0,T_move,T_rest,T_back);}
+    else if(t_local<periodTime){theta=move_rest_back(-max,t_local,periodTime/2,T_move,T_rest,T_back);}
+
+    psi_l=move_rest_back(max_pl,t_local,0,T_move,T_rest,T_back);
+    psi_r=move_rest_back(max_pr,t_local,periodTime/2,T_move,T_rest,T_back);
+
+    phi_r=move_rest_back(max_p,t_local,T_move,T_rest/2,0,T_rest);
+    phi_l=move_rest_back(max_p,t_local,periodTime/2+T_move,T_rest/2,0,T_rest);
+
+
+    SURENA.Links[2].JointAngle=-theta-psi_r;
+    SURENA.Links[6].JointAngle=saturate(theta,-max_a,max_a);
+    SURENA.Links[8].JointAngle=-theta+psi_l;
+    SURENA.Links[12].JointAngle=saturate(theta,-max_a,max_a);
+
+    SURENA.Links[3].JointAngle=-phi_r/2;
+    SURENA.Links[4].JointAngle=phi_r;
+    SURENA.Links[5].JointAngle=-phi_r/2;
+
+    SURENA.Links[9].JointAngle=-phi_l/2;
+    SURENA.Links[10].JointAngle=phi_l;
+    SURENA.Links[11].JointAngle=-phi_l/2;
 
 
 
 
 
 
-
-
-
-
-
-
-            }
 
         }
       //  ankleAdaptation();
 
-        if(GlobalTime>=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime){break;}
+
          links = SURENA.GetLinks();
         //links = SURENA_turning.GetLinks();
-hand_move();
-        EndPhase();
+//hand_move();
+        //EndPhase();
 
 
 
@@ -981,9 +1141,9 @@ hand_move();
         //        if(links[5].JointAngle>max_test){max_test=links[5].JointAngle;}
 
         double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-        double k_roll_r=1;
-        double k_roll_l=1;
-        double k_pitch=.5;
+        double k_roll_r=0;
+        double k_roll_l=0;
+        double k_pitch=0;
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
         cntrl[2]=links[2].JointAngle+k_roll_r*RollModified(0,0);//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])
@@ -1051,7 +1211,7 @@ hand_move();
 
         }
 
-        //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.T_end_of_first_SS){break;}
+      //  if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.Tc+OnlineTaskSpace.TDs){break;}
 
         ros::spinOnce();
         loop_rate.sleep();
