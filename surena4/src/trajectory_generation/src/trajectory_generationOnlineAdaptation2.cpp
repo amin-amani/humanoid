@@ -32,6 +32,14 @@
 using namespace  std;
 using namespace  Eigen;
 
+bool left_first=true;//right support in first step
+bool backward=false;
+bool turning=false;
+double TurningRadius=.5;
+bool sidewalk=!false;
+bool simulation=!false;
+
+
 double saturate(double a, double min, double max){
     if(a<min){return min;ROS_INFO("subceeding!");}
     else if(a>max){return max;ROS_INFO("exceeding!");}
@@ -86,7 +94,48 @@ void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModified
     data.data=0;    pub31.publish(data);
 }
 
+void  SendGazebo_reverse(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
+    if(links.count()<28){qDebug()<<"index err";return;}
+    std_msgs::Float64 data;
 
+    data.data=-links[7].JointAngle;    pub1.publish(data);
+    data.data=-links[8].JointAngle+RollModifieds(0,0);    pub2.publish(data);
+    data.data=links[9].JointAngle+PitchModifieds;    pub3.publish(data);
+    data.data=links[10].JointAngle;    pub4.publish(data);
+    // data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
+    data.data=saturate(links[11].JointAngle,-M_PI/5.4,M_PI/4)+theta_r;    pub5.publish(data);
+    data.data=-links[12].JointAngle+phi_r;    pub6.publish(data);
+    data.data=-links[1].JointAngle;    pub7.publish(data);
+    data.data=-links[2].JointAngle+RollModifieds(1,0);    pub8.publish(data);
+    data.data=links[3].JointAngle+PitchModifieds;    pub9.publish(data);
+    data.data=links[4].JointAngle;    pub10.publish(data);
+    //data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
+    data.data=saturate(links[5].JointAngle,-M_PI/5.4,M_PI/4)+theta_l;    pub11.publish(data);
+    data.data=-links[6].JointAngle+phi_l;    pub12.publish(data);
+
+    data.data=links[13].JointAngle;  pub13.publish(data);
+    data.data=links[14].JointAngle;  pub14.publish(data);
+
+    data.data=links[15].JointAngle; pub22.publish(data);
+    data.data=-links[16].JointAngle; pub23.publish(data);
+    data.data=-links[17].JointAngle; pub24.publish(data);
+    data.data=links[18].JointAngle; pub25.publish(data);
+    data.data=-links[19].JointAngle; pub26.publish(data);
+    data.data=-links[20].JointAngle; pub27.publish(data);
+    data.data=links[21].JointAngle; pub28.publish(data);
+
+    data.data=links[22].JointAngle; pub15.publish(data);
+    data.data=-links[23].JointAngle; pub16.publish(data);
+    data.data=-links[24].JointAngle; pub17.publish(data);
+    data.data=links[25].JointAngle; pub18.publish(data);
+    data.data=-links[26].JointAngle; pub19.publish(data);
+    data.data=-links[27].JointAngle; pub20.publish(data);
+    data.data=links[28].JointAngle; pub21.publish(data);
+
+    data.data=0;    pub29.publish(data);
+    data.data=0;    pub30.publish(data);
+    data.data=0;    pub31.publish(data);
+}
 
 int getch()
 {
@@ -278,9 +327,9 @@ void ankle_states(const gazebo_msgs::LinkStates& msg){
     //    ROS_INFO("x_left=%f,x_right=%f,y_left=%f,y_right=%fz_left=%f,z_right=%f",x_left,x_right,y_left,y_right,z_left,z_right);
 }
 
-bool simulation;
+
 Robot SURENA;//model of robot & kinematics funcs(IK & FK)
-Robot SURENA_turning;
+Robot SURENA_turning_side;
 TaskSpaceOnline3 OnlineTaskSpace;
 QList<LinkM> links;
 MatrixXd PoseRoot;//position of pelvis respected to global coordinate
@@ -328,11 +377,14 @@ void StartPhase(){
                 0,
                 0;
 
-        SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
-        SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
 
-        SURENA_turning.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
-        SURENA_turning.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+
+        SURENA_turning_side.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
+        SURENA_turning_side.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+
+
+SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
+SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
 
         MinimumJerkInterpolation CoefOffline;
         double D_pitch=-1*OnlineTaskSpace.HipPitchModification*(M_PI/180);
@@ -606,7 +658,17 @@ MatrixXd Coef_teta_motor_R; MatrixXd Coef_phi_motor_R;
 int main(int argc, char **argv)
 {
 
-    simulation=false;
+
+    if(sidewalk){
+        OnlineTaskSpace.Xe=0;
+        OnlineTaskSpace.Xs=0;
+        OnlineTaskSpace.side_extra_step_length=true;
+        OnlineTaskSpace.CoeffArrayPelvis();
+        OnlineTaskSpace.CoeffSideStartEnd();
+
+    }
+
+
     qc_initial_bool=!simulation;
     bump_initialize=false;
     wrench_init_bool=false;
@@ -722,6 +784,8 @@ int main(int argc, char **argv)
             ros::spinOnce();
             continue;
         }
+
+
 
         if(wrench_init_bool){
             WrenchHomming();
@@ -870,6 +934,16 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
+
+
+                if(backward){
+                    double backward_coeff=.7;
+                  PoseRoot(0,0)=-backward_coeff*PoseRoot(0,0);
+                  PoseLFoot(0,0)=-backward_coeff*PoseLFoot(0,0);
+                  PoseRFoot(0,0)=-backward_coeff*PoseRFoot(0,0);
+                }
+
+
                 MatrixXd R_P(3,3);  MatrixXd R_F_L(3,3);    MatrixXd R_F_R(3,3);
                 R_P=MatrixXd::Identity(3,3);
                 R_F_L=MatrixXd::Identity(3,3);
@@ -893,69 +967,83 @@ R_P=R_P*R_P2;
 //                        sin(pelvis_roll),cos(pelvis_roll),0,
 //                        0,0,1;
 
-                SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
-                SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
-
-                SURENA.ForwardKinematic(1);
 
 
 
+if(!turning && !sidewalk)
+{
+    SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
+    SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
+
+    SURENA.ForwardKinematic(1);
+}
+
+if(turning){
 
                 //*****************************
-//                ROS_INFO("Root: x=%f,y=%f ,left: x=%f,y=%f  ,right: x=%f,y=%f",
-//                         PoseRoot(0,0),PoseRoot(1,0),PoseLFoot(0,0),PoseLFoot(1,0),PoseRFoot(0,0),PoseRFoot(1,0));
-//                double TurningRadius,yaw_al,yaw_ar,yaw_p;
-//                TurningRadius=.3;
+               // ROS_INFO("Root: x=%f,y=%f ,left: x=%f,y=%f  ,right: x=%f,y=%f",
+                  //       PoseRoot(0,0),PoseRoot(1,0),PoseLFoot(0,0),PoseLFoot(1,0),PoseRFoot(0,0),PoseRFoot(1,0));
+                double yaw_al,yaw_ar,yaw_p;
 
-//                yaw_p=PoseRoot(0,0)/TurningRadius;
-//                double sp=sin(yaw_p);
-//                double cp=cos(yaw_p);
-//                PoseRoot(0,0)=(TurningRadius-PoseRoot(1,0))*sp;
-//                PoseRoot(1,0)=TurningRadius-(TurningRadius-PoseRoot(1,0))*cp;
+                yaw_p=PoseRoot(0,0)/TurningRadius;
+                double sp=sin(yaw_p);
+                double cp=cos(yaw_p);
+                PoseRoot(0,0)=(TurningRadius-PoseRoot(1,0))*sp;
+                PoseRoot(1,0)=TurningRadius-(TurningRadius-PoseRoot(1,0))*cp;
 
-//                yaw_al=PoseLFoot(0,0)/TurningRadius;
-//                double s_al=sin(yaw_al);
-//                double c_al=cos(yaw_al);
-//                PoseLFoot(0,0)=(TurningRadius-PoseLFoot(1,0))*s_al;
-//                PoseLFoot(1,0)=TurningRadius-(TurningRadius-PoseLFoot(1,0))*c_al;
+                yaw_al=PoseLFoot(0,0)/TurningRadius;
+                double s_al=sin(yaw_al);
+                double c_al=cos(yaw_al);
+                PoseLFoot(0,0)=(TurningRadius-PoseLFoot(1,0))*s_al;
+                PoseLFoot(1,0)=TurningRadius-(TurningRadius-PoseLFoot(1,0))*c_al;
 
-//                yaw_ar=PoseRFoot(0,0)/TurningRadius;
-//                double s_ar=sin(yaw_ar);
-//                double c_ar=cos(yaw_ar);
-//                PoseRFoot(0,0)=(TurningRadius-PoseRFoot(1,0))*s_ar;
-//                PoseRFoot(1,0)=TurningRadius-(TurningRadius-PoseRFoot(1,0))*c_ar;
+                yaw_ar=PoseRFoot(0,0)/TurningRadius;
+                double s_ar=sin(yaw_ar);
+                double c_ar=cos(yaw_ar);
+                PoseRFoot(0,0)=(TurningRadius-PoseRFoot(1,0))*s_ar;
+                PoseRFoot(1,0)=TurningRadius-(TurningRadius-PoseRFoot(1,0))*c_ar;
 
-////                ROS_INFO("Root: x=%f,y=%f ,left: x=%f,y=%f  ,right: x=%f,y=%f\nyaw_p=%f,yaw_al=%f,yaw_al=%f",
-////                         PoseRoot(0,0),PoseRoot(1,0),PoseLFoot(0,0),PoseLFoot(1,0),PoseRFoot(0,0),PoseRFoot(1,0),yaw_p,yaw_al,yaw_ar);
-//                R_P<<cos(yaw_p),-sin(yaw_p),0,
-//                        sin(yaw_p),cos(yaw_p),0,
-//                        0,0,1;
-//                R_F_R<<cos(yaw_ar),-sin(yaw_ar),0,
-//                        sin(yaw_ar),cos(yaw_ar),0,
-//                        0,0,1;
-//                R_F_L<<cos(yaw_al),-sin(yaw_al),0,
-//                        sin(yaw_al),cos(yaw_al),0,
-//                        0,0,1;
-//                //*--**********************************************
+//                ROS_INFO("Root: x=%f,y=%f ,left: x=%f,y=%f  ,right: x=%f,y=%f\nyaw_p=%f,yaw_al=%f,yaw_al=%f",
+//                         PoseRoot(0,0),PoseRoot(1,0),PoseLFoot(0,0),PoseLFoot(1,0),PoseRFoot(0,0),PoseRFoot(1,0),yaw_p,yaw_al,yaw_ar);
+                R_P<<cos(yaw_p),-sin(yaw_p),0,
+                        sin(yaw_p),cos(yaw_p),0,
+                        0,0,1;
+                R_F_R<<cos(yaw_ar),-sin(yaw_ar),0,
+                        sin(yaw_ar),cos(yaw_ar),0,
+                        0,0,1;
+                R_F_L<<cos(yaw_al),-sin(yaw_al),0,
+                        sin(yaw_al),cos(yaw_al),0,
+                        0,0,1;
+                //*--**********************************************
 
-
-
-//                //                double th=10*M_PI/180;
-//                //                R_P<<1,0,0,
-//                //                        0,cos(th),-sin(th),
-//                //                        0,sin(th),cos(th);
+                SURENA_turning_side.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
+                SURENA_turning_side.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
+                //SURENA_turning_side.ForwardKinematic(1);
 
 
 
+}
 
-//                SURENA_turning.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
-//                SURENA_turning.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
-//                //SURENA_turning.ForwardKinematic(1);
-
-
+if(sidewalk){
+double side_move_coef=.05/2/OnlineTaskSpace.StepLength;
 
 
+    //*****************************
+    PoseRoot(1,0)=PoseRoot(1,0)+side_move_coef*PoseRoot(0,0);
+    PoseRoot(0,0)=0;
 
+    PoseLFoot(1,0)=PoseLFoot(1,0)+side_move_coef*PoseLFoot(0,0);
+    PoseLFoot(0,0)=0;
+
+    PoseRFoot(1,0)=PoseRFoot(1,0)+side_move_coef*PoseRFoot(0,0);
+    PoseRFoot(0,0)=0;
+
+
+                SURENA_turning_side.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
+                SURENA_turning_side.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
+                //SURENA_turning_side.ForwardKinematic(1);
+}
+if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
 
 
@@ -969,9 +1057,12 @@ R_P=R_P*R_P2;
       //  ankleAdaptation();
 
         if(GlobalTime>=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime){break;}
-         links = SURENA.GetLinks();
-        //links = SURENA_turning.GetLinks();
-hand_move();
+        if(turning || sidewalk) {links = SURENA_turning_side.GetLinks();}
+        else{links = SURENA.GetLinks();}
+
+
+
+//hand_move();
         EndPhase();
 
 
@@ -983,6 +1074,13 @@ hand_move();
         double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
         double k_roll_r=1;
         double k_roll_l=1;
+        if(!left_first){
+            k_roll_r=OnlineTaskSpace.LeftHipRollModification/OnlineTaskSpace.RightHipRollModification;
+            k_roll_l=OnlineTaskSpace.RightHipRollModification/OnlineTaskSpace.LeftHipRollModification;
+
+        }
+
+
         double k_pitch=.5;
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
@@ -1003,7 +1101,7 @@ hand_move();
         qref=QC.ctrldata2qc(cntrl);
 
         msg.data.clear();
-        bool left_first=true;//right support in first step
+
         if(left_first){
             for(int  i = 0;i < 12;i++)
             {
@@ -1032,7 +1130,10 @@ hand_move();
 
         chatter_pub.publish(msg);
 
-        if (simulation){SendGazebo(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
+        if (simulation){
+            if(left_first){SendGazebo(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
+            else{SendGazebo_reverse(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
+        }
         links = SURENA.GetLinks();
 
         msg_contact_flag.data.clear();

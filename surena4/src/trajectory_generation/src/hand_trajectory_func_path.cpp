@@ -171,7 +171,7 @@ void  SendGazebo(vector<double> q){
 bool simulation;
 int main(int argc, char **argv)
 {
-    simulation=!true;
+    simulation=true;
 
     if (simulation){    ros::init(argc, argv, "rrbot");}
     else{ros::init(argc, argv, "jointdata");}

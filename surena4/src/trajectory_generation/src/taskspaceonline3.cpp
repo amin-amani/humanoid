@@ -5,13 +5,13 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=10;
-    LeftHipRollModification=2-.5;2.5;
-    RightHipRollModification=2;2.5;
-    FirstHipRollModification=2;3.5;
+    NStride=2;
+    LeftHipRollModification=2.7;+.5;
+    RightHipRollModification=2;
+    FirstHipRollModification=2;
     HipPitchModification=1;//2;
 
-    PelvisRollRange=10*M_PI/180;
+    //PelvisRollRange=10*M_PI/180;
 
     YpMax=.105;.08;.12;
     Yd=YpMax;.07;.12;
@@ -215,6 +215,30 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
             return x;
             }
 
+void TaskSpaceOnline3::CoeffSideStartEnd(){
+        //***** x start
+        MatrixXd Cx_st_iTime_al(1,2);
+        Cx_st_iTime_al<<T_s_st ,TStart-T_end_of_first_SS;
+        MatrixXd Cx_st_iPos_al(1,2);
+        Cx_st_iPos_al<<0, 2*StepLength;
+        MatrixXd Cx_st_iVel_al(1,2);
+        Cx_st_iVel_al<<0, 0;
+        MatrixXd Cx_st_iAcc_al(1,2);
+        Cx_st_iAcc_al<<0, 0;
+        C_st_x_al=CoefOffline.Coefficient(Cx_st_iTime_al,Cx_st_iPos_al,Cx_st_iVel_al,Cx_st_iAcc_al);
+
+        //***** x end
+        MatrixXd C_end_iTime_ar(1,2);
+        C_end_iTime_ar<<0, (T_end_a_e-T_end_a_s-T_end_of_last_SS);
+        MatrixXd C_end_iPos_ar(1,2);
+        C_end_iPos_ar<<0, 2*StepLength;
+        MatrixXd C_end_iVel_ar(1,2);
+        C_end_iVel_ar<<0, 0;
+        MatrixXd C_end_iAcc_ar(1,2);
+        C_end_iAcc_ar<<0, 0;
+        C_end_x_ar=CoefOffline.Coefficient(C_end_iTime_ar,C_end_iPos_ar,C_end_iVel_ar,C_end_iAcc_ar);
+        side_extra_step_length=true;
+}
 
 void TaskSpaceOnline3::CoeffArrayAnkle(){
 
@@ -356,7 +380,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
 }
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
-double vx=DesiredVelocity/3.6/2;
+double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
     //------------------Coefficient of cyclic motion in X direction--------------------
     MatrixXd ord(1,2);
     ord << 4,4;//3,3
@@ -413,7 +437,7 @@ double vx=DesiredVelocity/3.6/2;
     MatrixXd Cx_end_pTime(1,2);
     Cx_end_pTime<<(TDs),T_end_p_sx_rel ;
     MatrixXd Cx_end_pPos(1,2);
-    Cx_end_pPos<<(NStep+1)*StepLength-Xs, (NStep+1)*StepLength;
+    Cx_end_pPos<<(NStep+1)*StepLength-Xs, (NStep+1)*StepLength+(side_extra_step_length)*StepLength;
     MatrixXd Cx_end_pVel(1,2);
     Cx_end_pVel<<vx, 0;//Cx_end_pVel<<5*Cx_p(0,0)*pow(TDs,4)+4*Cx_p(0,1)*pow(TDs,3)+3*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3)*pow(TDs,1)+Cx_p(0,4), 0;
     MatrixXd Cx_end_pAccel(1,2);
@@ -540,7 +564,7 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
         DoubleSupport=true;
     }
     else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
-        xp=(2*NStride+1)*StepLength;
+        xp=(2*NStride+1)*StepLength+(side_extra_step_length)*StepLength;
         dxp=0;
         ddxp=0;
         DoubleSupport=true;
@@ -667,7 +691,7 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
     dzp=0;
     ddzp=0;
 
-    //qDebug()<<"t="<<localtiming<<"xp="<<xp<<"  yp="<<yp<<"  zp="<<zp;
+   // qDebug()<<"t="<<time<<"\txp="<<xp<<"\typ="<<yp;
 
     MatrixXd pelvis(10,1);
     pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
@@ -717,7 +741,9 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
         }
         else if(localtiming>TStart-T_end_of_first_SS){
             LeftFootOrientationAdaptator=true;
-            x_al=StepLength;
+            MatrixXd output1=CoefOffline.GetAccVelPos(C_st_x_al.row(0),TStart-T_end_of_first_SS,T_s_st,5);
+            x_al=output1(0,0);
+            //x_al=StepLength;
             y_al=0.5*_pelvisLength;
             MatrixXd output=CoefOffline.GetAccVelPos(C_st_z_al_end_of_SS.row(0),localtiming,TStart-T_end_of_first_SS,5);
             z_al=_lenghtOfAnkle+output(0,0);
@@ -731,7 +757,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
         footIndex=fmod(n,2);// shows which foot is swing foot (in cyclic mode left foots is swinging in the even steps(N))
         //it means whenever the footIndex is 0 the left foots will go to the swing mode
 
-        currentLeftFootX2=(n-fmod(n+1,2))*StepLength;
+        currentLeftFootX2=(n-fmod(n+1,2))*StepLength+side_extra_step_length*StepLength;
        // currentLeftFootY2;
         currentLeftFootZ=0.112;
 
@@ -820,7 +846,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
 
             n=n-1;
-            currentLeftFootX2=(n-fmod(n+1,2))*StepLength;
+            currentLeftFootX2=(n-fmod(n+1,2))*StepLength+side_extra_step_length*StepLength;
            // currentLeftFootY2;
             currentLeftFootZ=0.112;
 
@@ -870,7 +896,9 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
             }
             else if (localtiming<=(T_end_a_e-T_end_a_s)+TDs){
                 RightFootOrientationAdaptator=true;
-                x_ar=currentRightFootX2+StepLength;
+                MatrixXd output1=CoefOffline.GetAccVelPos(C_end_x_ar.row(0),(T_end_a_e-T_end_a_s-T_end_of_last_SS),0,5);
+                x_ar=currentRightFootX2+output1(0,0);
+               // x_ar=currentRightFootX2+StepLength;
                 x_al=currentLeftFootX2;//*/(2*NStride+1)*StepLength;/*
                 y_al=currentLeftFootY2;
                 y_ar=currentRightFootY2;
@@ -883,9 +911,10 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
             else{
 
+                MatrixXd output1=CoefOffline.GetAccVelPos(C_end_x_ar.row(0),(T_end_a_e-T_end_a_s-T_end_of_last_SS),0,5);
+                x_ar=currentRightFootX2+output1(0,0);
 
-
-                x_ar=currentRightFootX2+StepLength;//(2*NStride+1)*StepLength;
+               // x_ar=currentRightFootX2+StepLength;//(2*NStride+1)*StepLength;
                 z_ar=currentRightFootZ;//_lenghtOfAnkle;
 
                 x_al=currentLeftFootX2;//(2*NStride+1)*StepLength;
@@ -898,6 +927,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
     }
 }
+
     MatrixXd footpos(8,1);
     footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
 //qDebug()<<"time="<<time<<"\tzal="<<z_al-.112;

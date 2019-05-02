@@ -295,7 +295,7 @@ public:
     MatrixXd Cz_end_a;
     MatrixXd Cz_mod_p;
     MatrixXd Cz_mod_st_p;
-
+ bool side_extra_step_length=false;
 
     TaskSpaceOnline3();
 
@@ -303,6 +303,7 @@ public:
 
     void CoeffArrayAnkle();
     void CoeffArrayPelvis();
+    void CoeffSideStartEnd();
     MatrixXd PelvisTrajectory(double time);
     //void CoeffArrayFootAngle();
    // MatrixXd ModificationOfPelvisHeight(double time, int n, double localtiming, bool RFT_state, bool LFT_state, bool LastDSIndex);
