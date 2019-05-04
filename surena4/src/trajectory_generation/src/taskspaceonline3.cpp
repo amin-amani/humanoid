@@ -293,7 +293,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iTime_ar(1,3);
     C_cy_iTime_ar<<0, Tm, TSS-T_end_of_SS;
     MatrixXd C_cy_iPos_ar(1,3);
-    C_cy_iPos_ar<<0, XofAnkleMaximumHeight , 2*StepLength;
+    C_cy_iPos_ar<<0, StepLength , 2*StepLength;
     MatrixXd C_cy_iVel_ar(1,3);
     C_cy_iVel_ar<<0,INFINITY, 0;
     MatrixXd C_cy_iAcc_ar(1,3);

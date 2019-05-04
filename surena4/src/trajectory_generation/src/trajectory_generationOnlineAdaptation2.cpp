@@ -36,8 +36,8 @@ bool left_first=true;//right support in first step
 bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
-bool sidewalk=!false;
-bool simulation=!false;
+bool sidewalk=false;
+bool simulation=false;
 
 
 double saturate(double a, double min, double max){
@@ -659,14 +659,17 @@ int main(int argc, char **argv)
 {
 
 
-    if(sidewalk){
+    if(sidewalk||TurningRadius<.2){
+        OnlineTaskSpace.StepLength=TurningRadius/16*M_PI;
         OnlineTaskSpace.Xe=0;
         OnlineTaskSpace.Xs=0;
         OnlineTaskSpace.side_extra_step_length=true;
         OnlineTaskSpace.CoeffArrayPelvis();
+        OnlineTaskSpace.CoeffArrayAnkle();
         OnlineTaskSpace.CoeffSideStartEnd();
 
     }
+
 
 
     qc_initial_bool=!simulation;
@@ -1127,8 +1130,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         {
             msg.data.push_back(0);
         }
-
-        chatter_pub.publish(msg);
+        if(!simulation){chatter_pub.publish(msg);}
 
         if (simulation){
             if(left_first){SendGazebo(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
