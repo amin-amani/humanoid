@@ -940,7 +940,7 @@ int main(int argc, char **argv)
 
 
                 if(backward){
-                    double backward_coeff=.7;
+                    double backward_coeff=.5;
                   PoseRoot(0,0)=-backward_coeff*PoseRoot(0,0);
                   PoseLFoot(0,0)=-backward_coeff*PoseLFoot(0,0);
                   PoseRFoot(0,0)=-backward_coeff*PoseRFoot(0,0);
