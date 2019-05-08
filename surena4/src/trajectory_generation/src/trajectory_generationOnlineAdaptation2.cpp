@@ -58,21 +58,21 @@ ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
     if(links.count()<28){qDebug()<<"index err";return;}
     std_msgs::Float64 data;
-
+double offset=1*M_PI/180;
     data.data=links[1].JointAngle;    pub1.publish(data);
-    data.data=links[2].JointAngle+RollModifieds(0,0);    pub2.publish(data);
+    data.data=links[2].JointAngle+RollModifieds(0,0)+offset;    pub2.publish(data);
     data.data=links[3].JointAngle+PitchModifieds;    pub3.publish(data);
     data.data=links[4].JointAngle;    pub4.publish(data);
     // data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
     data.data=saturate(links[5].JointAngle,-M_PI/5.4,M_PI/4)+theta_r;    pub5.publish(data);
-    data.data=links[6].JointAngle+phi_r;    pub6.publish(data);
+    data.data=links[6].JointAngle+phi_r-offset;    pub6.publish(data);
     data.data=links[7].JointAngle;    pub7.publish(data);
-    data.data=links[8].JointAngle+RollModifieds(1,0);    pub8.publish(data);
+    data.data=links[8].JointAngle+RollModifieds(1,0)-offset;    pub8.publish(data);
     data.data=links[9].JointAngle+PitchModifieds;    pub9.publish(data);
     data.data=links[10].JointAngle;    pub10.publish(data);
     //data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
     data.data=saturate(links[11].JointAngle,-M_PI/5.4,M_PI/4)+theta_l;    pub11.publish(data);
-    data.data=links[12].JointAngle+phi_l;    pub12.publish(data);
+    data.data=links[12].JointAngle+phi_l+offset;    pub12.publish(data);
     data.data=links[13].JointAngle;    pub13.publish(data);
     data.data=links[14].JointAngle;    pub14.publish(data);
     data.data=links[15].JointAngle;    pub15.publish(data);
@@ -695,8 +695,8 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=6;
-    DurationOfendPhase=6;
+    DurationOfStartPhase=4;
+    DurationOfendPhase=4;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
     PitchModified=0;
