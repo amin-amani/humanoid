@@ -64,7 +64,7 @@ public:
     double T_beta;
 
     double Tm;
-    int Tc;
+    double Tc;
     double TDs;
     double TSS;
     double TGait;

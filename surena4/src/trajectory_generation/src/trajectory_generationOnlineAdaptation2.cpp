@@ -183,8 +183,11 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     //ROS_INFO("I heard: [%d  %d %d %d %d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3],(int)msg.data[4],(int)msg.data[5],(int)msg.data[6],(int)msg.data[7]);
     int temp[8];
 
-    bump_notpushed[0]=1012;bump_notpushed[1]= 924;bump_notpushed[2]=3038;bump_notpushed[3]=3098;
-    bump_notpushed[4]=3042;bump_notpushed[5]=3008;bump_notpushed[6]=1133;bump_notpushed[7]=1016;
+    bump_pushed[0]=1095;bump_pushed[1]= 849;bump_pushed[2]=3124;bump_pushed[3]=3003;
+    bump_pushed[4]=3126;bump_pushed[5]=2925;bump_pushed[6]=1204;bump_pushed[7]=923;
+
+    bump_notpushed[0]=1012;bump_notpushed[1]= 930;bump_notpushed[2]=3037;bump_notpushed[3]=3098;
+    bump_notpushed[4]=3042;bump_notpushed[5]=3009;bump_notpushed[6]=1123;bump_notpushed[7]=1014;
     temp[0]=msg.data[0]-bump_notpushed[0];
     temp[1]=-1*(msg.data[1]-bump_notpushed[1]);
     temp[2]=msg.data[2]-bump_notpushed[2];
@@ -1148,10 +1151,10 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-            //ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+           // ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
                      //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
-
+//qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
         }
 
         //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.T_end_of_first_SS){break;}

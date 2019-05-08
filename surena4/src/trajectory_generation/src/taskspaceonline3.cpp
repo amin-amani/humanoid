@@ -6,9 +6,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=3;
-    LeftHipRollModification=2.7;+.5;
-    RightHipRollModification=2;
-    FirstHipRollModification=2;
+    LeftHipRollModification= 3.1;2.7;+.5;
+    RightHipRollModification=3.1;2.7;
+    FirstHipRollModification=3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -51,9 +51,17 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     TSS=3;
     Tc=TSS+TDs;
 
-
-    AnkleMaximumHeight=0.06;
-    ReferencePelvisHeight=.91;.89;0.86+.02-.055;
+    //FastWalk17Ordibehesht
+    YpMax=.123;.123;.13;.12;105;
+    Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
+    StepLength=.15;.2;.12;.3;
+    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
+    TDs=2.7;
+    TSS=Tc-TDs;
+    TSS=2;
+    Tc=TSS+TDs;
+    AnkleMaximumHeight=0.025;
+    ReferencePelvisHeight=.91;.9;.89;0.86+.02-.055;
 
 
 
@@ -70,10 +78,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     // last step: timing parameter of pelvis motion
     T_end_of_first_SS=1;
     //    T_end_of_SS=.9;
-    T_end_of_SS=1;//TSS*.3;
+    T_end_of_SS=.5;//TSS*.3;
     T_end_of_last_SS=1;
 
-    h_end_of_SS=.02;
+    h_end_of_SS=.015;
 
     T_end_p_sx_rel=TDs+0.25*TEnd;
     T_end_p_sx=TGait+TDs+0.25*TEnd;
@@ -241,7 +249,7 @@ void TaskSpaceOnline3::CoeffSideStartEnd(){
 }
 
 void TaskSpaceOnline3::CoeffArrayAnkle(){
-
+double vz=-.04;
     //**************** start ***************************//
     //***** x start
     MatrixXd Cx_st_iTime_al(1,2);
@@ -260,7 +268,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_st_iPos(1,3);
     C_st_iPos<<0, AnkleMaximumHeight,h_end_of_SS;
     MatrixXd C_st_iVel(1,3);
-    C_st_iVel<<0 ,INFINITY, 0;
+    C_st_iVel<<0 ,INFINITY, vz;
     MatrixXd C_st_iAcc(1,3);
     C_st_iAcc<<0 ,INFINITY, 0;
     C_st_z_al=CoefOffline.Coefficient(C_st_iTime,C_st_iPos,C_st_iVel,C_st_iAcc);
@@ -271,7 +279,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_st_iPos_e(1,2);
     C_st_iPos_e<<h_end_of_SS,0;
     MatrixXd C_st_iVel_e(1,2);
-    C_st_iVel_e<<0 , 0;
+    C_st_iVel_e<<vz , 0;
     MatrixXd C_st_iAcc_e(1,2);
     C_st_iAcc_e<<0 , 0;
     C_st_z_al_end_of_SS=CoefOffline.Coefficient(C_st_iTime_e,C_st_iPos_e,C_st_iVel_e,C_st_iAcc_e);
@@ -306,7 +314,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iPos(1,3);
     C_cy_iPos<<0,AnkleMaximumHeight, h_end_of_SS;
     MatrixXd C_cy_iVel(1,3);
-    C_cy_iVel<<0 ,INFINITY, 0;
+    C_cy_iVel<<0 ,INFINITY, vz;
     MatrixXd C_cy_iAcc(1,3);
     C_cy_iAcc<<0 ,INFINITY, 0;
     C_cy_z_ar=CoefOffline.Coefficient(C_cy_iTime,C_cy_iPos,C_cy_iVel,C_cy_iAcc);
@@ -317,7 +325,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iPos_e(1,2);
     C_cy_iPos_e<< h_end_of_SS, 0;
     MatrixXd C_cy_iVel_e(1,2);
-    C_cy_iVel_e<<0 , 0;
+    C_cy_iVel_e<<vz , 0;
     MatrixXd C_cy_iAcc_e(1,2);
     C_cy_iAcc_e<<0 , 0;
     C_cy_z_ar_end_of_SS=CoefOffline.Coefficient(C_cy_iTime_e,C_cy_iPos_e,C_cy_iVel_e,C_cy_iAcc_e);
@@ -350,7 +358,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_end_z_iPos(1,3);
     C_end_z_iPos<<0, AnkleMaximumHeight, h_end_of_SS;
     MatrixXd C_end_z_iVel(1,3);
-    C_end_z_iVel<<0 ,INFINITY, 0;
+    C_end_z_iVel<<0 ,INFINITY, vz;
     MatrixXd C_end_z_iAcc(1,3);
     C_end_z_iAcc<<0 ,INFINITY, 0;
     C_end_z_ar=CoefOffline.Coefficient(C_end_z_iTime,C_end_z_iPos,C_end_z_iVel,C_end_z_iAcc);
@@ -361,7 +369,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_end_z_iPos_e(1,2);
     C_end_z_iPos_e<<h_end_of_SS, 0;
     MatrixXd C_end_z_iVel_e(1,2);
-    C_end_z_iVel_e<<0 , 0;
+    C_end_z_iVel_e<<vz , 0;
     MatrixXd C_end_z_iAcc_e(1,2);
     C_end_z_iAcc_e<<0 , 0;
     C_end_z_ar_end_of_SS=CoefOffline.Coefficient(C_end_z_iTime_e,C_end_z_iPos_e,C_end_z_iVel_e,C_end_z_iAcc_e);
@@ -695,6 +703,7 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
 
     MatrixXd pelvis(10,1);
     pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
+//    qDebug()<<"xp="<<
     return pelvis;
 }
 
@@ -823,6 +832,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
         }
 
         else if (localtiming<Tc){
+           // qDebug()<<"single support 2\t"<<Tc;
             LeftFootOrientationAdaptator=(footIndex==0);
             RightFootOrientationAdaptator=(footIndex!=0);
 
@@ -930,7 +940,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
     MatrixXd footpos(8,1);
     footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
-//qDebug()<<"time="<<time<<"\tzal="<<z_al-.112;
+//qDebug()<<"time="<<time<<"\txal="<<x_al<<"\tzal="<<z_al-.112;
     return footpos;
 
 }
