@@ -5,7 +5,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=3;
+    NStride=10;
     LeftHipRollModification= 3;+.5;
     RightHipRollModification=3;
     FirstHipRollModification=3;
@@ -101,9 +101,43 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     T_s_st=.5*TStart;
     T_st_a_d=T_s_st+0.45*(TStart-T_s_st);
 
+  ///****************************************
+    double c=1;
+    TStart=                TStart/c;
+    TEnd=                  TEnd/c;
+    TDs=                   TDs/c;
+    TSS=                   TSS/c;
+    Tc=                    Tc/c;
+    Tm=                    Tm/c;
+    TGait=                 TGait/c;
+    MotionTime=            MotionTime/c;
+    TMinPelvisY=           TMinPelvisY/c;
+    TMaxAnkle=             TMaxAnkle/c;
+    TMaxPelvisY=           TMaxPelvisY/c;
+    T_end_of_first_SS=     T_end_of_first_SS/c;
+    T_end_of_SS=           T_end_of_SS/c;
+    T_end_of_last_SS=      T_end_of_last_SS/c;
+    T_end_p_sx_rel=        T_end_p_sx_rel/c;
+    T_end_p_sx=            T_end_p_sx/c;
+    T_end_p_sy=            T_end_p_sy/c;
+    T_end_p_dy=            T_end_p_dy/c;
+    T_end_p_ey=            T_end_p_ey/c;
+    T_end_a_s=             T_end_a_s/c;
+    T_end_a_e=             T_end_a_e/c;
+    T_end_a_d=             T_end_a_d/c;
+    T_st_p_sy=             T_st_p_sy/c;
+    T_st_p_dy=             T_st_p_dy/c;
+    T_st_p_ey=             T_st_p_ey/c;
+    T_st_p_sx=             T_st_p_sx/c;
+    T_s_st=                T_s_st/c;
+    T_st_a_d=              T_st_a_d/c;
+
+
+
+
 
      YOffsetOfAnkletrajectory=0;
-     YOffsetOfAnklecatwalk=0;
+     YOffsetOfAnklecatwalk=-.0;
 
 
 
@@ -341,7 +375,7 @@ double vz=-.02;
     Cy_cy_iVel_first<<0 ,INFINITY, 0;
     MatrixXd Cy_cy_iAcc_first(1,3);
     Cy_cy_iAcc_first<<0 ,INFINITY, 0;
-    C_cy_y_ar_first=CoefOffline.Coefficient(Cy_cy_iTime_first,Cy_cy_iPos_first,Cy_cy_iVel_first,Cy_cy_iAcc_first);
+    C_cy_y_a_first=CoefOffline.Coefficient(Cy_cy_iTime_first,Cy_cy_iPos_first,Cy_cy_iVel_first,Cy_cy_iAcc_first);
 
     //***** y cycle
     MatrixXd Cy_cy_iTime(1,3);
@@ -352,18 +386,18 @@ double vz=-.02;
     Cy_cy_iVel<<0 ,INFINITY, 0;
     MatrixXd Cy_cy_iAcc(1,3);
     Cy_cy_iAcc<<0 ,INFINITY, 0;
-    C_cy_y_ar=CoefOffline.Coefficient(Cy_cy_iTime,Cy_cy_iPos,Cy_cy_iVel,Cy_cy_iAcc);
+    C_cy_y_a=CoefOffline.Coefficient(Cy_cy_iTime,Cy_cy_iPos,Cy_cy_iVel,Cy_cy_iAcc);
 
-    //***** y cycle end
-    MatrixXd Cy_cy_iTime_end(1,3);
-    Cy_cy_iTime_end<<0 ,Tm, TSS-T_end_of_SS;
-    MatrixXd Cy_cy_iPos_end(1,3);
-    Cy_cy_iPos_end<<YOffsetOfAnklecatwalk,YOffsetOfAnkletrajectory, 0;
-    MatrixXd Cy_cy_iVel_end(1,3);
-    Cy_cy_iVel_end<<0 ,INFINITY, 0;
-    MatrixXd Cy_cy_iAcc_end(1,3);
-    Cy_cy_iAcc_end<<0 ,INFINITY, 0;
-    C_cy_y_ar_end=CoefOffline.Coefficient(Cy_cy_iTime_end,Cy_cy_iPos_end,Cy_cy_iVel_end,Cy_cy_iAcc_end);
+    //***** y cycle last
+    MatrixXd Cy_cy_iTime_last(1,3);
+    Cy_cy_iTime_last<<0 ,Tm, TSS-T_end_of_SS;
+    MatrixXd Cy_cy_iPos_last(1,3);
+    Cy_cy_iPos_last<<YOffsetOfAnklecatwalk,YOffsetOfAnkletrajectory, 0;
+    MatrixXd Cy_cy_iVel_last(1,3);
+    Cy_cy_iVel_last<<0 ,INFINITY, 0;
+    MatrixXd Cy_cy_iAcc_last(1,3);
+    Cy_cy_iAcc_last<<0 ,INFINITY, 0;
+    C_cy_y_a_last=CoefOffline.Coefficient(Cy_cy_iTime_last,Cy_cy_iPos_last,Cy_cy_iVel_last,Cy_cy_iAcc_last);
 
     //*************************** end *************************************
     //***** x end
@@ -778,10 +812,14 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
             MatrixXd output1=CoefOffline.GetAccVelPos(C_st_x_al.row(0),TStart-T_end_of_first_SS,T_s_st,5);
             x_al=output1(0,0);
             //x_al=StepLength;
-            y_al=0.5*_pelvisLength;
+//            y_al=0.5*_pelvisLength;
+            MatrixXd output2=CoefOffline.GetAccVelPos(C_st_y_al.row(1),TStart-T_end_of_first_SS,TStart-T_s_st/2,5);
+            y_al=0.5*_pelvisLength+output2(0,0);
+
             MatrixXd output=CoefOffline.GetAccVelPos(C_st_z_al_end_of_SS.row(0),localtiming,TStart-T_end_of_first_SS,5);
             z_al=_lenghtOfAnkle+output(0,0);
         }
+     // qDebug()<<"localtiming="<<localtiming<<"\ty_al="<<y_al<<"\ty_ar="<<y_ar;
     }
 
     if (n!=1 && n!=(NStep+2)){//cyclic walking
@@ -798,6 +836,12 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
         currentRightFootX2=(n-fmod(n,2))*StepLength;
         //currentRightFootY2;
         currentRightFootZ=0.112;
+
+        currentRightFootY2=-0.5*_pelvisLength-YOffsetOfAnklecatwalk*(footIndex);
+        currentLeftFootY2=0.5*_pelvisLength+YOffsetOfAnklecatwalk*(!footIndex||n==1);
+
+//qDebug()<<"currentRightFootY2="<<currentRightFootY2<<"currentLeftFootY2="<<currentLeftFootY2;
+
 
 
         if (localtiming<TDs){// double support of cyclic walking
@@ -836,7 +880,8 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
                 z_al=(footIndex!=0)*currentLeftFootZ+(footIndex==0)*(currentLeftFootZ+output2(0,0));
                 z_ar=(footIndex!=0)*(currentRightFootZ+output2(0,0))+(footIndex==0)*currentRightFootZ;
 
-                MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_ar.row(0),localtiming-TDs,0,5);
+                MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_a.row(0),localtiming-TDs,0,5)*(n>1&&n<NStep)+CoefOffline.GetAccVelPos(C_cy_y_a_first.row(0),localtiming-TDs,0,5)*(n==1)+CoefOffline.GetAccVelPos(C_cy_y_a_last.row(0),localtiming-TDs,0,5)*(n==NStep);
+             //   qDebug()<<localtiming<<"\toutput3(0,0)"<<output3(0,0)<<"\tcurrentRightFootY2"<<currentRightFootY2;
                 y_al=(footIndex!=0)*currentLeftFootY2+(footIndex==0)*(currentLeftFootY2+output3(0,0));
                 y_ar=(footIndex!=0)*(currentRightFootY2-output3(0,0))+(footIndex==0)*currentRightFootY2;
 
@@ -848,11 +893,11 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
                 z_al=(footIndex!=0)*currentLeftFootZ+(footIndex==0)*(currentLeftFootZ+output2(0,0));
                 z_ar=(footIndex!=0)*(currentRightFootZ+output2(0,0))+(footIndex==0)*currentRightFootZ;
-
-                MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_ar.row(1),localtiming-TDs,Tm,5);
+                MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_a.row(1),localtiming-TDs,Tm,5)*(n>1&&n<NStep)+CoefOffline.GetAccVelPos(C_cy_y_a_first.row(1),localtiming-TDs,Tm,5)*(n==1)+CoefOffline.GetAccVelPos(C_cy_y_a_last.row(1),localtiming-TDs,Tm,5)*(n==NStep);
+              //  MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_a.row(1),localtiming-TDs,Tm,5);
                 y_al=(footIndex!=0)*currentLeftFootY2+(footIndex==0)*(currentLeftFootY2+output3(0,0));
                 y_ar=(footIndex!=0)*(currentRightFootY2-output3(0,0))+(footIndex==0)*currentRightFootY2;
-
+//qDebug()<<localtiming<<"\toutput3(0,0)"<<output3(0,0)<<"\tcurrentRightFootY2"<<currentRightFootY2;
             }
         }
 
@@ -870,11 +915,15 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
            z_al=(footIndex!=0)*currentLeftFootZ+(footIndex==0)*(currentLeftFootZ+output2(0,0));
            z_ar=(footIndex!=0)*(currentRightFootZ+output2(0,0))+(footIndex==0)*currentRightFootZ;
 
-           MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_ar.row(0),localtiming-TDs,0,5);
+           MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_a.row(1),TSS-T_end_of_SS,Tm,5)*(n>1&&n<NStep)+CoefOffline.GetAccVelPos(C_cy_y_a_first.row(1),TSS-T_end_of_SS,Tm,5)*(n==1)+CoefOffline.GetAccVelPos(C_cy_y_a_last.row(1),TSS-T_end_of_SS,Tm,5)*(n==NStep);
+    //       MatrixXd output3=CoefOffline.GetAccVelPos(C_cy_y_a.row(0),localtiming-TDs,0,5);
            y_al=(footIndex!=0)*currentLeftFootY2+(footIndex==0)*(currentLeftFootY2+output3(0,0));
            y_ar=(footIndex!=0)*(currentRightFootY2-output3(0,0))+(footIndex==0)*currentRightFootY2;
 
        }
+       // qDebug()<<"localtiming="<<localtiming<<"\tn"<<n<<"\ty_al="<<y_al<<"\ty_ar="<<y_ar;
+
+
     }
 
     if(n==NStep+2){//end step of walk right foot moves

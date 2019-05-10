@@ -37,7 +37,7 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
-bool simulation=!false;
+bool simulation=false;
 
 
 double saturate(double a, double min, double max){
@@ -54,6 +54,22 @@ ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher
 ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
 ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
 ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
+
+double move_rest_back(double max,double t_local,double T_start ,double T_move,double T_rest,double T_back){
+    double c3=(10*max)/pow(T_move,3);
+    double c4=-(15*max)/pow(T_move,4);
+    double c5=(6*max)/pow(T_move,5);
+    double c3_r=(10*max)/pow(T_back,3);
+    double c4_r=-(15*max)/pow(T_back,4);
+    double c5_r=(6*max)/pow(T_back,5);
+    double T_end=T_start+T_move+T_rest+T_back;
+    double theta=0;
+    if(t_local<T_start){theta=0;}
+    else if (t_local<T_start+T_move){theta=c3*pow(t_local-T_start,3)+c4*pow(t_local-T_start,4)+c5*pow(t_local-T_start,5);}
+    else if (t_local<T_start+T_move+T_rest){theta=max;}
+    else if (t_local<T_start+T_move+T_rest+T_back){theta=c3_r*pow(T_end-t_local,3)+c4_r*pow(T_end-t_local,4)+c5_r*pow(T_end-t_local,5);}
+    return theta;
+}
 
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
     if(links.count()<28){qDebug()<<"index err";return;}
@@ -855,14 +871,17 @@ int main(int argc, char **argv)
         StartPhase();
 
 
-
         int NumberOfTimeStep=(OnlineTaskSpace.Tc/OnlineTaskSpace._timeStep)+1;
+
+
 
         //-----------------------------------------------------------------------------------------------------//
         //------------------------------- main loop of cyclic walking -----------------------------------------//
         //-----------------------------------------------------------------------------------------------------//
 
-        if (GlobalTime>DurationOfStartPhase && GlobalTime<(DurationOfStartPhase+OnlineTaskSpace.MotionTime)){
+        if (GlobalTime>DurationOfStartPhase){// && GlobalTime<(DurationOfStartPhase+OnlineTaskSpace.MotionTime)){
+            GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;
+
             //Ankle Trajectory Replacement
             double m1;//x_al
             double m2;//y_al
@@ -873,7 +892,7 @@ int main(int argc, char **argv)
             double m7;//z_ar
             double m8;//pitch_ar
 
-            GlobalTime=GlobalTime+OnlineTaskSpace._timeStep;
+
 
             if ((OnlineTaskSpace.StepNumber==1) && (OnlineTaskSpace.localTiming>=OnlineTaskSpace.TStart) ) {
                 OnlineTaskSpace.localTiming=OnlineTaskSpace._timeStep;//0.001999999999000000;
@@ -918,22 +937,21 @@ int main(int argc, char **argv)
             if (round(OnlineTaskSpace.globalTime)<=round(OnlineTaskSpace.MotionTime)){
 
 
-                //if you want to have modification of height of pelvis please active the Pz(0,0) instead of P(2,0)
-                PoseRoot<<P(0,0)*0,
+                PoseRoot<<P(0,0),
                         P(1,0),
                         P(2,0),// Pz(0,0)
                         0,
                         0,
                         0;
 
-                PoseRFoot<<m5*0,
+                PoseRFoot<<m5,
                         m6,
                         m7,
                         0,
                         -1*m8*(M_PI/180),
                         0;
 
-                PoseLFoot<<m1*0,
+                PoseLFoot<<m1,
                         m2,
                         m3,
                         0,
@@ -942,6 +960,53 @@ int main(int argc, char **argv)
 
 
 
+                //if you want to have modification of height of pelvis please active the Pz(0,0) instead of P(2,0)
+                double Period = 2.5;
+                double Amplitude = .05;
+                double local_time=fmod(GlobalTime-DurationOfStartPhase,Period);
+
+                double s=0;
+                if(sin(2*M_PI*local_time/Period)<0){s=-1;}
+                if(sin(2*M_PI*local_time/Period)>0){s=1;}
+
+
+                PoseRoot<<0,
+                        Amplitude*sin(2*M_PI*local_time/Period)*exp(.1*(1-pow(sin(2*M_PI*local_time/Period),2))),
+                        OnlineTaskSpace.ReferencePelvisHeight,// Pz(0,0)
+                        0,
+                        0,
+                        0;
+
+//                PoseRFoot<<0,
+//                        -OnlineTaskSpace._pelvisLength/2,
+//                        OnlineTaskSpace._lenghtOfAnkle+(1+s)/2*abs(sin(2*M_PI*local_time/Period))*exp(-.1*(1-abs(sin(2*M_PI*local_time/Period))))*.025,
+//                        0,
+//                        0,
+//                        0;
+
+//                PoseLFoot<<0,
+//                        OnlineTaskSpace._pelvisLength/2,
+//                        OnlineTaskSpace._lenghtOfAnkle+(1-s)/2*abs(sin(2*M_PI*local_time/Period))*exp(-.1*(1-abs(sin(2*M_PI*local_time/Period))))*.025,
+//                        0,
+//                        0,
+//                        0;
+
+                PoseRFoot<<0,
+                        -OnlineTaskSpace._pelvisLength/2,
+                        OnlineTaskSpace._lenghtOfAnkle+move_rest_back(.01,local_time,Period/4-.5,.4,.2,.4),
+                        0,
+                        0,
+                        0;
+
+                PoseLFoot<<0,
+                        OnlineTaskSpace._pelvisLength/2,
+                        OnlineTaskSpace._lenghtOfAnkle+move_rest_back(.01,local_time,3*Period/4-.5,.4,.2,.4),
+                        0,
+                        0,
+                        0;
+
+//qDebug()<<"zl="<<PoseLFoot(2,0)<<"zr="<<PoseRFoot(2,0);
+//qDebug()<<"yp="<<PoseRoot(1,0);
                 if(backward){
                     double backward_coeff=.5;
                   PoseRoot(0,0)=-backward_coeff*PoseRoot(0,0);
@@ -1069,7 +1134,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
 
 //hand_move();
-        EndPhase();
+        //EndPhase();
 
 
 
@@ -1086,6 +1151,8 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         }
 
+        k_roll_r=0;
+        k_roll_l=0;
 
         double k_pitch=.5;
         cntrl[0]=0.0;

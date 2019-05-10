@@ -258,9 +258,9 @@ public:
     MatrixXd C_cy_x_al;
     MatrixXd C_cy_z_ar;
     MatrixXd C_cy_z_ar_end_of_SS;
-    MatrixXd C_cy_y_ar;
-    MatrixXd C_cy_y_ar_first;
-    MatrixXd C_cy_y_ar_end;
+    MatrixXd C_cy_y_a;
+    MatrixXd C_cy_y_a_first;
+    MatrixXd C_cy_y_a_last;
     MatrixXd C_cy_y_al;
     MatrixXd C_st_y_al;
     MatrixXd C_end_y_ar;

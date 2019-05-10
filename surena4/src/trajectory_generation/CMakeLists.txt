@@ -300,6 +300,15 @@ target_link_libraries(trajectory_generationOnlineAdaptation2
 )
 install(TARGETS trajectory_generationOnlineAdaptation2 RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(trajectory_generationDynamicWalk src/trajectory_generationDynamicWalk.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(trajectory_generationDynamicWalk
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS trajectory_generationDynamicWalk RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 add_executable(trajectory_generation_march_walk src/trajectory_generation_march_walk.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(trajectory_generation_march_walk
     ${catkin_LIBRARIES}
