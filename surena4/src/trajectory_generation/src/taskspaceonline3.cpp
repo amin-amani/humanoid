@@ -1,32 +1,11 @@
 #include "taskspaceonline3.h"
 
-void TaskSpaceOnline3::matrix_view(MatrixXd M){
-
-for (int i = 0; i <M.rows() ; ++i) {
-    QString str;
-    for (int j = 0; j <M.cols() ; ++j) {
-   str+=QString::number(M(i,j));
-   str+="   ";
-    }
-    qDebug()<<str;
-}
-qDebug()<<"";
-}
-
-
-void TaskSpaceOnline3::matrix_view(VectorXd M){
-QString str;
-for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
-qDebug()<<str;
-qDebug()<<"";
-}
-
 TaskSpaceOnline3::TaskSpaceOnline3()
 {
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=3;
+    NStride=1;
     LeftHipRollModification= 3.1;2.7;+.5;
     RightHipRollModification=3.1;2.7;
     FirstHipRollModification=3.1;2.7;
@@ -73,14 +52,14 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
-    YpMax=0.08;.123;.123;.13;.12;105;
+    YpMax=0.12;.123;.123;.13;.12;105;
     YStMax=YpMax;YEndMax=1.0*YpMax;
     Yd=0.08;
     StepLength=.075;.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
-    TDs=2.7;
+    TDs=3;2.7;
     TSS=Tc-TDs;
-    TSS=1.2;
+    TSS=2;1.2;
     Tc=TSS+TDs;
     AnkleMaximumHeight=0.025;
     ReferencePelvisHeight=.91;.9;.89;0.86+.02-.055;
@@ -135,6 +114,74 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     CoeffArrayAnkle();
     CoeffArrayPelvis();
+}
+
+void TaskSpaceOnline3::numplot(double num,double min,double max){
+  //⬛
+
+  QString str;
+  int l=100;
+  int n=int((num-min)/(max-min)*l);
+  if (num<min){n=0;}
+  if (num>max){n=100;}
+  str+=QString::number(min);
+  str+="|";
+  if (n<=l/2){
+      for (int i = 0; i < n; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < l/2-n; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+  }
+  else {
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < n-l/2; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l-n; ++i) {
+          str+=" ";
+      }
+
+  }
+
+  str+="|";
+  str+=QString::number(max);
+  str+="=>";str+=QString::number(num);
+  qDebug()<<str;
+qDebug()<<"";
+
+
+}
+
+void TaskSpaceOnline3::matrix_view(MatrixXd M){
+
+for (int i = 0; i <M.rows() ; ++i) {
+    QString str;
+    for (int j = 0; j <M.cols() ; ++j) {
+   str+=QString::number(M(i,j));
+   str+="   ";
+    }
+    qDebug()<<str;
+}
+qDebug()<<"";
+}
+
+
+void TaskSpaceOnline3::matrix_view(VectorXd M){
+QString str;
+for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
+qDebug()<<str;
+qDebug()<<"";
 }
 
 
@@ -431,11 +478,14 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
 
     //------------------Coefficient of cyclic Pelvis motion in Y direction--------------------
     MatrixXd ordY(1,8);
-    ordY << 3,4,5,5,4,4,5,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
+    ordY << 3,4,4,5,3,4,4,5;// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
     MatrixXd tttY(1,9);
     tttY <<0,TMinPelvisY,TDs,TDs+TSS/2,Tc,Tc+TDs/2,Tc+TDs,Tc+TDs+TSS/2,2*Tc;
     MatrixXd conY(3,9);
-    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
+//    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
+//    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+    double v_d=3*(YpMax-Yd)/TSS;
+    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,v_d, 0 ,0,INFINITY,-v_d,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
     Cy_p_i.resize(8,6);
     Cy_p_i.fill(0);
@@ -729,7 +779,8 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
     MatrixXd pelvis(10,1);
     pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
 
- //  qDebug()<<"t="<<t<<"yp="<<yp<<"dyp="<<dyp;
+   qDebug()<<"t="<<t<<"yp="<<yp<<"dyp="<<dyp;
+   numplot(yp,-YpMax*1.5,YpMax*1.5);
     return pelvis;
 }
 

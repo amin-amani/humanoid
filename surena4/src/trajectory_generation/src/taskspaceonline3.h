@@ -317,6 +317,7 @@ public:
     double PelvisRoll(double time);
     void matrix_view(VectorXd M);
         void matrix_view(MatrixXd M);
+        void numplot(double num,double min,double max);
 };
 
 #endif // TASKSPACEONLINE3_H

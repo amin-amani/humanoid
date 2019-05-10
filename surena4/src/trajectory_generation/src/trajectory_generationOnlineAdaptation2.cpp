@@ -711,6 +711,8 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
+    ros::Publisher  y_pelvis_pub  = nh.advertise<std_msgs::Float64>("y_pelvis",100);
+
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
@@ -940,6 +942,9 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
+                std_msgs::Float64 y_pelvis;
+                y_pelvis.data=P(1,0);
+                y_pelvis_pub.publish(y_pelvis);
 
 
                 if(backward){
@@ -1147,6 +1152,10 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         msg_contact_flag.data.push_back(contact_flag_sensor2);
 
         contact_flag.publish(msg_contact_flag);
+
+
+
+
 
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
