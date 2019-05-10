@@ -946,6 +946,8 @@ int main(int argc, char **argv)
                 y_pelvis.data.clear();
                 y_pelvis.data.push_back(P(1,0));
                 y_pelvis.data.push_back(OnlineTaskSpace.globalTime);
+                y_pelvis.data.push_back(PoseRFoot(2));
+                y_pelvis.data.push_back(PoseLFoot(2));
                 y_pelvis_pub.publish(y_pelvis);
 
 

@@ -6,9 +6,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=3;
-    LeftHipRollModification= 3.1;2.7;+.5;
-    RightHipRollModification=3.1;2.7;
-    FirstHipRollModification=3.1;2.7;
+    LeftHipRollModification= 3;3.1;2.7;+.5;
+    RightHipRollModification=3;3.1;2.7;
+    FirstHipRollModification=3;3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -52,16 +52,16 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
-    YpMax=0.12;.123;.123;.13;.12;105;
+    YpMax=0.11;.123;.123;.13;.12;105;
     YStMax=YpMax;YEndMax=1.0*YpMax;
     Yd=0.08;
-    StepLength=.075;.15;.2;.12;.3;
+    StepLength=.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
     TDs = 3;
     TSS=Tc-TDs;
-    TSS=2;1.2;
+    TSS=2;
     Tc=TSS+TDs;
     AnkleMaximumHeight=0.025;
     ReferencePelvisHeight=.91;.9;.89;0.86+.02-.055;
@@ -487,7 +487,8 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
 //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
 //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
     double v_d=4*(YpMax-Yd)/TSS;
-    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,v_d, 0 ,0,INFINITY,-v_d,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+    double v_d2 = v_d;
+    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   v_d2, INFINITY,v_d, 0 ,-v_d2,INFINITY,-v_d,0,v_d2     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
     Cy_p_i.resize(8,6);
     Cy_p_i.fill(0);
@@ -546,7 +547,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
     MatrixXd Cy_st_pePos(1,2);
     Cy_st_pePos<<-1*YStMax, -1*Yd;
     MatrixXd Cy_st_peVel(1,2);   // Cy_st_peVel<<0 ,5*Cy_p(0,0)*pow(0,4)+4*Cy_p(0,1)*pow(0,3)+3*Cy_p(0,2)*pow(0,2)+2*Cy_p(0,3)*pow(0,1)+Cy_p(0,4);
-    Cy_st_peVel<<0 ,0;
+    Cy_st_peVel<<0 ,v_d2;
     MatrixXd Cy_st_peAccel(1,2);    //Cy_st_peAccel<<0 ,2*Cy_p(0,3);
     Cy_st_peAccel<<0 ,0;
     Cy_st_pb=CoefOffline.Coefficient(Cy_st_peTime,Cy_st_pePos,Cy_st_peVel,Cy_st_peAccel);
@@ -556,7 +557,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
     MatrixXd Cy_end_psPos(1,2);
     Cy_end_psPos<<Yd, YEndMax;
     MatrixXd Cy_end_psVel(1,2);//    Cy_end_psVel<<5*Cy_p_i(1,0)*pow(TDs,4)+4*Cy_p_i(1,1)*pow(TDs,3)+3*Cy_p_i(1,2)*pow(TDs,2)+2*Cy_p_i(1,3)*pow(TDs,1)+Cy_p_i(1,4),0;
-    Cy_end_psVel<<0,0;
+    Cy_end_psVel<<v_d2,0;
     MatrixXd Cy_end_psAccel(1,2);//    Cy_end_psAccel<< 5*4*Cy_p_i(1,0)*pow(TDs,4)+4*3*Cy_p_i(1,1)*pow(TDs,3)+3*2*Cy_p_i(1,2)*pow(TDs,2)+2*Cy_p_i(1,3), 0;
     Cy_end_psAccel<<0,0;
     Cy_end_pa=CoefOffline.Coefficient(Cy_end_psTime,Cy_end_psPos,Cy_end_psVel,Cy_end_psAccel);
@@ -781,8 +782,8 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
     MatrixXd pelvis(10,1);
     pelvis<<xp,yp,zp,dxp,dyp,dzp,ddxp,ddyp,ddzp,yawp;
 
-   qDebug()<<"t="<<t<<"yp="<<yp<<"dyp="<<dyp;
-   numplot(yp,-YpMax*1.5,YpMax*1.5);
+   //qDebug()<<"t="<<t<<"yp="<<yp<<"dyp="<<dyp;
+   //numplot(yp,-YpMax*1.5,YpMax*1.5);
     return pelvis;
 }
 
