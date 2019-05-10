@@ -711,7 +711,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
-    ros::Publisher  y_pelvis_pub  = nh.advertise<std_msgs::Float64>("y_pelvis",100);
+    ros::Publisher  y_pelvis_pub  = nh.advertise<std_msgs::Float32MultiArray>("y_pelvis",100);
 
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
@@ -942,8 +942,10 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
-                std_msgs::Float64 y_pelvis;
-                y_pelvis.data=P(1,0);
+                std_msgs::Float32MultiArray y_pelvis;
+                y_pelvis.data.clear();
+                y_pelvis.data.push_back(P(1,0));
+                y_pelvis.data.push_back(OnlineTaskSpace.globalTime);
                 y_pelvis_pub.publish(y_pelvis);
 
 
