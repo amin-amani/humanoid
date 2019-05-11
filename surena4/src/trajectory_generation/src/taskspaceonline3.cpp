@@ -42,8 +42,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     //test
-    YpMax=.123;.13;.12;105;
+    YpMax=.123;0.09;.13;.12;105;
     Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
+//    Yd=0.05;
     StepLength=.1;.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     TDs=3;

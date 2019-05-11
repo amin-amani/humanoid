@@ -940,7 +940,12 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
-
+//PoseRoot(0)=0;
+//PoseRFoot(0)=0;
+//PoseLFoot(0)=0;
+//PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight;
+//PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+//PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 
                 if(backward){
                     double backward_coeff=.5;
@@ -1085,7 +1090,8 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
             k_roll_l=OnlineTaskSpace.RightHipRollModification/OnlineTaskSpace.LeftHipRollModification;
 
         }
-
+//        k_roll_r=0;
+//        k_roll_l=0;
 
         double k_pitch=.5;
         cntrl[0]=0.0;
