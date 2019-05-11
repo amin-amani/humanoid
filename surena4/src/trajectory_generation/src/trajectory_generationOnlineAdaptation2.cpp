@@ -943,12 +943,12 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
-PoseLFoot(0)=0;
-PoseRFoot(0)=0;
-PoseRoot(0)=0;
-PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
-PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
-PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight;
+//PoseLFoot(0)=0;
+//PoseRFoot(0)=0;
+//PoseRoot(0)=0;
+//PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+//PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));
 
                 if(backward){
                     double backward_coeff=.5;
@@ -962,7 +962,7 @@ PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight;
                 R_P=MatrixXd::Identity(3,3);
                 R_F_L=MatrixXd::Identity(3,3);
                 R_F_R=MatrixXd::Identity(3,3);
-                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180;//3 was good
+                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180*0;//3 was good
                 R_P<<1,0,0,
                       0,cos(pelvis_roll),-sin(pelvis_roll),
                         0,sin(pelvis_roll),cos(pelvis_roll);
@@ -1094,10 +1094,11 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         }
 
-        k_roll_r=0;
-        k_roll_l=0;
+//        k_roll_r=0;
+//        k_roll_l=0;
 
-        double k_pitch=.5;
+        double k_pitch=0;
+
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
         cntrl[2]=links[2].JointAngle+k_roll_r*RollModified(0,0);//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])

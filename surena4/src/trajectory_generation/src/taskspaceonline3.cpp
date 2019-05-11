@@ -52,7 +52,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
-    YpMax=0.10-0.0;.123;.123;.13;.12;105;
+    YpMax=0.11-0.0;.123;.123;.13;.12;105;
     YStMax=.12;
     YEndMax=.12;
     Yd=0.07-0.0;
@@ -60,16 +60,16 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
-    TDs = 2.5;
+    TDs = 2.5;2;
     TSS=Tc-TDs;
     TSS=1.5;
     Tc=TSS+TDs;
 
     DesiredVelocity=StepLength*3.6/Tc;
     AnkleMaximumHeight=0.025;
-    ReferencePelvisHeight=.91;.9;.89;0.86+.02-.055;
+    ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
-    Xe=0.08;.023;
+    Xe=0.02;.023;
     Xs=0.0;
 
 //    TDs=2;//2.5;
