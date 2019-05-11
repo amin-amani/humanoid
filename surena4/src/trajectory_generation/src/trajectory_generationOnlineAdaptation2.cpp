@@ -711,7 +711,8 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
-    ros::Publisher  y_pelvis_pub  = nh.advertise<std_msgs::Float32MultiArray>("y_pelvis",100);
+    ros::Publisher  trajectory_data_pub  = nh.advertise<std_msgs::Float32MultiArray>("trajectory_data",100);
+    std_msgs::Float32MultiArray trajectory_data;
 
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
@@ -942,14 +943,12 @@ int main(int argc, char **argv)
                         -1*m4*(M_PI/180),
                         0;
 
-                std_msgs::Float32MultiArray y_pelvis;
-                y_pelvis.data.clear();
-                y_pelvis.data.push_back(P(1,0));
-                y_pelvis.data.push_back(OnlineTaskSpace.globalTime);
-                y_pelvis.data.push_back(PoseRFoot(2));
-                y_pelvis.data.push_back(PoseLFoot(2));
-                y_pelvis_pub.publish(y_pelvis);
-
+PoseLFoot(0)=0;
+PoseRFoot(0)=0;
+PoseRoot(0)=0;
+PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight;
 
                 if(backward){
                     double backward_coeff=.5;
@@ -1095,6 +1094,8 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         }
 
+        k_roll_r=0;
+        k_roll_l=0;
 
         double k_pitch=.5;
         cntrl[0]=0.0;
@@ -1110,7 +1111,6 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         cntrl[10]=links[10].JointAngle;
         cntrl[11]=saturate(links[11].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_L;
         cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
-
 
         vector<int> qref(12);
         qref=QC.ctrldata2qc(cntrl);
@@ -1157,7 +1157,30 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         contact_flag.publish(msg_contact_flag);
 
-
+        trajectory_data.data.clear();
+        trajectory_data.data.push_back(OnlineTaskSpace.globalTime);
+        trajectory_data.data.push_back(PoseRoot(0));
+        trajectory_data.data.push_back(PoseRoot(1));
+        trajectory_data.data.push_back(PoseRoot(2));
+        trajectory_data.data.push_back(PoseRFoot(0));
+        trajectory_data.data.push_back(PoseRFoot(1));
+        trajectory_data.data.push_back(PoseRFoot(2));
+        trajectory_data.data.push_back(PoseLFoot(0));
+        trajectory_data.data.push_back(PoseLFoot(1));
+        trajectory_data.data.push_back(PoseLFoot(2));
+        trajectory_data.data.push_back(cntrl[1]);
+        trajectory_data.data.push_back(cntrl[2]);
+        trajectory_data.data.push_back(cntrl[3]);
+        trajectory_data.data.push_back(cntrl[4]);
+        trajectory_data.data.push_back(cntrl[5]);
+        trajectory_data.data.push_back(cntrl[6]);
+        trajectory_data.data.push_back(cntrl[7]);
+        trajectory_data.data.push_back(cntrl[8]);
+        trajectory_data.data.push_back(cntrl[9]);
+        trajectory_data.data.push_back(cntrl[10]);
+        trajectory_data.data.push_back(cntrl[11]);
+        trajectory_data.data.push_back(cntrl[12]);
+        trajectory_data_pub.publish(trajectory_data);
 
 
 
