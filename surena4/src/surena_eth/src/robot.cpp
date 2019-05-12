@@ -193,7 +193,7 @@ void Robot::NewjointDataReceived()
 {
     // qDebug()<<"get new data..."<<_rosNode->JointsData.data.at(20);
     QList<int> _motorPosition;
-for(int ii=0; ii<28 ; ii++)
+for(int ii=0; ii<34 ; ii++)
 {
     _motorPosition.append(_rosNode->JointsData.data.at(ii));
 }

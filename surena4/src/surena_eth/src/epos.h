@@ -159,7 +159,7 @@ const unsigned char _bumpSensorCommand[8]={0x01,0x01,0x01,0x20,0x01,0x01,0x01,0x
     QByteArray CreatePDOPacket(int canID, int value1, int value2);
     QByteArray CreateDynamixelPacket(int canID, int motorID, int motorPosition, int velocity);
     QByteArray CreateBumpRequestCommand();
-    QByteArray CreateWaistAndHeadCommand();
+    QByteArray CreateWaistAndHeadCommand(QList<int> motorPositions);
     bool ActiveAllHands(bool switchOn);
     bool ActiveHand(int nodeID,bool switchOn=true);
     bool IsValidRunPacket(QByteArray packet);

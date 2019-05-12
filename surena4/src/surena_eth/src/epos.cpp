@@ -506,11 +506,28 @@ inline QByteArray Epos::CreateBumpRequestCommand()
     return command;
 }
 //========================================================================
-inline QByteArray Epos::CreateWaistAndHeadCommand()
+inline QByteArray Epos::CreateWaistAndHeadCommand(QList<int> motorPositions)
 {
-    QByteArray command;
-    command.append(QByteArray(10, Qt::Initialization::Uninitialized));
-    return command;
+       static int motorID=0;
+    //QByteArray command;
+    //motor id=led 6~10
+    //motor1 400~3800
+    //motor2 1800~2250
+    //motor3 1050~3050
+    //motor4 10~4080
+    //vel=40
+   //motor pos=28-29 30 31
+
+    motorID++;
+    if(motorID>5)motorID=1;
+    if(motorID==5)motorID=6;
+    qDebug()<<"id="<< motorID << " val=" << motorPositions[27+motorID];
+     //command.append(QByteArray(10, Qt::Initialization::Uninitialized));
+       //return CreateDynamixelPacket(0x211,3,2400,40);
+     //return CreateDynamixelPacket(0x211,10,2400,40);
+        return CreateDynamixelPacket(0x211,motorID,motorPositions[27+motorID],40);
+    //command.append(QByteArray(10, Qt::Initialization::Uninitialized));
+    //return command;
 }
 //========================================================================
 void Epos::SetAllPositionCST(QList<int> motorPositions)
@@ -519,7 +536,7 @@ void Epos::SetAllPositionCST(QList<int> motorPositions)
    for(int i=0; i< 12; i++)
     command.append(MtorDataToArray(0x401,motorPositions.at(i)));
     command.append(CreateHandPacket(motorPositions));
-    command.append(CreateWaistAndHeadCommand());
+    command.append(CreateWaistAndHeadCommand(motorPositions));
     command.append(CreateBumpRequestCommand());
 //    //packet must be 300 bytes 180 byte zero
     command.append(QByteArray(ReserveByteCount, Qt::Initialization::Uninitialized));
