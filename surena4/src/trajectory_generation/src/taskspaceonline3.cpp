@@ -5,7 +5,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=3;
+    NStride=5;
     LeftHipRollModification= 3.2;3.1;2.7;+.5;
     RightHipRollModification=3.2;3.1;2.7;
     FirstHipRollModification=3.2;3.1;2.7;
@@ -52,21 +52,21 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
-    YpMax=0.11-0.0;.123;.123;.13;.12;105;
+    YpMax=0.11;.123;.123;.13;.12;105;
     YStMax=.12;
     YEndMax=.12;
-    Yd=0.07-0.0;
+    Yd=0.07;
     StepLength=.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
-    TDs = 2.5;2;
+    TDs = 2;2.5;2;
     TSS=Tc-TDs;
     TSS=1.5;
     Tc=TSS+TDs;
 
     DesiredVelocity=StepLength*3.6/Tc;
-    AnkleMaximumHeight=0.025;
+    AnkleMaximumHeight=0.04;
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
     Xe=0.02;.023;
@@ -486,7 +486,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
 //matrix_view(Cx_p);
     //------------------Coefficient of cyclic Pelvis motion in Y direction--------------------
     MatrixXd ordY(1,8);
-    ordY << 4,3,4,5,4,3,4,5;// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
+    ordY << 5,3,4,5,5,3,4,5;// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
     MatrixXd tttY(1,9);
     tttY <<0,TMinPelvisY,TDs,TDs+TSS/2,Tc,Tc+TDs/2,Tc+TDs,Tc+TDs+TSS/2,2*Tc;
     MatrixXd conY(3,9);
@@ -494,7 +494,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
 //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
     double v_d=4*(YpMax-Yd)/TSS;
     double v_d2 = v_d;
-    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   v_d2, INFINITY,v_d, 0 ,-v_d2,INFINITY,-v_d,0,v_d2     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   v_d2, 3*v_d/4,v_d, 0 ,-v_d2,-3*v_d/4,-v_d,0,v_d2     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
     Cy_p_i.resize(8,6);
     Cy_p_i.fill(0);
