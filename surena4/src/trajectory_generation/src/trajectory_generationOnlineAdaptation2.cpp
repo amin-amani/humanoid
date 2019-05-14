@@ -39,7 +39,7 @@ double TurningRadius=.5;
 bool sidewalk=false;
 int bump_threshold=95;
 bool simulation=false;
-bool AnkleZAdaptation=!false;
+bool AnkleZAdaptation=false;
 
 
 double saturate(double a, double min, double max){
