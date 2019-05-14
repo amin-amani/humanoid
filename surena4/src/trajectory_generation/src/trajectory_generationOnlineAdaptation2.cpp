@@ -339,8 +339,8 @@ MatrixXd PoseRoot;//position of pelvis respected to global coordinate
 MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
 MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
 double GlobalTime;
-double  DurationOfStartPhase;
-double  DurationOfendPhase;
+double  DurationOfStartPhase=6;
+double  DurationOfendPhase=6;
 
 
 
@@ -695,8 +695,7 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=6;
-    DurationOfendPhase=6;
+
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
     PitchModified=0;
@@ -962,7 +961,7 @@ PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTa
                 R_P=MatrixXd::Identity(3,3);
                 R_F_L=MatrixXd::Identity(3,3);
                 R_F_R=MatrixXd::Identity(3,3);
-                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180*0;//3 was good
+                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180;//3 was good
                 R_P<<1,0,0,
                       0,cos(pelvis_roll),-sin(pelvis_roll),
                         0,sin(pelvis_roll),cos(pelvis_roll);
@@ -1097,7 +1096,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 //        k_roll_r=0;
 //        k_roll_l=0;
 
-        double k_pitch=0;
+        double k_pitch=0.5;
 
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
