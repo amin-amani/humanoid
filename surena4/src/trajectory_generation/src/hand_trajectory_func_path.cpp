@@ -66,6 +66,77 @@ ros::Publisher pub29 ;
 ros::Publisher pub30 ;
 ros::Publisher pub31 ;
 
+bool simulation=!true;
+
+void numplot(double num,double min,double max){
+  //⬛
+
+  QString str;
+  int l=100;
+  int n=int((num-min)/(max-min)*l);
+  if (num<min){n=0;}
+  if (num>max){n=100;}
+  str+=QString::number(min);
+  str+="|";
+  if (n<=l/2){
+      for (int i = 0; i < n; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < l/2-n; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+  }
+  else {
+      for (int i = 0; i < l/2; ++i) {
+          str+=" ";
+      }
+      for (int i = 0; i < n-l/2; ++i) {
+          str+="|";
+
+      }
+      str+="|";
+      for (int i = 0; i < l-n; ++i) {
+          str+=" ";
+      }
+
+  }
+
+  str+="|";
+  str+=QString::number(max);
+  str+="=>";str+=QString::number(num);
+  qDebug()<<str;
+qDebug()<<"";
+
+
+}
+
+void matrix_view(MatrixXd M){
+
+for (int i = 0; i <M.rows() ; ++i) {
+    QString str;
+    for (int j = 0; j <M.cols() ; ++j) {
+   str+=QString::number(M(i,j));
+   str+="   ";
+    }
+    qDebug()<<str;
+}
+qDebug()<<"";
+}
+
+
+void matrix_view(VectorXd M){
+QString str;
+for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
+qDebug()<<str;
+qDebug()<<"";
+}
+
+
 
 int getch()
 {
@@ -81,20 +152,56 @@ int getch()
     return c;
 }
 
+int qc_offset[12];
+bool qc_initial_bool;
+void qc_initial(const sensor_msgs::JointState & msg){
+    if (qc_initial_bool){
+
+        for (int i = 0; i < 12; ++i) {
+            qc_offset[i]=int(msg.position[i+1]);
+
+        }
+
+        qc_initial_bool=false;
+
+        ROS_INFO("Offset=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\nInitialized!",
+                 qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
+                qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
+                qc_offset[10],qc_offset[11]);}
+}
+
 VectorXd absolute_q0(7);
+bool abs_initial_bool;
+
 
 void abs_read(const sensor_msgs::JointState & msg){
-    VectorXi absolute_sensor(7);
+    if (abs_initial_bool){
+
+    VectorXd absolute_sensor(7);
     for (int i = 0; i < 7; ++i) {
-        absolute_sensor(i)=msg.position[i+13];
+        absolute_sensor(i)=msg.position[i+13+8];
         absolute_q0(i)=0;
     }
+//right hand
+    absolute_q0(0)=double(absolute_sensor(0)-2867)/8192*2*M_PI;
+    absolute_q0(1)=double(absolute_sensor(1)-3264)/8192*2*M_PI;
+    absolute_q0(2)=-double(absolute_sensor(2)-2888)/8192*2*M_PI;
+    absolute_q0(3)=double(absolute_sensor(3)-2088)/8192*2*M_PI;
+//    //left hand
+//        absolute_q0(0)=double(absolute_sensor(0)-665)/8192*2*M_PI;
+//        absolute_q0(1)=double(absolute_sensor(1)-1362)/8192*2*M_PI;
+//        absolute_q0(2)=-double(absolute_sensor(2)+2715)/8192*2*M_PI;
+//        absolute_q0(3)=-double(absolute_sensor(3)-83)/8192*2*M_PI;
+matrix_view(absolute_sensor);
+VectorXd absolute_q0_deg(7);
+absolute_q0_deg=180/M_PI*absolute_q0;
+matrix_view(absolute_q0_deg);
+abs_initial_bool=false;
+    }
 
-    absolute_q0(0)=double(absolute_sensor(0)-2859)/8192*2*M_PI;
-    absolute_q0(1)=double(absolute_sensor(1)-0427)/8192*2*M_PI;
-    absolute_q0(2)=double(absolute_sensor(2)-4051)/8192*2*M_PI;
-    absolute_q0(3)=double(absolute_sensor(3)-2355)/8192*2*M_PI;
-}
+
+
+    }
 
 
 
@@ -168,10 +275,11 @@ void  SendGazebo(vector<double> q){
 }
 
 
-bool simulation;
+
 int main(int argc, char **argv)
 {
-    simulation=true;
+abs_initial_bool=!simulation;
+qc_initial_bool=!simulation;
 
     if (simulation){    ros::init(argc, argv, "rrbot");}
     else{ros::init(argc, argv, "jointdata");}
@@ -186,6 +294,7 @@ int main(int argc, char **argv)
 
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("qc",1000);
     ros::Subscriber abs_sensor = nh.subscribe("/surena/abs_joint_state", 1000, abs_read);
+    ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
 
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
@@ -293,9 +402,47 @@ int main(int argc, char **argv)
     VectorXd qr_end(7);
     while (ros::ok())
     {
+        if (abs_initial_bool) {
+            ROS_INFO_ONCE("abs is initializing!");
+            ros::spinOnce();
+            continue;
+        }
+
+        if (qc_initial_bool) {
+            ROS_INFO_ONCE("qc is initializing!");
+            ros::spinOnce();
+            continue;
+        }
+
+
+
+
         if(initializing){
 
             if(simulation){
+                q0<<10*M_PI/180,
+                        -4*M_PI/180,
+                        0,
+                        -20*M_PI/180,
+                        0,
+                        0,
+                        0;
+
+//                q0<<0,
+//                        -10*M_PI/180,
+//                        0,
+//                        0,
+//                        0,
+//                        0,
+//                        0;
+            }
+            else{
+
+
+
+                q0=absolute_q0;
+qDebug("q0 init ok");
+
 //                q0<<10*M_PI/180,
 //                        -4*M_PI/180,
 //                        0,
@@ -304,23 +451,13 @@ int main(int argc, char **argv)
 //                        0,
 //                        0;
 
-                q0<<0,
-                        -10*M_PI/180,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0;
-            }
-            else{
-                  // q0=absolute_q0;
-                q0<<0,
-                        -10*M_PI/180,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0;
+//                q0<<0,
+//                        -10*M_PI/180,
+//                        0,
+//                        0,
+//                        0,
+//                        0,
+//                        0;
              }
 ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0(6));
             //self recognition
@@ -497,6 +634,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 //                        0,
 //                        0,
 //                        0;
+
             }
 
 
@@ -653,12 +791,6 @@ if(simulation){SendGazebo(q);}
 
             }
 
-            msg.data.clear();
-
-            for(int  i = 0;i < 12;i++)
-            {
-                msg.data.push_back(0);
-            }
 
             q_motor[0]=-int(7*(qr1[count]-q0(0))*360/M_PI);
             q_motor[1]=int(7*(qr2[count]-q0(1))*360/M_PI);
@@ -671,7 +803,11 @@ if(simulation){SendGazebo(q);}
 
             q_motor[7]=4;
 
-
+            msg.data.clear();
+            for(int  i = 0;i < 12;i++)
+            {
+                msg.data.push_back(qc_offset[i]);
+            }
             //right hand epose
             msg.data.push_back(q_motor[0]);//12 -y  a,z
             msg.data.push_back(q_motor[1]);//13 +x
@@ -693,8 +829,8 @@ if(simulation){SendGazebo(q);}
             msg.data.push_back(0);//26
             msg.data.push_back(6);//27
             ++count;
+if(!simulation){chatter_pub.publish(msg);}
 
-            chatter_pub.publish(msg);
         }
 
         ros::spinOnce();
