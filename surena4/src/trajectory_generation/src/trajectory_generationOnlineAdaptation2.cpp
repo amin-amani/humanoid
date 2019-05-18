@@ -37,7 +37,7 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
-int bump_threshold=95;
+int bump_threshold=98;
 bool simulation=false;
 bool AnkleZAdaptation=false;
 
@@ -1119,7 +1119,7 @@ PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTa
                 R_P=MatrixXd::Identity(3,3);
                 R_F_L=MatrixXd::Identity(3,3);
                 R_F_R=MatrixXd::Identity(3,3);
-                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI*0/180;//3 was good
+                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180;//3 was good
                 R_P<<1,0,0,
                       0,cos(pelvis_roll),-sin(pelvis_roll),
                         0,sin(pelvis_roll),cos(pelvis_roll);
@@ -1254,7 +1254,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 //       k_roll_r=0;
 //       k_roll_l=0;
 
-        double k_pitch=1.5;
+        double k_pitch=.5;
 
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;

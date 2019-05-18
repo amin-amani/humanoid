@@ -153,6 +153,8 @@ int getch()
 }
 
 int qc_offset[12];
+int qra_offset[4];
+int qla_offset[4];
 bool qc_initial_bool;
 void qc_initial(const sensor_msgs::JointState & msg){
     if (qc_initial_bool){
@@ -162,12 +164,25 @@ void qc_initial(const sensor_msgs::JointState & msg){
 
         }
 
+        for (int i = 12; i < 16; ++i){
+            qra_offset[i-12]=int(msg.position[i+1]);
+        }
+
+        for (int i = 16; i < 20; ++i){
+            qla_offset[i-16]=int(msg.position[i+1]);
+        }
+
+
         qc_initial_bool=false;
 
-        ROS_INFO("Offset=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\nInitialized!",
+        ROS_INFO("Offset_feet=%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\n",
                  qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
                 qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
-                qc_offset[10],qc_offset[11]);}
+                qc_offset[10],qc_offset[11]);
+    ROS_INFO("Offset_righthand=%d\t%d\t%d\t%d",qra_offset[0],qra_offset[1], qra_offset[2],qra_offset[3]);
+    ROS_INFO("Offset_lefthand=%d\t%d\t%d\t%d",qla_offset[0],qla_offset[1], qla_offset[2],qla_offset[3]);
+ROS_INFO("Initialized!");
+    }
 }
 
 VectorXd absolute_q0(7);
@@ -179,12 +194,12 @@ void abs_read(const sensor_msgs::JointState & msg){
 
     VectorXd absolute_sensor(7);
     for (int i = 0; i < 7; ++i) {
-        absolute_sensor(i)=msg.position[i+13+8];
+        absolute_sensor(i)=msg.position[i+13];
         absolute_q0(i)=0;
     }
 //right hand
     absolute_q0(0)=double(absolute_sensor(0)-2867)/8192*2*M_PI;
-    absolute_q0(1)=double(absolute_sensor(1)-3264)/8192*2*M_PI;
+    absolute_q0(1)=double(absolute_sensor(1)-1362)/8192*2*M_PI;
     absolute_q0(2)=-double(absolute_sensor(2)-2888)/8192*2*M_PI;
     absolute_q0(3)=double(absolute_sensor(3)-2088)/8192*2*M_PI;
 //    //left hand
@@ -343,6 +358,7 @@ qc_initial_bool=!simulation;
     VectorXd r_target(3);
     VectorXd r_middle(3);
     MatrixXd R_target(3,3);
+    int fingers_mode;
     VectorXd q0(7);
 
 
@@ -470,6 +486,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.3,
                         -.0,
                         -.3;
+                fingers_mode=15;
             }
 
             //pointing
@@ -482,6 +499,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.1,
                         -.35,
                         -.3;
+                fingers_mode=8;
             }
 
             // mini touch
@@ -494,6 +512,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.2,
                         -.25,
                         -.35;
+                fingers_mode=7;
             }
 
             // looking at horizon
@@ -506,6 +525,8 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.4,
                         -.2,
                         -0.05;
+                fingers_mode=7;
+
             }
 
             // respct
@@ -518,6 +539,8 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.4,
                         -0.05,
                         -0.3;
+                fingers_mode=7;
+
             }
 
             // hand-shake
@@ -530,6 +553,8 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.3,
                         -0.05,
                         -0.4;
+                fingers_mode=5;
+
             }
 
             // waving
@@ -542,6 +567,8 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 r_middle<<.4,
                         -0.2,
                         -0.2;
+                fingers_mode=7;
+
             }
 
             // temp
@@ -561,7 +588,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
             double v0=0;
             double v_target =.4;
             right_hand hand0(q0,r_target,R_target,0,0);
-            ROS_INFO("r0=%f,%f,%f",hand0.r_right_palm(0),hand0.r_right_palm(1),hand0.r_right_palm(2));
+          //  ROS_INFO("r0=%f,%f,%f",hand0.r_right_palm(0),hand0.r_right_palm(1),hand0.r_right_palm(2));
 
             d0=hand0.dist;
             d=d0;
@@ -619,7 +646,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
             X_coef=coef_generator.Coefficient(t,P_x,V_x,A_x);
             Y_coef=coef_generator.Coefficient(t,P_y,V_y,A_y);
             Z_coef=coef_generator.Coefficient(t,P_z,V_z,A_z);
-            ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
+         //   ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
             //ROS_INFO("\ncoeff_x=%f\t%f\t%f\t%f\t%f\t%f",X_coef(0)
             //ROS_INFO("\n
             //ROS_INFO("\n
@@ -634,6 +661,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 //                        0,
 //                        0,
 //                        0;
+                 fingers_mode=6;
 
             }
 
@@ -646,8 +674,8 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 
 
             //ROS_INFO("theta_target=%f,sai_target=%f,phi_target=%f",theta_target,sai_target,phi_target);
-            ROS_INFO("\nr_target=\n%f\n%f\n%f",r_target(0),r_target(1),r_target(2));
-            ROS_INFO("\nR_target=\n%f\t%f\t%f\n%f\t%f\t%f\n%f\t%f\t%f\n",R_target(0,0),R_target(0,1),R_target(0,2),R_target(1,0),R_target(1,1),R_target(1,2),R_target(2,0),R_target(2,1),R_target(2,2));
+            //ROS_INFO("\nr_target=\n%f\n%f\n%f",r_target(0),r_target(1),r_target(2));
+           // ROS_INFO("\nR_target=\n%f\t%f\t%f\n%f\t%f\t%f\n%f\t%f\t%f\n",R_target(0,0),R_target(0,1),R_target(0,2),R_target(1,0),R_target(1,1),R_target(1,2),R_target(2,0),R_target(2,1),R_target(2,2));
             ROS_INFO("press any key to start!");
             getch();
             initializing=false;
@@ -656,7 +684,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
 
         else {
 
-
+int fingers=6;
             time=double(count)*.005;
             if(scenario=="h"){time+=t(2);}
 
@@ -697,6 +725,7 @@ ROS_INFO("q0= %f, %f, %f, %f, %f, %f, %f",q0(0),q0(1),q0(2),q0(3),q0(4),q0(5),q0
                 sai=hand.sai;
                 phi=hand.phi;
                 qr_end=q_ra;
+                fingers=fingers_mode;
                 ROS_INFO("%f\t%f\t%f\t%f\t%f\t%f\t%f\t",qr_end(0),qr_end(1),qr_end(2),qr_end(3),qr_end(4),qr_end(5),qr_end(6));
 
 
@@ -720,7 +749,7 @@ if(scenario=="h")
     z_r<<0,0;
 
     p_r<<qr_end(0),10*M_PI/180,
-            qr_end(1),-4*M_PI/180,
+            qr_end(1),-6*M_PI/180,
             qr_end(2),0,
             qr_end(3),-20*M_PI/180,
             qr_end(4),0,
@@ -732,6 +761,7 @@ if(scenario=="h")
         q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
 
     }
+    fingers=fingers_mode;
 }
  else{break;}
 
@@ -792,16 +822,16 @@ if(simulation){SendGazebo(q);}
             }
 
 
-            q_motor[0]=-int(7*(qr1[count]-q0(0))*360/M_PI);
-            q_motor[1]=int(7*(qr2[count]-q0(1))*360/M_PI);
-            q_motor[2]=-int(10*(qr3[count]-q0(2))*300/M_PI);
-            q_motor[3]=int(10*(qr4[count]-q0(3))*300/M_PI);
+            q_motor[0]=-int(10*(qr1[count]-q0(0))*180/M_PI*120/60)+qra_offset[0];
+            q_motor[1]=int(10*(qr2[count]-q0(1))*180/M_PI*120/60)+qra_offset[1];
+            q_motor[2]=-int(7*(qr3[count]-q0(2))*180/M_PI*100/60)+qra_offset[2];
+            q_motor[3]=int(7*(qr4[count]-q0(3))*180/M_PI*100/60)+qra_offset[3];
 
             q_motor[4]=int((qr5[count]-q0(4))*(2048)/M_PI);
             q_motor[5]=int((qr6[count]-q0(5))*(4000-2050)/(23*M_PI/180));
             q_motor[6]=int((qr7[count]-q0(6))*(4000-2050)/(23*M_PI/180));
 
-            q_motor[7]=4;
+            q_motor[7]=fingers;
 
             msg.data.clear();
             for(int  i = 0;i < 12;i++)

@@ -134,7 +134,7 @@ msg.data.push_back(q[3]);
 msg.data.push_back(0);//16
 msg.data.push_back(0);//17
 msg.data.push_back(0);//18
-msg.data.push_back(2);//19
+msg.data.push_back(6);//19
 //left hand epose
 msg.data.push_back(q[4]);//20 +y
 msg.data.push_back(q[5]);//21 +x
@@ -144,7 +144,7 @@ msg.data.push_back(q[7]);//23 -y
 msg.data.push_back(0);//24
 msg.data.push_back(0);//25
 msg.data.push_back(0);//26
-msg.data.push_back(8);//27
+msg.data.push_back(6);//27
 
 //for(int i= 12;i < 16;i++){
 

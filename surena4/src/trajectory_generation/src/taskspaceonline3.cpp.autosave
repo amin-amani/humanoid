@@ -467,7 +467,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
 
 }
 
-void TaskSpaceOnline3::CoeffArrayPelvis(){
+void TaskSpaceOnline3::<CoeffArrayPelvis(){
 double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
     //------------------Coefficient of cyclic motion in X direction--------------------
     MatrixXd ord(1,2);
