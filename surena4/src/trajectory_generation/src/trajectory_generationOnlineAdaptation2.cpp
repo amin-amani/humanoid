@@ -36,7 +36,7 @@ bool left_first=true;//right support in first step
 bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
-bool sidewalk=false;
+bool sidewalk=!false;
 bool simulation=false;
 
 
@@ -711,6 +711,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);
+    ros::Publisher  trajectory_data_pub  = nh.advertise<std_msgs::Float32MultiArray>("my_trajectory_data",100);
+    std_msgs::Float32MultiArray trajectory_data;
+
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
@@ -1040,7 +1043,8 @@ double side_move_coef=.05/2/OnlineTaskSpace.StepLength;
 
 
     //*****************************
-    PoseRoot(1,0)=PoseRoot(1,0)+side_move_coef*PoseRoot(0,0);
+double pelvis_coef=1+.1*PoseRoot(1,0)/OnlineTaskSpace.Yd;
+    PoseRoot(1,0)=PoseRoot(1,0)*pelvis_coef+PoseRoot(0,0)*side_move_coef;
     PoseRoot(0,0)=0;
 
     PoseLFoot(1,0)=PoseLFoot(1,0)+side_move_coef*PoseLFoot(0,0);
@@ -1153,6 +1157,40 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         msg_contact_flag.data.push_back(contact_flag_sensor2);
 
         contact_flag.publish(msg_contact_flag);
+
+        trajectory_data.data.clear();
+        trajectory_data.data.push_back(OnlineTaskSpace.globalTime);
+        trajectory_data.data.push_back(PoseRoot(0));
+        trajectory_data.data.push_back(PoseRoot(1));
+        trajectory_data.data.push_back(PoseRoot(2));
+        trajectory_data.data.push_back(PoseRFoot(0));
+        trajectory_data.data.push_back(PoseRFoot(1));
+        trajectory_data.data.push_back(PoseRFoot(2));
+        trajectory_data.data.push_back(PoseLFoot(0));
+        trajectory_data.data.push_back(PoseLFoot(1));
+        trajectory_data.data.push_back(PoseLFoot(2));
+        trajectory_data.data.push_back(double(a)/500);
+        trajectory_data.data.push_back(double(b)/500);
+        trajectory_data.data.push_back(double(c)/500);
+        trajectory_data.data.push_back(double(d)/500);
+        trajectory_data.data.push_back(double(e)/500);
+        trajectory_data.data.push_back(double(f)/500);
+        trajectory_data.data.push_back(double(g)/500);
+        trajectory_data.data.push_back(double(h)/500);
+        trajectory_data.data.push_back(cntrl[1]);
+        trajectory_data.data.push_back(cntrl[2]);
+        trajectory_data.data.push_back(cntrl[3]);
+        trajectory_data.data.push_back(cntrl[4]);
+        trajectory_data.data.push_back(cntrl[5]);
+        trajectory_data.data.push_back(cntrl[6]);
+        trajectory_data.data.push_back(cntrl[7]);
+        trajectory_data.data.push_back(cntrl[8]);
+        trajectory_data.data.push_back(cntrl[9]);
+        trajectory_data.data.push_back(cntrl[10]);
+        trajectory_data.data.push_back(cntrl[11]);
+        trajectory_data.data.push_back(cntrl[12]);
+        trajectory_data_pub.publish(trajectory_data);
+
 
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
