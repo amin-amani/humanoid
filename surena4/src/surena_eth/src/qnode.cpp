@@ -90,7 +90,10 @@ bool QNode::Init() {
     _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
-    // _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
+    _resetHandsService = n.advertiseService("ResetHands", &QNode::ResetHands, this);
+    _activateHandsService = n.advertiseService("ActivateHands", &QNode::ActivateHands, this);
+
+     //_resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _getRobotStatus = n.advertiseService("GetRobotStatus", &QNode::GetRobotStatus, this);
 
     for (int i = 0; i < 29; i++) {
@@ -191,6 +194,50 @@ bool QNode::WaitExternalOperation(int timeoutms=60000)
     if(timer.isActive())return true;
     return false;
 
+}
+//================================================================================================================================================================
+bool QNode::ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res)
+{
+    _lastOperationResult=-1;
+        Q_EMIT DoResetHands();
+
+        //===============================
+    if(!WaitExternalOperation(6000))
+    {
+    res.result=-1;
+    //res.="response timeout!";
+    return false;
+
+    }
+    if(_lastOperationResult!=0)
+    {
+        //res.success=false;
+        //res.message="response with error";
+    res.result=-1;
+        return false;
+}
+}
+//================================================================================================================================================================
+bool QNode::ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res)
+{
+    _lastOperationResult=-1;
+        Q_EMIT DoActivateHands();
+
+        //===============================
+    if(!WaitExternalOperation(6000))
+    {
+    res.result=-1;
+    //res.="response timeout!";
+    return false;
+
+    }
+    if(_lastOperationResult!=0)
+    {
+        //res.success=false;
+        //res.message="response with error";
+    res.result=-1;
+        return false;
+}
 }
 //================================================================================================================================================================
 bool QNode::ResetAllNodes(robot_teleop::node::Request &req, robot_teleop::node::Response &res)

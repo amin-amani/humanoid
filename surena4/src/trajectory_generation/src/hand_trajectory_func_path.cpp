@@ -35,7 +35,7 @@
 using namespace  std;
 using namespace  Eigen;
 
-bool simulation=true;
+bool simulation=!true;
 
 
 
@@ -149,8 +149,8 @@ void qc_initial(const sensor_msgs::JointState & msg){
             qra_offset[i-12]=int(msg.position[i+1]);
         }
 
-        for (int i = 16; i < 20; ++i){
-            qla_offset[i-16]=int(msg.position[i+1]);
+        for (int i = 20; i < 24; ++i){
+            qla_offset[i-20]=int(msg.position[i+1]);
         }
 
 
@@ -424,37 +424,37 @@ qc_initial_bool=!simulation;
         if(initializing){
 
             if(simulation){
-//                q0_r<<10*M_PI/180,
-//                        -6*M_PI/180,
-//                        0,
-//                        -20*M_PI/180,
-//                        0,
-//                        0,
-//                        0;
-
-//                q0_l<<10*M_PI/180,
-//                        6*M_PI/180,
-//                        0,
-//                        -20*M_PI/180,
-//                        0,
-//                        0,
-//                        0;
-                //home test
-                q0_r<<20*M_PI/180,
-                        -16*M_PI/180,
+                q0_r<<10*M_PI/180,
                         -6*M_PI/180,
-                        -28*M_PI/180,
+                        0,
+                        -20*M_PI/180,
                         0,
                         0,
                         0;
 
-                q0_l<<45*M_PI/180,
-                        34*M_PI/180,
-                        10*M_PI/180,
-                        -10*M_PI/180,
+                q0_l<<10*M_PI/180,
+                        6*M_PI/180,
+                        0,
+                        -20*M_PI/180,
                         0,
                         0,
                         0;
+                //home test
+//                q0_r<<20*M_PI/180,
+//                        -16*M_PI/180,
+//                        -6*M_PI/180,
+//                        -28*M_PI/180,
+//                        0,
+//                        0,
+//                        0;
+
+//                q0_l<<45*M_PI/180,
+//                        34*M_PI/180,
+//                        10*M_PI/180,
+//                        -10*M_PI/180,
+//                        0,
+//                        0,
+//                        0;
 
 
 
@@ -921,10 +921,10 @@ if(simulation){SendGazebo(q);}
             q_motor_r[7]=fingers_r;
 
 
-            q_motor_l[0]=-int(10*(ql1[count]-q0_l(0))*180/M_PI*120/60)+qla_offset[0];
-            q_motor_l[1]=int(10*(ql2[count]-q0_l(1))*180/M_PI*120/60)+qla_offset[1];
+            q_motor_l[0]=int(10*(ql1[count]-q0_l(0))*180/M_PI*120/60)+qla_offset[0];
+            q_motor_l[1]=-int(10*(ql2[count]-q0_l(1))*180/M_PI*120/60)+qla_offset[1];
             q_motor_l[2]=-int(7*(ql3[count]-q0_l(2))*180/M_PI*100/60)+qla_offset[2];
-            q_motor_l[3]=int(7*(ql4[count]-q0_l(3))*180/M_PI*100/60)+qla_offset[3];
+            q_motor_l[3]=-int(7*(ql4[count]-q0_l(3))*180/M_PI*100/60)+qla_offset[3];
 
             q_motor_l[4]=int((ql5[count]-q0_l(4))*(2048)/M_PI);
             q_motor_l[5]=int((ql6[count]-q0_l(5))*(4000-2050)/(23*M_PI/180));

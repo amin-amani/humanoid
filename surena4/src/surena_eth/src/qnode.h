@@ -76,6 +76,8 @@ private:
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;
     ros::ServiceServer _resetAllNodesService;
+    ros::ServiceServer _resetHandsService;
+    ros::ServiceServer _activateHandsService;
     ros::ServiceServer _getRobotStatus;
 
 public:
@@ -129,6 +131,9 @@ public:
     bool WaitExternalOperation(int timeoutms);
     bool GetRobotStatus(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
     bool ReadErrors(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+    bool ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
+    bool ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
+
 Q_SIGNALS:
     //=================================================================================================
 	void loggingUpdated();
@@ -140,6 +145,10 @@ Q_SIGNALS:
     void SetActiveCSP(int id);
     //=================================================================================================
     void DoResetAllNodes(int id);
+    //=================================================================================================
+    void DoResetHands(void);
+    //=================================================================================================
+    void DoActivateHands(void);
     //=================================================================================================
     void SetHome(int id);
    // =================================================================================================
