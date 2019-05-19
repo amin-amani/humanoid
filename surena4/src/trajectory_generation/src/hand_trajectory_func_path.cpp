@@ -425,7 +425,7 @@ qc_initial_bool=!simulation;
 
             if(simulation){
                 q0_r<<10*M_PI/180,
-                        -6*M_PI/180,
+                        -9*M_PI/180,
                         0,
                         -20*M_PI/180,
                         0,
@@ -433,7 +433,7 @@ qc_initial_bool=!simulation;
                         0;
 
                 q0_l<<10*M_PI/180,
-                        6*M_PI/180,
+                        9*M_PI/180,
                         0,
                         -20*M_PI/180,
                         0,
@@ -826,7 +826,7 @@ int fingers_r=6;  int fingers_l=6;
 
 
                         p_r<<   qr_end(0),10*M_PI/180,
-                                qr_end(1),-6*M_PI/180,
+                                qr_end(1),-10*M_PI/180,
                                 qr_end(2),0,
                                 qr_end(3),-20*M_PI/180,
                                 qr_end(4),0,
@@ -834,7 +834,7 @@ int fingers_r=6;  int fingers_l=6;
                                 qr_end(6),0;
 
                         p_l<<   ql_end(0),10*M_PI/180,
-                                ql_end(1),6*M_PI/180,
+                                ql_end(1),10*M_PI/180,
                                 ql_end(2),0,
                                 ql_end(3),-20*M_PI/180,
                                 ql_end(4),0,
@@ -922,7 +922,7 @@ if(simulation){SendGazebo(q);}
 
 
             q_motor_l[0]=int(10*(ql1[count]-q0_l(0))*180/M_PI*120/60)+qla_offset[0];
-            q_motor_l[1]=-int(10*(ql2[count]-q0_l(1))*180/M_PI*120/60)+qla_offset[1];
+            q_motor_l[1]=int(10*(ql2[count]-q0_l(1))*180/M_PI*120/60)+qla_offset[1];
             q_motor_l[2]=-int(7*(ql3[count]-q0_l(2))*180/M_PI*100/60)+qla_offset[2];
             q_motor_l[3]=-int(7*(ql4[count]-q0_l(3))*180/M_PI*100/60)+qla_offset[3];
 
