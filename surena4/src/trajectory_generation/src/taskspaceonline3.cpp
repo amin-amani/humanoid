@@ -5,7 +5,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=3;
+    NStride=1;
     LeftHipRollModification= 3.1;2.7;+.5;
     RightHipRollModification=3.1;2.7;
     FirstHipRollModification=3.1;2.7;
@@ -446,7 +446,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6/2;
     MatrixXd Cx_end_pTime(1,2);
     Cx_end_pTime<<(TDs),T_end_p_sx_rel ;
     MatrixXd Cx_end_pPos(1,2);
-    Cx_end_pPos<<(NStep+1)*StepLength-Xs, (NStep+1)*StepLength;//+(side_extra_step_length)*StepLength
+    Cx_end_pPos<<(NStep+1)*StepLength-Xs, (NStep+1)*StepLength+(side_extra_step_length)*StepLength;
     MatrixXd Cx_end_pVel(1,2);
     Cx_end_pVel<<vx, 0;//Cx_end_pVel<<5*Cx_p(0,0)*pow(TDs,4)+4*Cx_p(0,1)*pow(TDs,3)+3*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3)*pow(TDs,1)+Cx_p(0,4), 0;
     MatrixXd Cx_end_pAccel(1,2);
@@ -573,7 +573,7 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
         DoubleSupport=true;
     }
     else if (t>=T_end_p_sx  && t<=(TGait+TDs+TEnd)){
-        xp=(2*NStride+1)*StepLength;//+(side_extra_step_length)*StepLength;
+        xp=(2*NStride+1)*StepLength+(side_extra_step_length)*StepLength;
         dxp=0;
         ddxp=0;
         DoubleSupport=true;
