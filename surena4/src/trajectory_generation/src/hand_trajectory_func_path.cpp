@@ -373,7 +373,7 @@ qc_initial_bool=!simulation;
     MatrixXd Y_coef_r;        MatrixXd Y_coef_l;
     MatrixXd Z_coef_r;        MatrixXd Z_coef_l;
 
-    MatrixXd t(1,3);
+    MatrixXd t_r(1,3);        MatrixXd t_l(1,3);
     MatrixXd P_x_r(1,3);      MatrixXd P_x_l(1,3);
     MatrixXd V_x_r(1,3);      MatrixXd V_x_l(1,3);
     MatrixXd A_x_r(1,3);      MatrixXd A_x_l(1,3);
@@ -401,6 +401,7 @@ qc_initial_bool=!simulation;
     ros::Rate loop_rate(200);
     int count = 0;
     double time=0.0;
+    double time_r,time_l;
     bool initializing=true;
 
     VectorXd qr_end(7);VectorXd ql_end(7);
@@ -704,7 +705,7 @@ if(scenario_l=="g"){
 
             //****path generation
 
-            t<<0,2,4;
+            t_r<<0,2,4;t_l<<0,2,4;
             P_x_r<< hand0_r.r_right_palm(0),r_middle_r(0),r_target_r(0);
             P_y_r<< hand0_r.r_right_palm(1),r_middle_r(1),r_target_r(1);
             P_z_r<< hand0_r.r_right_palm(2),r_middle_r(2),r_target_r(2);
@@ -719,13 +720,13 @@ if(scenario_l=="g"){
             A_y_r<<0,INFINITY,0;     A_y_l<<0,INFINITY,0;
             A_z_r<<0,INFINITY,0;     A_z_l<<0,INFINITY,0;
 
-            X_coef_r=coef_generator.Coefficient(t,P_x_r,V_x_r,A_x_r);
-            Y_coef_r=coef_generator.Coefficient(t,P_y_r,V_y_r,A_y_r);
-            Z_coef_r=coef_generator.Coefficient(t,P_z_r,V_z_r,A_z_r);
+            X_coef_r=coef_generator.Coefficient(t_r,P_x_r,V_x_r,A_x_r);
+            Y_coef_r=coef_generator.Coefficient(t_r,P_y_r,V_y_r,A_y_r);
+            Z_coef_r=coef_generator.Coefficient(t_r,P_z_r,V_z_r,A_z_r);
 
-            X_coef_l=coef_generator.Coefficient(t,P_x_l,V_x_l,A_x_l);
-            Y_coef_l=coef_generator.Coefficient(t,P_y_l,V_y_l,A_y_l);
-            Z_coef_l=coef_generator.Coefficient(t,P_z_l,V_z_l,A_z_l);
+            X_coef_l=coef_generator.Coefficient(t_l,P_x_l,V_x_l,A_x_l);
+            Y_coef_l=coef_generator.Coefficient(t_l,P_y_l,V_y_l,A_y_l);
+            Z_coef_l=coef_generator.Coefficient(t_l,P_z_l,V_z_l,A_z_l);
          //   ROS_INFO("%d,%d",X_coef.rows(),X_coef.cols());
             //ROS_INFO("\ncoeff_x=%f\t%f\t%f\t%f\t%f\t%f",X_coef(0)
             //ROS_INFO("\n
@@ -733,8 +734,12 @@ if(scenario_l=="g"){
 
             //home
             if(scenario_r=="h"){
-                 qr_end=q0_r;ql_end=q0_l;
-                 fingers_mode_r=6;fingers_mode_l=6;
+                 qr_end=q0_r;
+                 fingers_mode_r=6;
+            }
+            if(scenario_l=="h"){
+                 ql_end=q0_l;
+                 fingers_mode_l=6;
             }
 
             //ROS_INFO("theta_target=%f,sai_target=%f,phi_target=%f",theta_target,sai_target,phi_target);
@@ -750,79 +755,66 @@ if(scenario_l=="g"){
 
 int fingers_r=6;  int fingers_l=6;
             time=double(count)*.005;
-            if(scenario_r=="h"){time+=t(2);}
-
+            time_r=time; time_l=time;
+            if(scenario_r=="h"){time_r+=t_r(2);}
+            if(scenario_l=="h"){time_l+=t_l(2);}
             VectorXd P_r(3); VectorXd V_r(3);
             VectorXd P_l(3); VectorXd V_l(3);
-            if(time<t(1)){
-                P_r<<   coef_generator.GetAccVelPos(X_coef_r.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef_r.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef_r.row(0),time,0,5)(0,0);
-                V_r<<   coef_generator.GetAccVelPos(X_coef_r.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef_r.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef_r.row(0),time,0,5)(0,1);
-
-                P_l<<   coef_generator.GetAccVelPos(X_coef_l.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef_l.row(0),time,0,5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef_l.row(0),time,0,5)(0,0);
-                V_l<<   coef_generator.GetAccVelPos(X_coef_l.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef_l.row(0),time,0,5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef_l.row(0),time,0,5)(0,1);
+            if(time_r<t_r(1)){
+                P_r<<   coef_generator.GetAccVelPos(X_coef_r.row(0),time_r,0,5)(0,0),
+                        coef_generator.GetAccVelPos(Y_coef_r.row(0),time_r,0,5)(0,0),
+                        coef_generator.GetAccVelPos(Z_coef_r.row(0),time_r,0,5)(0,0);
+                V_r<<   coef_generator.GetAccVelPos(X_coef_r.row(0),time_r,0,5)(0,1),
+                        coef_generator.GetAccVelPos(Y_coef_r.row(0),time_r,0,5)(0,1),
+                        coef_generator.GetAccVelPos(Z_coef_r.row(0),time_r,0,5)(0,1);
 
 
 
 
                 right_hand hand_r(q_ra,V_r,r_target_r,R_target_r);
-                left_hand hand_l(q_la,V_l,r_target_l,R_target_l);
-                hand_r.doQP(q_ra);      hand_l.doQP(q_la);
-                q_ra=hand_r.q_next;     q_la=hand_l.q_next;
-                d_r=hand_r.dist;        d_l=hand_l.dist;
-                theta_r=hand_r.theta;   theta_l=hand_l.theta;
-                sai_r=hand_r.sai;       sai_l=hand_l.sai;
-                phi_r=hand_r.phi;       phi_l=hand_l.phi;
-            }
-            else if (time<t(2)){
-                P_r<<   coef_generator.GetAccVelPos(X_coef_r.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef_r.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef_r.row(1),time,t(1),5)(0,0);
-                V_r<<   coef_generator.GetAccVelPos(X_coef_r.row(1),time,t(1) ,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef_r.row(1),time,t(1),5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef_r.row(1),time,t(1),5)(0,1);
 
-                P_l<<   coef_generator.GetAccVelPos(X_coef_l.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Y_coef_l.row(1),time,t(1),5)(0,0),
-                        coef_generator.GetAccVelPos(Z_coef_l.row(1),time,t(1),5)(0,0);
-                V_l<<   coef_generator.GetAccVelPos(X_coef_l.row(1),time,t(1) ,5)(0,1),
-                        coef_generator.GetAccVelPos(Y_coef_l.row(1),time,t(1),5)(0,1),
-                        coef_generator.GetAccVelPos(Z_coef_l.row(1),time,t(1),5)(0,1);
+                hand_r.doQP(q_ra);
+                q_ra=hand_r.q_next;
+                d_r=hand_r.dist;
+                theta_r=hand_r.theta;
+                sai_r=hand_r.sai;
+                phi_r=hand_r.phi;
+            }
+            else if (time_r<t_r(2)){
+                P_r<<   coef_generator.GetAccVelPos(X_coef_r.row(1),time_r,t_r(1),5)(0,0),
+                        coef_generator.GetAccVelPos(Y_coef_r.row(1),time_r,t_r(1),5)(0,0),
+                        coef_generator.GetAccVelPos(Z_coef_r.row(1),time_r,t_r(1),5)(0,0);
+                V_r<<   coef_generator.GetAccVelPos(X_coef_r.row(1),time_r,t_r(1) ,5)(0,1),
+                        coef_generator.GetAccVelPos(Y_coef_r.row(1),time_r,t_r(1),5)(0,1),
+                        coef_generator.GetAccVelPos(Z_coef_r.row(1),time_r,t_r(1),5)(0,1);
 
 
                 right_hand hand_r(q_ra,V_r,r_target_r,R_target_r);
-                left_hand hand_l(q_la,V_l,r_target_l,R_target_l);
-                hand_r.doQP(q_ra);      hand_l.doQP(q_la);
-                q_ra=hand_r.q_next;     q_la=hand_l.q_next;
-                d_r=hand_r.dist;        d_l=hand_l.dist;
-                theta_r=hand_r.theta;   theta_l=hand_l.theta;
-                sai_r=hand_r.sai;       sai_l=hand_l.sai;
-                phi_r=hand_r.phi;       phi_l=hand_l.phi;
-                fingers_r=fingers_mode_r;fingers_l=fingers_mode_l;
 
-                ROS_INFO("right: %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
-                ROS_INFO("left:  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_la(0),q_la(1),q_la(2),q_la(3),q_la(4),q_la(5),q_la(6));
+                hand_r.doQP(q_ra);
+                q_ra=hand_r.q_next;
+                d_r=hand_r.dist;
+                theta_r=hand_r.theta;
+                sai_r=hand_r.sai;
+                phi_r=hand_r.phi;
+                fingers_r=fingers_mode_r;
+
+               // ROS_INFO("right: %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
+                //ROS_INFO("left:  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_la(0),q_la(1),q_la(2),q_la(3),q_la(4),q_la(5),q_la(6));
             }
-            else if (time<t(2)*2){
+            else if (time_r<t_r(2)*2){
 
-                if(scenario_r=="g" && time<8){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
-                else if(scenario_r=="f" && time<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time-t(2))/2*(2*M_PI));}
+                if(scenario_r=="g" && time_r<8){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
+                else if(scenario_r=="f" && time_r<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
                 else{
-                    ROS_INFO_ONCE("reached!");
+                    ROS_INFO_ONCE("right reached!");
                     if(scenario_r=="h")
                     {
                         MatrixXd t_h(1,2);
                         MatrixXd p_r(7,2); MatrixXd p_l(7,2);
                         MatrixXd zero(1,2); zero<<0,0;
                         MatrixXd r_coeff;  MatrixXd l_coeff;
-                        t_h<<t(2),t(2)*2;
+                        t_h<<t_r(2),t_r(2)*2;
 
 
                         p_r<<   qr_end(0),10*M_PI/180,
@@ -833,6 +825,70 @@ int fingers_r=6;  int fingers_l=6;
                                 qr_end(5),0,
                                 qr_end(6),0;
 
+
+                        for (int i = 0; i < 7; ++i) {
+                            r_coeff=coef_generator.Coefficient(t_h,p_r.row(i),zero,zero);
+                            q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time_r,t_h(0) ,5)(0,0);
+
+                        }
+                        fingers_r=fingers_mode_r;
+                    }
+                    else{break;}
+                }
+            }//
+
+
+            if(time_l<t_l(1)){
+
+                P_l<<   coef_generator.GetAccVelPos(X_coef_l.row(0),time_l,0,5)(0,0),
+                        coef_generator.GetAccVelPos(Y_coef_l.row(0),time_l,0,5)(0,0),
+                        coef_generator.GetAccVelPos(Z_coef_l.row(0),time_l,0,5)(0,0);
+                V_l<<   coef_generator.GetAccVelPos(X_coef_l.row(0),time_l,0,5)(0,1),
+                        coef_generator.GetAccVelPos(Y_coef_l.row(0),time_l,0,5)(0,1),
+                        coef_generator.GetAccVelPos(Z_coef_l.row(0),time_l,0,5)(0,1);
+
+                left_hand hand_l(q_la,V_l,r_target_l,R_target_l);
+                hand_l.doQP(q_la);
+                q_la=hand_l.q_next;
+                d_l=hand_l.dist;
+                theta_l=hand_l.theta;
+                sai_l=hand_l.sai;
+                phi_l=hand_l.phi;
+
+            }
+
+            else if (time_l<t_l(2)){
+
+                P_l<<   coef_generator.GetAccVelPos(X_coef_l.row(1),time_l,t_l(1),5)(0,0),
+                        coef_generator.GetAccVelPos(Y_coef_l.row(1),time_l,t_l(1),5)(0,0),
+                        coef_generator.GetAccVelPos(Z_coef_l.row(1),time_l,t_l(1),5)(0,0);
+                V_l<<   coef_generator.GetAccVelPos(X_coef_l.row(1),time_l,t_l(1) ,5)(0,1),
+                        coef_generator.GetAccVelPos(Y_coef_l.row(1),time_l,t_l(1),5)(0,1),
+                        coef_generator.GetAccVelPos(Z_coef_l.row(1),time_l,t_l(1),5)(0,1);
+                left_hand hand_l(q_la,V_l,r_target_l,R_target_l);
+                hand_l.doQP(q_la);
+                q_la=hand_l.q_next;
+                d_l=hand_l.dist;
+                theta_l=hand_l.theta;
+                sai_l=hand_l.sai;
+                phi_l=hand_l.phi;
+                fingers_l=fingers_mode_l;
+
+            }
+
+            else if (time_l<t_l(2)*2){
+                if(scenario_l=="g" && time_l<8){q_la(2)=ql_end(2)+15*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
+                else if(scenario_l=="f" && time_l<8){q_la(3)=ql_end(3)+5*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
+                else{
+                    ROS_INFO_ONCE("left reached!");
+                    if(scenario_l=="h")
+                    {
+                        MatrixXd t_h(1,2);
+                         MatrixXd p_l(7,2);
+                        MatrixXd zero(1,2); zero<<0,0;
+                         MatrixXd l_coeff;
+                        t_h<<t_l(2),t_l(2)*2;
+
                         p_l<<   ql_end(0),10*M_PI/180,
                                 ql_end(1),10*M_PI/180,
                                 ql_end(2),0,
@@ -842,25 +898,16 @@ int fingers_r=6;  int fingers_l=6;
                                 ql_end(6),0;
 
                         for (int i = 0; i < 7; ++i) {
-                            r_coeff=coef_generator.Coefficient(t_h,p_r.row(i),zero,zero);
-                            q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_h(0) ,5)(0,0);
                             l_coeff=coef_generator.Coefficient(t_h,p_l.row(i),zero,zero);
-                            q_la(i)=coef_generator.GetAccVelPos(l_coeff.row(0),time,t_h(0) ,5)(0,0);
+                            q_la(i)=coef_generator.GetAccVelPos(l_coeff.row(0),time_l,t_h(0) ,5)(0,0);
                         }
-                        fingers_r=fingers_mode_r;fingers_l=fingers_mode_l;
+                        fingers_l=fingers_mode_l;
                     }
                     else{break;}
-
-                    //                    r_coeff=(coef_generator.Coefficient(t_r,p_r,z_r,z_r));
-                    //                    q_ra(0)=coef_generator.GetAccVelPos(r_coeff.row(0),time,t_r(0) ,5)(0,0);
-
-                    // ROS_INFO("  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
-
                 }
-
-
-                //else{break;}
             }
+
+
             else{break;}
 
             matrix_view(P_r); matrix_view(P_l);

@@ -16,27 +16,49 @@ QString WorkingDirectory="/home/cast/speech-test/";
  void Talk(const std_msgs::String & msg)
  {
     static bool running=false;
+    bool anyCommand=false;
     if(running){ROS_INFO("is running");return;}
     running=true;
     QStringList args;
     args.clear();
     talker->terminate();
-//    if(QString::fromStdString(msg.data).contains("سورنا ممنونم"))
-// {
-//      args.append("خواهش دارم");
-//    }
-//    if(QString::fromStdString(msg.data).contains("سورنا دست بده"))
-// {
-//      args.append("چیزی هم هستی");
-//    }
-//    else{
 
-//    }
-    args.append(QString::fromStdString(msg.data));
+    if(QString::fromStdString(msg.data).contains("سورنا ممنونم"))
+ {
+      args.append("خواهش میکنم");
+      anyCommand=true;
+    }
+    if(QString::fromStdString(msg.data).contains("سورنا سلام"))
+ {
+        anyCommand=true;
+      args.append("سلام ، از آشنایی شما خوشبختم");
+    }
+    if(QString::fromStdString(msg.data).contains("سورنا حالت چطوره"))
+ {
+        anyCommand=true;
+      args.append("به لطف شما ، خوبم");
+    }
+    if(QString::fromStdString(msg.data).contains("سورنا چند درجه آزادی داری"))
+ {
+        anyCommand=true;
+      args.append("من ۴۳ درجه آزادی دارم");
+    }
+    if(QString::fromStdString(msg.data).contains("سورنا صدای منو میشنوی"))
+ {
+        anyCommand=true;
+      args.append("بله ، در خدمتم");
+    }
+    else{
 
-    talker->start(WorkingDirectory+"speech-test",args);
+    }
+    //args.append(QString::fromStdString(msg.data));
+
+    if(anyCommand)
+    {
+     talker->start(WorkingDirectory+"speech-test",args);
     talker->waitForFinished(4000);
-        talker->terminate();
+     talker->terminate();
+    }
     running=false;
  }
  //===========================================================================
