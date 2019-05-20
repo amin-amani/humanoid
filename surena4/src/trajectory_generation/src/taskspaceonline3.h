@@ -40,7 +40,7 @@ public:
     int StepNumber=1;
 
     double TStart=6;
-    double TEnd=8;//8
+    double TEnd=8;//6
 
     double StepLength;//0.0840000;
     double DesiredVelocity;//0.050;
@@ -315,9 +315,6 @@ public:
 
     MatrixXd AnkleTrajectory(double time, int n, double localtiming);
     double PelvisRoll(double time);
-    void matrix_view(VectorXd M);
-        void matrix_view(MatrixXd M);
-        void numplot(double num,double min,double max);
 };
 
 #endif // TASKSPACEONLINE3_H

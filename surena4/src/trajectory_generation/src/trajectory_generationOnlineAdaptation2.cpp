@@ -37,9 +37,7 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
-int bump_threshold=98;
 bool simulation=false;
-bool AnkleZAdaptation=false;
 
 
 double saturate(double a, double min, double max){
@@ -47,38 +45,6 @@ double saturate(double a, double min, double max){
     else if(a>max){return max;ROS_INFO("exceeding!");}
     else{return a;}
 }
-
-
-double move_rest_back(double max,double t_local,double T_start ,double T_move,double T_rest,double T_back){
-    double c3=(10*max)/pow(T_move,3);
-    double c4=-(15*max)/pow(T_move,4);
-    double c5=(6*max)/pow(T_move,5);
-    double c3_r=(10*max)/pow(T_back,3);
-    double c4_r=-(15*max)/pow(T_back,4);
-    double c5_r=(6*max)/pow(T_back,5);
-    double T_end=T_start+T_move+T_rest+T_back;
-    double theta=0;
-    if(t_local<T_start){theta=0;}
-    else if (t_local<T_start+T_move){theta=c3*pow(t_local-T_start,3)+c4*pow(t_local-T_start,4)+c5*pow(t_local-T_start,5);}
-    else if (t_local<T_start+T_move+T_rest){theta=max;}
-    else if (t_local<T_start+T_move+T_rest+T_back){theta=c3_r*pow(T_end-t_local,3)+c4_r*pow(T_end-t_local,4)+c5_r*pow(T_end-t_local,5);}
-    return theta;
-}
-
-
-double move2pose(double max,double t_local,double T_start ,double T_end){
-    double T_move=T_end-T_start;
-    double c3=(10*max)/pow(T_move,3);
-    double c4=-(15*max)/pow(T_move,4);
-    double c5=(6*max)/pow(T_move,5);
-    double theta=0;
-    if(t_local<T_start){theta=0;}
-    else if (t_local<T_end){theta=c3*pow(t_local-T_start,3)+c4*pow(t_local-T_start,4)+c5*pow(t_local-T_start,5);}
-    else{theta=max;}
-    return theta;
-}
-
-
 
 ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
 ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
@@ -195,11 +161,6 @@ double teta_motor_L,teta_motor_R;//pitch
 double phi_motor_L,phi_motor_R;//roll
 double PitchModified;
 
-double AnkleZR,AnkleZL;
-double AnkleZ_offsetR=0;
-double AnkleZ_offsetL=0;
-
-
 int qc_offset[12];
 bool qc_initial_bool;
 
@@ -222,11 +183,11 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     //ROS_INFO("I heard: [%d  %d %d %d %d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3],(int)msg.data[4],(int)msg.data[5],(int)msg.data[6],(int)msg.data[7]);
     int temp[8];
 
-    bump_pushed[0]=1094;bump_pushed[1]= 844;bump_pushed[2]=3129;bump_pushed[3]=3005;
-    bump_pushed[4]=3126;bump_pushed[5]=2920;bump_pushed[6]=1212;bump_pushed[7]=920;
+    bump_pushed[0]=1095;bump_pushed[1]= 849;bump_pushed[2]=3124;bump_pushed[3]=3003;
+    bump_pushed[4]=3126;bump_pushed[5]=2925;bump_pushed[6]=1204;bump_pushed[7]=923;
 
-    bump_notpushed[0]=1012;bump_notpushed[1]= 931;bump_notpushed[2]=3037;bump_notpushed[3]=3098;
-    bump_notpushed[4]=3042;bump_notpushed[5]=3009;bump_notpushed[6]=1120;bump_notpushed[7]=1015;
+    bump_notpushed[0]=1012;bump_notpushed[1]= 930;bump_notpushed[2]=3037;bump_notpushed[3]=3098;
+    bump_notpushed[4]=3042;bump_notpushed[5]=3009;bump_notpushed[6]=1123;bump_notpushed[7]=1014;
     temp[0]=msg.data[0]-bump_notpushed[0];
     temp[1]=-1*(msg.data[1]-bump_notpushed[1]);
     temp[2]=msg.data[2]-bump_notpushed[2];
@@ -718,10 +679,6 @@ int main(int argc, char **argv)
     bump_initialize=false;
     wrench_init_bool=false;
 
-
-    bool leftzstop=false;
-    bool rightzstop=false;
-
     vector<double> cntrl(13);
     QCgenerator QC;
     for (int i = 0; i < 12; ++i) {
@@ -733,7 +690,6 @@ int main(int argc, char **argv)
     teta_motor_R=0;
     phi_motor_L=0;
     phi_motor_R=0;
-
 
     double footSensorSaturation=75;//if all sensors data are bigger than this amount, this means the foot is landed on the ground
     double footSensorthreshold=4;// will start orientaition correction
@@ -864,13 +820,13 @@ int main(int argc, char **argv)
 
             contact_flag_sensor2=-contact_flag_sensor2;
             firstcontactL=false;
-          //  ROS_INFO("shalap [%f  %f] a=%d b=%d c=%d d=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,a,b,c,d);
+            ROS_INFO("shalap [%f  %f] a=%d b=%d c=%d d=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,a,b,c,d);
         }
         //-------------for detecting the full contact of Left foot with ground-------------//
         //-------------flag to show contact detected by sensors,sign of flag changes-------------//
         if ((!fullcontactL) && (a)>=footSensorSaturation && (b)>=footSensorSaturation && (c)>=footSensorSaturation && (d)>=footSensorSaturation){
             contact_flag_sensor=-contact_flag_sensor;
-          //  ROS_INFO("left swing foot landing is successful = [%f  %f] a=%d b=%d c=%d d=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,a,b,c,d);
+            ROS_INFO("left swing foot landing is successful = [%f  %f] a=%d b=%d c=%d d=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,a,b,c,d);
             fullcontactL=true;
         }
 
@@ -887,13 +843,13 @@ int main(int argc, char **argv)
 
             contact_flag_sensor2=-contact_flag_sensor2;
             firstcontactR=false;
-          //  ROS_INFO("shooloop[%f  %f]  e=%d f=%d g=%d h=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,e,f,g,h);
+            ROS_INFO("shooloop[%f  %f]  e=%d f=%d g=%d h=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,e,f,g,h);
         }
 
         //-------------for detecting the full contact of Right foot with ground-------------//
         if ((!fullcontactR) && (e)>=footSensorSaturation && (f)>=footSensorSaturation && (g)>=footSensorSaturation && (h)>=footSensorSaturation){
             contact_flag_sensor=-contact_flag_sensor;
-          //  ROS_INFO("Right swing foot landing is successful= [%f  %f]  e=%d f=%d g=%d h=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,e,f,g,h);
+            ROS_INFO("Right swing foot landing is successful= [%f  %f]  e=%d f=%d g=%d h=%d", OnlineTaskSpace.localTiming,OnlineTaskSpace.globalTime,e,f,g,h);
             fullcontactR=true;
         }
 
@@ -966,116 +922,6 @@ int main(int argc, char **argv)
 
 
                 //if you want to have modification of height of pelvis please active the Pz(0,0) instead of P(2,0)
-
-                if(!AnkleZAdaptation){AnkleZL=m3;AnkleZR=m7;}
-else{
-                double local_time_cycle=0;
-                if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.TStart){
-                  AnkleZR=m7;
-                  if(GlobalTime-DurationOfStartPhase<OnlineTaskSpace.T_s_st*3/2){
-                          AnkleZL=m3;
-                  }
-                  else{
-
-                      if(!leftzstop){
-                          if(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold){
-                              leftzstop=true;
-                              AnkleZL=m3;
-                              AnkleZL+=AnkleZ_offsetL;
-                              AnkleZ_offsetL=AnkleZL-OnlineTaskSpace._lenghtOfAnkle;
-                              qDebug()<<"leftzstop=true AnkleZL="<<AnkleZL<<"offset="<<AnkleZ_offsetL;
-                          }
-                          else{AnkleZL=m3;
-                              AnkleZL+=AnkleZ_offsetL;
-                          }
-                      }
-
-                  }
-                }
-                else if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs){
-                    local_time_cycle=fmod(GlobalTime-DurationOfStartPhase-OnlineTaskSpace.TStart,2*OnlineTaskSpace.Tc);
-
-
-
-
-                    if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
-                        rightzstop=false;
-                        AnkleZR=m7;
-                        AnkleZ_offsetR=0;
-                    }
-                    else if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
-                        if(!rightzstop){
-                            if(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold){
-                                rightzstop=true;
-                                AnkleZR=m7;
-                                AnkleZR+=AnkleZ_offsetR;
-                                AnkleZ_offsetR=AnkleZR-OnlineTaskSpace._lenghtOfAnkle;
-                                qDebug()<<"rightzstop=true AnkleZR="<<AnkleZR<<"offset="<<AnkleZ_offsetR;
-                            }
-                            else{AnkleZR=m7;
-                                AnkleZR+=AnkleZ_offsetR;
-                            }
-                        }
-                    }
-
-                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
-
-                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
-                    }
-
-
-
-
-
-
-                    // AnkleZL=m3;
-
-                    if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
-                        AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
-
-                    }
-                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
-                        leftzstop=false;
-                        AnkleZL=m3;
-                        AnkleZ_offsetL=0;
-                    }
-                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
-                        if(!leftzstop){
-                            if(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold){
-                                leftzstop=true;
-                                AnkleZL=m3;
-                                AnkleZL+=AnkleZ_offsetL;
-                                AnkleZ_offsetL=AnkleZL-OnlineTaskSpace._lenghtOfAnkle;
-                                qDebug()<<"leftzstop=true AnkleZL="<<AnkleZL<<"offset="<<AnkleZ_offsetR;
-                            }
-                            else{AnkleZL=m3;
-                                AnkleZL+=AnkleZ_offsetL;
-                            }
-                        }
-                    }
-
-                    //qDebug()<<local_time_cycle;
-                }
-                else{
-                    AnkleZR=m7;
-                    AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,GlobalTime,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs ,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+OnlineTaskSpace.TEnd/2-OnlineTaskSpace.T_end_of_last_SS);
-
-//                    AnkleZR+=AnkleZ_offsetR;
-//                    AnkleZL+=AnkleZ_offsetL;
-                }
-}
-//                if(local_time_cycle>OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2&&local_time_cycle<OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
-
-
-//                }
-
-//                if(local_time_cycle>OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2&&local_time_cycle<OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
-
-//                }
-
-
-
-
                 PoseRoot<<P(0,0),
                         P(1,0),
                         P(2,0),// Pz(0,0)
@@ -1085,27 +931,24 @@ else{
 
                 PoseRFoot<<m5,
                         m6,
-                        AnkleZR,
+                        m7,
                         0,
                         -1*m8*(M_PI/180),
                         0;
 
                 PoseLFoot<<m1,
                         m2,
-                        AnkleZL,
+                        m3,
                         0,
                         -1*m4*(M_PI/180),
                         0;
 
-
-
-
-//PoseLFoot(0)=0;
-//PoseRFoot(0)=0;
 //PoseRoot(0)=0;
-//PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
+//PoseRFoot(0)=0;
+//PoseLFoot(0)=0;
+//PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight;
 //PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
-PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));
+//PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 
                 if(backward){
                     double backward_coeff=.5;
@@ -1200,7 +1043,8 @@ double side_move_coef=.05/2/OnlineTaskSpace.StepLength;
 
 
     //*****************************
-    PoseRoot(1,0)=PoseRoot(1,0)+side_move_coef*PoseRoot(0,0);
+double pelvis_coef=1+.1*PoseRoot(1,0)/OnlineTaskSpace.Yd;
+    PoseRoot(1,0)=PoseRoot(1,0)*pelvis_coef+PoseRoot(0,0)*side_move_coef;
     PoseRoot(0,0)=0;
 
     PoseLFoot(1,0)=PoseLFoot(1,0)+side_move_coef*PoseLFoot(0,0);
@@ -1250,12 +1094,10 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
             k_roll_l=OnlineTaskSpace.RightHipRollModification/OnlineTaskSpace.LeftHipRollModification;
 
         }
-
-//       k_roll_r=0;
-//       k_roll_l=0;
+//        k_roll_r=0;
+//        k_roll_l=0;
 
         double k_pitch=.5;
-
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
         cntrl[2]=links[2].JointAngle+k_roll_r*RollModified(0,0);//+k_roll_corr*(links[2].JointAngle-roll_absoulte[0])
@@ -1269,6 +1111,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         cntrl[10]=links[10].JointAngle;
         cntrl[11]=saturate(links[11].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_L;
         cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
+
 
         vector<int> qref(12);
         qref=QC.ctrldata2qc(cntrl);
@@ -1349,19 +1192,17 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         trajectory_data_pub.publish(trajectory_data);
 
 
-
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-         //   ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+           // ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
                      //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
 //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
         }
 
         //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.T_end_of_first_SS){break;}
-//if((e>100||f>100||g>100||h>100)&&GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
-//   break;}
+
         ros::spinOnce();
         loop_rate.sleep();
         ++count;
