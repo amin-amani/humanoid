@@ -48,6 +48,12 @@ QString WorkingDirectory="/home/cast/speech-test/";
         anyCommand=true;
       args.append("بله ، در خدمتم");
     }
+    if(QString::fromStdString(msg.data).contains("سورنا خودتو معرفی کن"))
+ {
+        anyCommand=true;
+      args.append("بله ، من سورنا هستم");
+    }
+
     else{
 
     }

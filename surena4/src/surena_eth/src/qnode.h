@@ -73,6 +73,7 @@ private:
     ros::Publisher chatter_publisher;
     ros::Publisher _imuPublisher,_jointPublisher,_incJointPublisher,_bumpPublisher,_rigthtFtPublisher,_leftFtPublisher;
     QStringListModel logging_model;
+    ros::ServiceServer _updatePositions;
     ros::ServiceServer _activeCSPService;
     ros::ServiceServer _hommingService;
     ros::ServiceServer _resetAllNodesService;
@@ -131,6 +132,7 @@ public:
     bool WaitExternalOperation(int timeoutms);
     bool GetRobotStatus(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
     bool ReadErrors(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+    bool UpdatePositions(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
     bool ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
     bool ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
 
@@ -155,6 +157,8 @@ Q_SIGNALS:
         void DoReadError();
     //=================================================================================================
   void ExternalOperationComleted();
+  //=================================================================================================
+  void UpdateAllPositions(void);
 };
 
 //}  // namespace my_qt_gui_subscriber

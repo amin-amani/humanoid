@@ -466,6 +466,22 @@ qc_initial_bool=!simulation;
             }
             else{
                 q0_r=absolute_q0_r;q0_l=absolute_q0_l;
+
+//                q0_r<<10*M_PI/180,
+//                        -9*M_PI/180,
+//                        0,
+//                        -20*M_PI/180,
+//                        0,
+//                        0,
+//                        0;
+
+//                q0_l<<10*M_PI/180,
+//                        9*M_PI/180,
+//                        0,
+//                        -20*M_PI/180,
+//                        0,
+//                        0,
+//                        0;
                 qDebug("q0 init ok");
 
              }
@@ -881,7 +897,8 @@ int fingers_r=6;  int fingers_l=6;
                 else if(scenario_l=="f" && time_l<8){q_la(3)=ql_end(3)+5*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
                 else{
                     ROS_INFO_ONCE("left reached!");
-                    if(scenario_l=="h")
+                   // if(scenario_l=="h")
+                   if(true)
                     {
                         MatrixXd t_h(1,2);
                          MatrixXd p_l(7,2);
@@ -903,7 +920,8 @@ int fingers_r=6;  int fingers_l=6;
                         }
                         fingers_l=fingers_mode_l;
                     }
-                    else{break;}
+
+                  //  else{break;}
                 }
             }
 

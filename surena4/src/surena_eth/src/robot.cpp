@@ -22,6 +22,7 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(SetActiveCSP(int)),this,SLOT(ActiveCSP(int)));
     connect(_rosNode,SIGNAL(DoResetAllNodes(int)),this,SLOT(ResetAllNodes(int)));
     connect(_rosNode,SIGNAL(DoResetHands()),this,SLOT(ResetHands()));
+    connect(_rosNode,SIGNAL(UpdateAllPositions()),this,SLOT(ReadAllInitialPositions()));
     connect(_rosNode,SIGNAL(DoActivateHands()),this,SLOT(ActivateHands()));
     connect(_rosNode,SIGNAL(DoReadError()),this,SLOT(ReadErrors()));
     connect(_rosNode,SIGNAL(SetHome(int)),this,SLOT(Home(int)));
@@ -201,7 +202,7 @@ for(int ii=0; ii<28 ; ii++)
 }
 // motor offset dynamixel
 _motorPosition[24]+=3000;
-_motorPosition[25]+=2050;
+_motorPosition[25]+=(2050-300);
 _motorPosition[26]+=2050;
 _motorPosition[16]+=2300;
 _motorPosition[17]+=2050;

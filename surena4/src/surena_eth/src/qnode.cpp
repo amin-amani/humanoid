@@ -92,6 +92,7 @@ bool QNode::Init() {
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _resetHandsService = n.advertiseService("ResetHands", &QNode::ResetHands, this);
     _activateHandsService = n.advertiseService("ActivateHands", &QNode::ActivateHands, this);
+    _updatePositions = n.advertiseService("UpdatePositions", &QNode::UpdatePositions, this);
 
      //_resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _getRobotStatus = n.advertiseService("GetRobotStatus", &QNode::GetRobotStatus, this);
@@ -217,6 +218,23 @@ bool QNode::ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Res
         return false;
 }
 }
+//================================================================================================================================================================
+bool QNode::UpdatePositions(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
+{
+    _lastOperationResult=-1;
+
+    Q_EMIT UpdateAllPositions();//req.nodeID);
+    if(!WaitExternalOperation(10000))
+    {
+            return false;
+    }
+    if(_lastOperationResult!=0)
+    {
+        return false;
+    }
+    return true;
+}
+
 //================================================================================================================================================================
 bool QNode::ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res)
 {

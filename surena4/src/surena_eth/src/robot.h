@@ -47,7 +47,7 @@ public:
     explicit Robot(QObject *parent ,int argc, char **argv);
     //=================================================================================================
 
-    bool ReadAllInitialPositions();
+
     void WaitMs(int ms);
 
 signals:
@@ -55,6 +55,7 @@ signals:
 
 public slots:
         void ReadErrors();
+           bool ReadAllInitialPositions();
     void StatusCheck();
     //=================================================================================================
     void Initialize();
