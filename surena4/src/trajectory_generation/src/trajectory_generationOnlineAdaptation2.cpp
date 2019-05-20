@@ -34,8 +34,8 @@ using namespace  Eigen;
 
 bool left_first=true;//right support in first step
 bool backward=false;
-bool turning=!false;
-double TurningRadius=.01;
+bool turning=false;
+double TurningRadius=.5;
 bool sidewalk=false;
 bool simulation=false;
 

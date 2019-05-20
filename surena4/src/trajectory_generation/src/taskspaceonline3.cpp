@@ -5,7 +5,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=1;
+    NStride=3;
     LeftHipRollModification= 3.1;2.7;+.5;
     RightHipRollModification=3.1;2.7;
     FirstHipRollModification=3.1;2.7;

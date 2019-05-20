@@ -27,7 +27,9 @@ class Robot : public QObject
     float CurrentIncPositions[40];
 
    // const double offset[12]={ -790 ,-86, 315, 433, 614, -266, -33 ,374, -277, 593, 748, 339};
-    const double offset[12]={ -770   ,-86, 315, 433, 614, -246   , -33 ,374, -277, 573  , 728  , 339};
+    //it was used till 20th of May.
+    //const double offset[12]={ -770   ,-86, 315, 433, 614, -246   , -33 ,374, -277, 573  , 728  , 339};
+    const double offset[12]={ -775  ,-86, 315, 433, 614, -245   , -33 ,374, -277, 573  , 728  , 339};
 
 
     const double ratio[12]={ 1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1};
