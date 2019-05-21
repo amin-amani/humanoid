@@ -8,9 +8,16 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     NStride=3;
     LeftHipRollModification= 3.1;2.7;+.5;
     RightHipRollModification=3.1;2.7;
+//Bazdid
+    LeftHipRollModification= 2.7;+.5;
+    RightHipRollModification=2;
+
     FirstHipRollModification=3.1;2.7;
     HipPitchModification=1;//2;
 
+    //Bazdid
+    FirstHipRollModification=2;2.7;
+HipPitchModification=0.5;//2;
     //PelvisRollRange=10*M_PI/180;
 
     YpMax=.105;.08;.12;
@@ -54,15 +61,30 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     //FastWalk17Ordibehesht
     YpMax=.123;.123;.13;.12;105;
-    YpMax = 0.115;
+    YpMax = 0.115; // 0.09 is soso
+
+    //Bazdid
+    YpMax = 0.123;
     Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
     StepLength=.15;.2;.12;.3;
+    //Bazdid
+    StepLength=0.1;
+
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     TDs=2.7;
     TSS=Tc-TDs;
     TSS=2;
+
+    //Bazdid
+    TDs = 3;
+    TSS = 3;
+
     Tc=TSS+TDs;
     AnkleMaximumHeight=0.025;
+
+    //Bazdid
+    AnkleMaximumHeight=0.06;
+
     ReferencePelvisHeight=.91;.9;.89;0.86+.02-.055;
 
 
@@ -84,6 +106,12 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     T_end_of_last_SS=1;
 
     h_end_of_SS=.015;
+
+    //Bazdid
+    h_end_of_SS=.02;
+    T_end_of_first_SS = 1;
+    T_end_of_SS = 1;
+    T_end_of_last_SS = 1;
 
     T_end_p_sx_rel=TDs+0.25*TEnd;
     T_end_p_sx=TGait+TDs+0.25*TEnd;
@@ -149,8 +177,8 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
     double t;
     double rollR=0;
     double rollL=0;
-    double dt=0;
-    double dt2=-0.20;
+    double dt=0; //0
+    double dt2=-0.2; // -0.2
     double ChargeCoeffLeftStart =0.8;.4+dt;// 0.4;          //after DS start
     double ChargeCoeffLeftEnd =1.3;1;// 1.5;              //<1 before DS ends; >1 after SS start
     double DechargeCoeffLeftStart = 0.4+dt;//.4;        //after DS start
@@ -162,8 +190,8 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
 
     double ChargeCoeffRightStartStartPhase = 0.3;   //while reducing height(0.5 means minimum height)
     double ChargeCoeffRightEndStartPhase = 0.7;     //almot maximum ankle height
-    double DechargeCoeffRightStartStartPhase = 0.4+dt; //after DS start
-    double DechargeCoeffRightEndStartPhase = 1+dt2;     //<1 before DS ends; >1 after SS start
+    double DechargeCoeffRightStartStartPhase =0.4+dt; //after DS start
+    double DechargeCoeffRightEndStartPhase =1+dt2;     //<1 before DS ends; >1 after SS start
     double ChargeCoeffRightStart =0.8;.4+dt;// 0.4;             //after DS start
     double ChargeCoeffRightEnd =1.3; 1;// 1.5;                 //<1 before DS ends; >1 after SS start
     double DechargeCoeffRightStart = 0.4+dt;//.4;           //after DS start

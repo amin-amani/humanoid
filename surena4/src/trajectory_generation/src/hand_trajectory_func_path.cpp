@@ -304,7 +304,7 @@ qc_initial_bool=!simulation;
     msg_dim.size = 1;
     msg.layout.dim.clear();
     msg.layout.dim.push_back(msg_dim);
-
+double t_r_offset=0;double t_l_offset=0;
     if(simulation){
         pub1  = nh.advertise<std_msgs::Float64>("joint1_position_controller/command",100);
         pub2  = nh.advertise<std_msgs::Float64>("joint2_position_controller/command",100);
@@ -386,7 +386,7 @@ qc_initial_bool=!simulation;
     MatrixXd V_z_r(1,3);      MatrixXd V_z_l(1,3);
     MatrixXd A_z_r(1,3);      MatrixXd A_z_l(1,3);
 
-
+int fingers_r=6;  int fingers_l=6;
     VectorXd q_ra;VectorXd q_la;
 
 
@@ -426,7 +426,7 @@ qc_initial_bool=!simulation;
 
             if(simulation){
                 q0_r<<10*M_PI/180,
-                        -9*M_PI/180,
+                        -10*M_PI/180,
                         0,
                         -20*M_PI/180,
                         0,
@@ -434,7 +434,7 @@ qc_initial_bool=!simulation;
                         0;
 
                 q0_l<<10*M_PI/180,
-                        9*M_PI/180,
+                        10*M_PI/180,
                         0,
                         -20*M_PI/180,
                         0,
@@ -465,23 +465,34 @@ qc_initial_bool=!simulation;
 
             }
             else{
-                q0_r=absolute_q0_r;q0_l=absolute_q0_l;
+                if (scenario_r=="h"){
+                   q0_r=absolute_q0_r;
+                }
+                else{
+                    q0_r<<10*M_PI/180,
+                            -10*M_PI/180,
+                            0,
+                            -20*M_PI/180,
+                            0,
+                            0,
+                            0;
+                }
 
-//                q0_r<<10*M_PI/180,
-//                        -9*M_PI/180,
-//                        0,
-//                        -20*M_PI/180,
-//                        0,
-//                        0,
-//                        0;
+                if (scenario_l=="h"){
+                   q0_l=absolute_q0_l;
+                }
+                else{
+                      q0_l<<10*M_PI/180,
+                            10*M_PI/180,
+                            0,
+                            -20*M_PI/180,
+                            0,
+                            0,
+                            0;
+                }
 
-//                q0_l<<10*M_PI/180,
-//                        9*M_PI/180,
-//                        0,
-//                        -20*M_PI/180,
-//                        0,
-//                        0,
-//                        0;
+
+
                 qDebug("q0 init ok");
 
              }
@@ -612,13 +623,14 @@ if(scenario_l=="e"){
 if(scenario_r=="f"){
 
     r_target_r<<.45,
-            0.0,
-            -0.25;
+            -0.10,
+            -0.2;
     R_target_r=hand_funcs.rot(2,-80*M_PI/180,3);
     r_middle_r<<.3,
             -0.05,
             -0.4;
     fingers_mode_r=5;
+
 
 }
 if(scenario_l=="f"){
@@ -658,6 +670,32 @@ if(scenario_l=="g"){
     fingers_mode_l=7;
 
 }
+// gripping
+if(scenario_r=="j"){
+r_target_r<<.4,
+        0.,
+        -0.15;
+r_middle_r<<.3,
+        -.0,
+        -.3;
+
+R_target_r=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,-10*M_PI/180+atan2(r_target_r(1),r_target_r(0)),3);
+fingers_mode_r=2;
+}
+if(scenario_l=="j"){
+r_target_l<<.4,
+        -0.,
+        -0.15;
+r_middle_l<<.3,
+        .0,
+        -.3;
+
+R_target_l=hand_funcs.rot(2,-90*M_PI/180,3)*hand_funcs.rot(1,-(-10*M_PI/180+atan2(r_target_r(1),r_target_r(0))),3);
+fingers_mode_l=2;
+}
+
+
+
 
             // temp
             if(scenario_r=="z"){
@@ -749,6 +787,9 @@ if(scenario_l=="g"){
             //ROS_INFO("\n
 
             //home
+
+
+
             if(scenario_r=="h"){
                  qr_end=q0_r;
                  fingers_mode_r=6;
@@ -769,11 +810,19 @@ if(scenario_l=="g"){
 
         else {
 
-int fingers_r=6;  int fingers_l=6;
+
             time=double(count)*.005;
             time_r=time; time_l=time;
-            if(scenario_r=="h"){time_r+=t_r(2);}
-            if(scenario_l=="h"){time_l+=t_l(2);}
+
+            if((scenario_r=="g"||scenario_r=="f")&&time_r>=t_r(2)*2-.005){scenario_r="h";;t_r_offset=2*t_r(2);}
+            if((scenario_l=="g"||scenario_l=="f")&&time_l>=t_l(2)*2-.005){scenario_l="h";;t_l_offset=2*t_l(2);}
+
+            if(scenario_r=="h"){time_r=time_r+(t_r(2)-t_r_offset);}
+            if(scenario_l=="h"){time_l=time_l+(t_l(2)-t_l_offset);}
+
+            if(scenario_r=="n"){time_r=t_r(2)*3;}
+            if(scenario_l=="n"){time_l=t_l(2)*3;}
+
             VectorXd P_r(3); VectorXd V_r(3);
             VectorXd P_l(3); VectorXd V_l(3);
             if(time_r<t_r(1)){
@@ -814,18 +863,20 @@ int fingers_r=6;  int fingers_l=6;
                 sai_r=hand_r.sai;
                 phi_r=hand_r.phi;
                 fingers_r=fingers_mode_r;
-
+qr_end=q_ra;
                // ROS_INFO("right: %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_ra(0),q_ra(1),q_ra(2),q_ra(3),q_ra(4),q_ra(5),q_ra(6));
                 //ROS_INFO("left:  %f\t%f\t%f\t%f\t%f\t%f\t%f\t",q_la(0),q_la(1),q_la(2),q_la(3),q_la(4),q_la(5),q_la(6));
+
             }
             else if (time_r<t_r(2)*2){
 
-                if(scenario_r=="g" && time_r<8){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
-                else if(scenario_r=="f" && time_r<8){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
+
+                if(scenario_r=="g"){q_ra(2)=qr_end(2)+15*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
+                else if(scenario_r=="f"){q_ra(3)=qr_end(3)+5*M_PI/180*sin((time_r-t_r(2))/2*(2*M_PI));}
                 else{
                     ROS_INFO_ONCE("right reached!");
-                    if(scenario_r=="h")
-                    {
+                    //if(scenario_r=="h")
+
                         MatrixXd t_h(1,2);
                         MatrixXd p_r(7,2); MatrixXd p_l(7,2);
                         MatrixXd zero(1,2); zero<<0,0;
@@ -847,9 +898,28 @@ int fingers_r=6;  int fingers_l=6;
                             q_ra(i)=coef_generator.GetAccVelPos(r_coeff.row(0),time_r,t_h(0) ,5)(0,0);
 
                         }
-                        fingers_r=fingers_mode_r;
+
+                        fingers_r=6;
+
+                }
+
+                if(scenario_r=="j"&&time_r==t_r(2)){ fingers_r=2;}
+                if(scenario_r=="j"&&time_r==(t_r(2)+.005)){
+                     fingers_r=7;
+                    for (int var = 0; var < 10*200; ++var) {
+                        ros::spinOnce();
+                        loop_rate.sleep();
+                      //  qDebug()<<"right gripping/finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7]<<"\tt_l:"<<time_l<<"\tt_r:"<<time_r;
                     }
-                    else{break;}
+                }
+
+                if(scenario_r=="j"&&time_r==(t_r(2)+.01)){
+                    fingers_r=6;
+                    for (int var = 0; var < 2*200; ++var) {
+                        ros::spinOnce();
+                        loop_rate.sleep();
+                        //  qDebug()<<"right releasing/finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7]<<"\tt_l:"<<time_l<<"\tt_r:"<<time_r;
+                    }
                 }
             }//
 
@@ -889,17 +959,27 @@ int fingers_r=6;  int fingers_l=6;
                 sai_l=hand_l.sai;
                 phi_l=hand_l.phi;
                 fingers_l=fingers_mode_l;
+                ql_end=q_la;
 
             }
 
+
+
             else if (time_l<t_l(2)*2){
-                if(scenario_l=="g" && time_l<8){q_la(2)=ql_end(2)+15*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
-                else if(scenario_l=="f" && time_l<8){q_la(3)=ql_end(3)+5*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
+
+
+
+
+
+
+
+                if(scenario_l=="g"){q_la(2)=ql_end(2)+15*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
+                else if(scenario_l=="f"){q_la(3)=ql_end(3)+5*M_PI/180*sin((time_l-t_l(2))/2*(2*M_PI));}
                 else{
                     ROS_INFO_ONCE("left reached!");
-                   // if(scenario_l=="h")
-                   if(true)
-                    {
+                  //  if(scenario_l=="h")
+
+
                         MatrixXd t_h(1,2);
                          MatrixXd p_l(7,2);
                         MatrixXd zero(1,2); zero<<0,0;
@@ -918,18 +998,47 @@ int fingers_r=6;  int fingers_l=6;
                             l_coeff=coef_generator.Coefficient(t_h,p_l.row(i),zero,zero);
                             q_la(i)=coef_generator.GetAccVelPos(l_coeff.row(0),time_l,t_h(0) ,5)(0,0);
                         }
-                        fingers_l=fingers_mode_l;
+                        fingers_l=6;
+
+                }
+
+                if(scenario_l=="j"&&time_l==t_l(2)){ fingers_l=2;}
+
+
+                if(scenario_l=="j"&&time_l==(t_l(2)+.005)){
+                    if(scenario_l=="j"){ fingers_l=7;}
+                    for (int var = 0; var < 10*200; ++var) {
+                        ros::spinOnce();
+                        loop_rate.sleep();
+                       // qDebug()<<"left gripping/finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7]<<"\tt_l:"<<time_l<<"\tt_r:"<<time_r;
                     }
 
-                  //  else{break;}
+                }
+
+                if((scenario_l=="j"&&time_l==(t_l(2)+.01))){
+                    if(scenario_l=="j"){ fingers_l=6;}
+
+                    for (int var = 0; var < 2*200; ++var) {
+                        ros::spinOnce();
+                        loop_rate.sleep();
+                       // qDebug()<<"left releasing/finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7]<<"\tt_l:"<<time_l<<"\tt_r:"<<time_r;
+                    }
+
                 }
             }
+if(scenario_l!="g"&&scenario_l!="f"&&scenario_r!="g"&&scenario_r!="f"){
+            if(time_r==(t_r(2)-.005)||time_l==(t_l(2)-.005)){
+                     for (int var = 0; var < 2*200; ++var) {
+                    ros::spinOnce();
+                    loop_rate.sleep();
+                }
+            }
+}
+            if(time_r>2*t_r(2)&&time_l>2*t_l(2)) {break;}
 
 
-            else{break;}
-
-            matrix_view(P_r); matrix_view(P_l);
-
+        //    matrix_view(P_r); matrix_view(P_l);
+}
             qr1.append(q_ra(0));    ql1.append(q_la(0));
             qr2.append(q_ra(1));    ql2.append(q_la(1));
             qr3.append(q_ra(2));    ql3.append(q_la(2));
@@ -948,7 +1057,7 @@ int fingers_r=6;  int fingers_l=6;
 
 
 
-            {
+
                 for (int i = 0; i < 31; ++i) {
                     q[i]=0;
                 }
@@ -971,7 +1080,7 @@ int fingers_r=6;  int fingers_l=6;
 if(simulation){SendGazebo(q);}
 
 
-            }
+
 
 
             q_motor_r[0]=-int(10*(qr1[count]-q0_r(0))*180/M_PI*120/60)+qra_offset[0];
@@ -992,7 +1101,7 @@ if(simulation){SendGazebo(q);}
             q_motor_l[3]=-int(7*(ql4[count]-q0_l(3))*180/M_PI*100/60)+qla_offset[3];
 
             q_motor_l[4]=int((ql5[count]-q0_l(4))*(2048)/M_PI);
-            q_motor_l[5]=int((ql6[count]-q0_l(5))*(4000-2050)/(23*M_PI/180));
+            q_motor_l[5]=-int((ql6[count]-q0_l(5))*(4000-2050)/(23*M_PI/180));
             q_motor_l[6]=int((ql7[count]-q0_l(6))*(4000-2050)/(23*M_PI/180));
 
             q_motor_l[7]=fingers_l;
@@ -1026,12 +1135,13 @@ if(simulation){SendGazebo(q);}
             ++count;
 if(!simulation){chatter_pub.publish(msg);}
 
-        }
+
 
         ros::spinOnce();
         loop_rate.sleep();
+       // qDebug()<<"finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7];
 
+}
 
-    }
     return 0;
 }

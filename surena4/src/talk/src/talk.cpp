@@ -31,7 +31,7 @@ QString WorkingDirectory="/home/cast/speech-test/";
     if(QString::fromStdString(msg.data).contains("سورنا سلام"))
  {
         anyCommand=true;
-      args.append("سلام ، از آشنایی شما خوشبختم");
+      args.append("سلام ، از آشنایی با شما خوشبختم");
     }
     if(QString::fromStdString(msg.data).contains("سورنا حالت چطوره"))
  {
@@ -41,7 +41,7 @@ QString WorkingDirectory="/home/cast/speech-test/";
     if(QString::fromStdString(msg.data).contains("سورنا چند درجه آزادی داری"))
  {
         anyCommand=true;
-      args.append("من ۴۳ درجه آزادی دارم");
+      args.append("من ۴۳ درجه ی آزادی دارم");
     }
     if(QString::fromStdString(msg.data).contains("سورنا صدای منو میشنوی"))
  {
@@ -51,7 +51,12 @@ QString WorkingDirectory="/home/cast/speech-test/";
     if(QString::fromStdString(msg.data).contains("سورنا خودتو معرفی کن"))
  {
         anyCommand=true;
-      args.append("بله ، من سورنا هستم");
+
+      args.append("من سورنا ۴، نسل چهارم ربات انسان نمای ملی ایران هستم که با حمایت معاونت علمی و فناوری ریاست جمهوری در مرکز"
+                  " سیستمها و فناوریهای پیشرفته دانشگاه تهران ساخته شده ام."
+                  );
+
+      //qDebug()<<"len="<<args[0].length();
     }
 
     else{
@@ -62,7 +67,7 @@ QString WorkingDirectory="/home/cast/speech-test/";
     if(anyCommand)
     {
      talker->start(WorkingDirectory+"speech-test",args);
-    talker->waitForFinished(4000);
+    talker->waitForFinished(args[0].length()*150);
      talker->terminate();
     }
     running=false;
