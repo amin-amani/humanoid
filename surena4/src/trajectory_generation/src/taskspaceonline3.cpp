@@ -5,10 +5,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
-    NStride=3;
-    LeftHipRollModification= 3.2;3.1;2.7;+.5;
-    RightHipRollModification=3.2;3.1;2.7;
-    FirstHipRollModification=3.2;3.1;2.7;
+    NStride=300;
+    LeftHipRollModification= 2;3.2;3.1;2.7;+.5;
+    RightHipRollModification=2;3.2;3.1;2.7;
+    FirstHipRollModification=2;3.2;3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -53,16 +53,15 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     //FastWalk17Ordibehesht
     YpMax=0.11-0.0;.123;.123;.13;.12;105;
-    YStMax=.12;
-    YEndMax=.12;
-    Yd=0.07-0.0;
+    YStMax=.123;
+    YEndMax=.123;
+    Yd=0.065;.1;0.07-0.0;
     StepLength=.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
-    TDs = 2;2;
-    TSS=Tc-TDs;
-    TSS=1.5;
+    TDs = .75;2;
+    TSS=.74;
     Tc=TSS+TDs;
 
     DesiredVelocity=StepLength*3.6/Tc;
@@ -85,10 +84,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     // last step: timing parameter of pelvis motion
     T_end_of_first_SS=1;
     //    T_end_of_SS=.9;
-    T_end_of_SS=.5;//TSS*.3;
+    T_end_of_SS=.0005;//TSS*.3;
     T_end_of_last_SS=1;
 
-    h_end_of_SS=.015;
+    h_end_of_SS=.00000000015;
 
     T_end_p_sx_rel=TDs+0.25*TEnd;
     T_end_p_sx=TGait+TDs+0.25*TEnd;
@@ -119,7 +118,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     CoeffArrayAnkle();
+
     CoeffArrayPelvis();
+
 }
 
 void TaskSpaceOnline3::numplot(double num,double min,double max){
@@ -418,7 +419,8 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd Cy_cy_iAcc(1,3);
     Cy_cy_iAcc<<0 ,INFINITY, 0;
     C_cy_y_ar=CoefOffline.Coefficient(Cy_cy_iTime,Cy_cy_iPos,Cy_cy_iVel,Cy_cy_iAcc);
-    //*************************** end *************************************
+
+ //*************************** end *************************************
     //***** x end
     MatrixXd C_end_iTime_ar(1,2);
     C_end_iTime_ar<<0, (T_end_a_e-T_end_a_s-T_end_of_last_SS);
@@ -489,31 +491,63 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
 //matrix_view(Cx_p);
     //------------------Coefficient of cyclic Pelvis motion in Y direction--------------------
     MatrixXd ordY(1,8);
-    ordY << 4,3,4,5,4,3,4,5;// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
-    MatrixXd tttY(1,9);
-    tttY <<0,TMinPelvisY,TDs,TDs+TSS/2,Tc,Tc+TDs/2,Tc+TDs,Tc+TDs+TSS/2,2*Tc;
-    MatrixXd conY(3,9);
-//    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
-//    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
-    double v_d=4*(YpMax-Yd)/TSS;
-    double v_d2 = v_d;
-    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   v_d2, INFINITY,v_d, 0 ,-v_d2,INFINITY,-v_d,0,v_d2     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+//  ordY << 3,3,4,4,5,3,4,4; // ordY << 4,3,4,5,4,3,4,5;////// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
+//    MatrixXd tttY(1,9);
+//    tttY <<0,TMinPelvisY,TDs,TDs+TSS/2,Tc,Tc+TDs/2,Tc+TDs,Tc+TDs+TSS/2,2*Tc;
+//    MatrixXd conY(3,9);
+////    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
+////    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+//    double v_d=4*(YpMax-Yd)/TSS;
+//    double v_d2 = v_d;
+//    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   v_d2, INFINITY,v_d, 0 ,-v_d2,INFINITY,-v_d,0,v_d2     ,INFINITY, INFINITY,INFINITY, INFINITY ,INFINITY,INFINITY,INFINITY,INFINITY,INFINITY;//a= ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
-    Cy_p_i.resize(8,6);
-    Cy_p_i.fill(0);
-    Cy_p_i.block(0,0,8,6)=CoefOffline.Coefficient1(tttY,ordY,conY,0.1).transpose();//.block(0,1,8,5)
-    Cy_p.resize(1,48);
-    Cy_p.fill(0);
-    Cy_p.block(0,0,1,6)=Cy_p_i.row(0);
-    Cy_p.block(0,6,1,6)=Cy_p_i.row(1);
-    Cy_p.block(0,12,1,6)=Cy_p_i.row(2);
-    Cy_p.block(0,18,1,6)=Cy_p_i.row(3);
-    Cy_p.block(0,24,1,6)=Cy_p_i.row(4);
-    Cy_p.block(0,30,1,6)=Cy_p_i.row(5);
-    Cy_p.block(0,36,1,6)=Cy_p_i.row(6);
-    Cy_p.block(0,42,1,6)=Cy_p_i.row(7);
+//    Cy_p_i.resize(8,6);
+//    Cy_p_i.fill(0);
+//    Cy_p_i.block(0,0,8,6)=CoefOffline.Coefficient1(tttY,ordY,conY,0.1).transpose();//.block(0,1,8,5)
+//    Cy_p.resize(1,48);
+//    Cy_p.fill(0);
+//    Cy_p.block(0,0,1,6)=Cy_p_i.row(0);
+//    Cy_p.block(0,6,1,6)=Cy_p_i.row(1);
+//    Cy_p.block(0,12,1,6)=Cy_p_i.row(2);
+//    Cy_p.block(0,18,1,6)=Cy_p_i.row(3);
+//    Cy_p.block(0,24,1,6)=Cy_p_i.row(4);
+//    Cy_p.block(0,30,1,6)=Cy_p_i.row(5);
+//    Cy_p.block(0,36,1,6)=Cy_p_i.row(6);
+//    Cy_p.block(0,42,1,6)=Cy_p_i.row(7);
 
     //matrix_view(Cy_p_i);
+
+
+    ordY << 5,5,5,5,5,5,5,5; // ordY << 4,3,4,5,4,3,4,5;////// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old
+      MatrixXd tttY(1,9);
+      tttY <<0,TMinPelvisY,TDs,TDs+TSS/2,Tc,Tc+TDs/2,Tc+TDs,Tc+TDs+TSS/2,2*Tc;
+      MatrixXd conY(3,9);
+  //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,0,0;
+  //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+
+
+      double a_d=-.35;
+      double a_h=a_d/3/TDs;
+      double c_h=(Yd-a_h*TDs*TDs*TDs/8)*2/TDs;
+      double v_d=3*a_h*TDs*TDs/4+c_h;
+      YpMax=a_d/2*(TSS/2)*(TSS/2)+v_d*(TSS/2)+Yd;
+      conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,
+              v_d, c_h,v_d, 0 ,-v_d,-c_h, -v_d,0,v_d
+              ,-a_d, 0,a_d, a_d ,a_d, 0 ,-a_d,-a_d,-a_d;//a= ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+
+      Cy_p_i.resize(8,6);
+      Cy_p_i.fill(0);
+      Cy_p_i.block(0,0,8,6)=CoefOffline.Coefficient1(tttY,ordY,conY,0.1).transpose();//.block(0,1,8,5)
+      Cy_p.resize(1,48);
+      Cy_p.fill(0);
+      Cy_p.block(0,0,1,6)=Cy_p_i.row(0);
+      Cy_p.block(0,6,1,6)=Cy_p_i.row(1);
+      Cy_p.block(0,12,1,6)=Cy_p_i.row(2);
+      Cy_p.block(0,18,1,6)=Cy_p_i.row(3);
+      Cy_p.block(0,24,1,6)=Cy_p_i.row(4);
+      Cy_p.block(0,30,1,6)=Cy_p_i.row(5);
+      Cy_p.block(0,36,1,6)=Cy_p_i.row(6);
+      Cy_p.block(0,42,1,6)=Cy_p_i.row(7);
 
 
     //----------------Coefficient of Start of Pelvis motion in x direction---------------------
@@ -564,9 +598,9 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
     MatrixXd Cy_st_pePos(1,2);
     Cy_st_pePos<<-1*YStMax, -1*Yd;
     MatrixXd Cy_st_peVel(1,2);   // Cy_st_peVel<<0 ,5*Cy_p(0,0)*pow(0,4)+4*Cy_p(0,1)*pow(0,3)+3*Cy_p(0,2)*pow(0,2)+2*Cy_p(0,3)*pow(0,1)+Cy_p(0,4);
-    Cy_st_peVel<<0 ,v_d2;
+    Cy_st_peVel<<0 , v_d;//5*Cy_p(0,0)*pow(0,4)+4*Cy_p(0,1)*pow(0,3)+3*Cy_p(0,2)*pow(0,2)+2*Cy_p(0,3)*pow(0,1)+Cy_p(0,4);
     MatrixXd Cy_st_peAccel(1,2);    //Cy_st_peAccel<<0 ,2*Cy_p(0,3);
-    Cy_st_peAccel<<0 ,0;
+    Cy_st_peAccel<<0 ,-a_d;//2*Cy_p(0,3);//Cy_st_peAccel<<0 ,0;
     Cy_st_pb=CoefOffline.Coefficient(Cy_st_peTime,Cy_st_pePos,Cy_st_peVel,Cy_st_peAccel);
     // -------------------Coefficient of End of Pelvis motion in y direction--------------
     MatrixXd Cy_end_psTime(1,2);
@@ -574,9 +608,10 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
     MatrixXd Cy_end_psPos(1,2);
     Cy_end_psPos<<Yd, YEndMax;
     MatrixXd Cy_end_psVel(1,2);//    Cy_end_psVel<<5*Cy_p_i(1,0)*pow(TDs,4)+4*Cy_p_i(1,1)*pow(TDs,3)+3*Cy_p_i(1,2)*pow(TDs,2)+2*Cy_p_i(1,3)*pow(TDs,1)+Cy_p_i(1,4),0;
-    Cy_end_psVel<<v_d2,0;
-    MatrixXd Cy_end_psAccel(1,2);//    Cy_end_psAccel<< 5*4*Cy_p_i(1,0)*pow(TDs,4)+4*3*Cy_p_i(1,1)*pow(TDs,3)+3*2*Cy_p_i(1,2)*pow(TDs,2)+2*Cy_p_i(1,3), 0;
-    Cy_end_psAccel<<0,0;
+    Cy_end_psVel<<v_d,0;
+    MatrixXd Cy_end_psAccel(1,2);
+     Cy_end_psAccel<<-a_d ,0;// 5*4*Cy_p_i(1,0)*pow(TDs,4)+4*3*Cy_p_i(1,1)*pow(TDs,3)+3*2*Cy_p_i(1,2)*pow(TDs,2)+2*Cy_p_i(1,3), 0;
+   // Cy_end_psAccel<<0,0;
     Cy_end_pa=CoefOffline.Coefficient(Cy_end_psTime,Cy_end_psPos,Cy_end_psVel,Cy_end_psAccel);
 
     MatrixXd Cy_end_peTime(1,2);
@@ -855,7 +890,10 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
             z_al=_lenghtOfAnkle+output(0,0);
         }
     }
-
+    x_ar=0;
+    z_ar=_lenghtOfAnkle;
+    x_al=0;
+    z_al=_lenghtOfAnkle;
     if (n!=1 && n!=(NStep+2)){//cyclic walking
 
         n=n-1;
@@ -1037,7 +1075,7 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
 
     MatrixXd footpos(8,1);
     footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
-qDebug()<<"time="<<time<<"\tzal="<<z_al-.112<<"\tzar="<<z_ar-.112;
+//qDebug()<<"time="<<time<<"\tzal="<<z_al-.112<<"\tzar="<<z_ar-.112;
     return footpos;
 
 }

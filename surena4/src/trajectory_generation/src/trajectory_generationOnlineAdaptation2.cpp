@@ -37,9 +37,9 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
-int bump_threshold=98;
+int bump_threshold=85;
 bool simulation=false;
-bool AnkleZAdaptation=false;
+bool AnkleZAdaptation=!false;
 
 
 double saturate(double a, double min, double max){
@@ -1011,16 +1011,21 @@ else{
                                 AnkleZR+=AnkleZ_offsetR;
                                 AnkleZ_offsetR=AnkleZR-OnlineTaskSpace._lenghtOfAnkle;
                                 qDebug()<<"rightzstop=true AnkleZR="<<AnkleZR<<"offset="<<AnkleZ_offsetR;
+                                ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+
                             }
                             else{AnkleZR=m7;
                                 AnkleZR+=AnkleZ_offsetR;
                             }
                         }
                     }
+                    //else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
 
-                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
+                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2){
 
-                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
+//                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
+                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
+
                     }
 
 
@@ -1030,9 +1035,11 @@ else{
 
                     // AnkleZL=m3;
 
-                    if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
-                        AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
+                   // if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
+                     if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2){
 
+                         //                    AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
+                         AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
                     }
                     else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
                         leftzstop=false;
@@ -1043,11 +1050,15 @@ else{
                         if(!leftzstop){
                             if(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold){
                                 leftzstop=true;
+
                                 AnkleZL=m3;
                                 AnkleZL+=AnkleZ_offsetL;
                                 AnkleZ_offsetL=AnkleZL-OnlineTaskSpace._lenghtOfAnkle;
                                 qDebug()<<"leftzstop=true AnkleZL="<<AnkleZL<<"offset="<<AnkleZ_offsetR;
+                                ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+
                             }
+
                             else{AnkleZL=m3;
                                 AnkleZL+=AnkleZ_offsetL;
                             }
@@ -1100,9 +1111,9 @@ else{
 
 
 
-//PoseLFoot(0)=0;
-//PoseRFoot(0)=0;
-//PoseRoot(0)=0;
+PoseLFoot(0)=0;
+PoseRFoot(0)=0;
+PoseRoot(0)=0;
 //PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 //PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));
@@ -1353,7 +1364,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-         //   ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+//            ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
                      //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
 //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
