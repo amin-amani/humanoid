@@ -1118,9 +1118,9 @@ else{
 
 
 
-PoseLFoot(0)=0;
-PoseRFoot(0)=0;
-PoseRoot(0)=0;
+//PoseLFoot(0)=0;
+//PoseRFoot(0)=0;
+//PoseRoot(0)=0;
 //PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 //PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));

@@ -30,6 +30,7 @@ public:
 
     double YpMax;//Rm*0.5*_pelvisLength*1.2;
     double Yd;//1*Rd*YpMax
+    double a_d;
     double YStMax;// Start motion parameter in y direction
     double YEndMax;//End motion parameter in y direction
     double Xe;// Distance of pelvis and rear ankle in DS Xe=Sc*StepLength/(Rse+1)*1.2;

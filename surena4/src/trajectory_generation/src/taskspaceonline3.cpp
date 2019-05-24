@@ -6,9 +6,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=300;
-    LeftHipRollModification= 2.5;3.2;3.1;2.7;+.5;
-    RightHipRollModification=2.5;3.2;3.1;2.7;
-    FirstHipRollModification=0;3.2;3.1;2.7;
+    LeftHipRollModification= 2;3.2;3.1;2.7;+.5;
+    RightHipRollModification=2;3.2;3.1;2.7;
+    FirstHipRollModification=2;3.2;3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -53,10 +53,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     //FastWalk17Ordibehesht
     YpMax=0.11-0.0;.123;.123;.13;.12;105;
-    YStMax=.06;.123;
+    YStMax=.123;.06;
     YEndMax=.123;
     Yd=0.055;0.065;.1;0.07-0.0;
-    StepLength=.15;.2;.12;.3;
+    StepLength=.1;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
@@ -66,10 +66,11 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     //dynamic hamid
 
-    TDs =0.6;
-    TSS=.6;
+    TDs =0.7;
+    TSS=0.7;
     Tc=TSS+TDs;
-    Yd=.0545;
+    Yd=.0562;
+    a_d=-.438;
 
 
 
@@ -78,8 +79,8 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     AnkleMaximumHeight=0.025;
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
-    Xe=.04;0.02;.023;
-    Xs=0.01;
+    Xe=.04/15*10;0.02;.023;
+    Xs=0.01/15*10;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
@@ -92,10 +93,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
     TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
     // last step: timing parameter of pelvis motion
-    T_end_of_first_SS=1;
+    T_end_of_first_SS=.001;
     //    T_end_of_SS=.9;
     T_end_of_SS=.0005;//TSS*.3;
-    T_end_of_last_SS=1;
+    T_end_of_last_SS=.001;
 
     h_end_of_SS=.00000000015;
 
@@ -536,14 +537,18 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
   //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
 
-      double a_d=-.4545;
+
       double a_h=a_d/3/TDs;
       double c_h=(Yd-a_h*TDs*TDs*TDs/8)*2/TDs;
       double v_d=3*a_h*TDs*TDs/4+c_h;
-      YpMax=a_d/2*(TSS/2)*(TSS/2)+v_d*(TSS/2)+Yd;
+      //YpMax=a_d/2*(TSS/2)*(TSS/2)+v_d*(TSS/2)+Yd;
+      double a_a_h=(a_d*TSS*TSS/2+v_d*TSS)*12/(TSS*TSS*TSS*TSS);
+      double b_b_h=-a_a_h*TSS;
+      YpMax=-.75*a_a_h*(TSS*TSS*TSS*TSS)/48+a_d*TSS*TSS/8+v_d*TSS/2+Yd;
+      double a_p_max=a_a_h*TSS*TSS/4+b_b_h*TSS/2+a_d;
       conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,
               v_d, c_h,v_d, 0 ,-v_d,-c_h, -v_d,0,v_d
-              ,-a_d, 0,a_d, a_d ,a_d, 0 ,-a_d,-a_d,-a_d;//a= ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
+              ,-a_d, 0,a_d, a_p_max ,a_d, 0 ,-a_d,-a_p_max,-a_d;//a= ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
       Cy_p_i.resize(8,6);
       Cy_p_i.fill(0);
@@ -900,10 +905,10 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
             z_al=_lenghtOfAnkle+output(0,0);
         }
     }
-    x_ar=0;
-    z_ar=_lenghtOfAnkle;
-    x_al=0;
-    z_al=_lenghtOfAnkle;
+//    x_ar=0;
+//    z_ar=_lenghtOfAnkle;
+//    x_al=0;
+//    z_al=_lenghtOfAnkle;
     if (n!=1 && n!=(NStep+2)){//cyclic walking
 
         n=n-1;
