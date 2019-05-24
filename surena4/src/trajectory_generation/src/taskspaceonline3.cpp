@@ -6,9 +6,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=300;
-    LeftHipRollModification= 2;3.2;3.1;2.7;+.5;
-    RightHipRollModification=2;3.2;3.1;2.7;
-    FirstHipRollModification=2;3.2;3.1;2.7;
+    LeftHipRollModification= 2.5;3.2;3.1;2.7;+.5;
+    RightHipRollModification=2.5;3.2;3.1;2.7;
+    FirstHipRollModification=0;3.2;3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -53,16 +53,26 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     //FastWalk17Ordibehesht
     YpMax=0.11-0.0;.123;.123;.13;.12;105;
-    YStMax=.123;
+    YStMax=.06;.123;
     YEndMax=.123;
-    Yd=0.065;.1;0.07-0.0;
+    Yd=0.055;0.065;.1;0.07-0.0;
     StepLength=.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
-    TDs = .75;2;
-    TSS=.74;
+    TDs =0.55; .75;2;
+    TSS=.706;
     Tc=TSS+TDs;
+
+    //dynamic hamid
+
+    TDs =0.6;
+    TSS=.6;
+    Tc=TSS+TDs;
+    Yd=.0545;
+
+
+
 
     DesiredVelocity=StepLength*3.6/Tc;
     AnkleMaximumHeight=0.025;
@@ -526,7 +536,7 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
   //    conY<<-1*Yd,0,Yd,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,   0, INFINITY,INFINITY, 0 ,0,INFINITY,INFINITY,0,0     ,0, INFINITY,INFINITY, INFINITY ,0,INFINITY,INFINITY,INFINITY,0;
 
 
-      double a_d=-.35;
+      double a_d=-.4545;
       double a_h=a_d/3/TDs;
       double c_h=(Yd-a_h*TDs*TDs*TDs/8)*2/TDs;
       double v_d=3*a_h*TDs*TDs/4+c_h;

@@ -446,6 +446,8 @@ MatrixXd quater2rot(double w,double x,double y, double z){
     return R;
 }
 double roll_imu=0;
+int N=100;
+double roll_imu_qeue[100];
 double a_y=0;double a_z=0;
 void IMU_feedback(const sensor_msgs::Imu &msg){
 //   double w,x,y,z;
@@ -459,7 +461,14 @@ void IMU_feedback(const sensor_msgs::Imu &msg){
 //   roll_imu=acos(R(2,1));
    a_y=msg.linear_acceleration.y;
    a_z=msg.linear_acceleration.z;
-   roll_imu=atan2(a_y,a_z);
+   roll_imu_qeue[0]=atan2(a_y,a_z)/8;
+   for (int i = 1; i < N; ++i) {
+       roll_imu_qeue[i]=roll_imu_qeue[i-1];
+   }
+   roll_imu=0;
+   for (int i = 0; i < N; ++i) {
+       roll_imu+=roll_imu_qeue[i]/100;
+   }
 
 }
 
@@ -523,6 +532,10 @@ void ankle_states(const gazebo_msgs::LinkStates& msg){
 
 int main(int argc, char **argv)
 {
+    for (int i = 0; i < N; ++i) {
+        roll_imu_qeue[i]=0;
+    }
+
 
     QString address;
 
@@ -662,10 +675,10 @@ T_begin=6+Tds/2;
         //matrix_view(positionmat[count]);
 
 
-       //cntrl[2]+=roll_imu;
-       //cntrl[8]+=roll_imu;
-       //cntrl[6]-=roll_imu;
-        cntrl[12]-=roll_imu/10;
+       cntrl[2]+=roll_imu;
+       cntrl[8]+=roll_imu;
+       cntrl[6]-=roll_imu;
+       cntrl[12]-=roll_imu/10;
 
 
         vector<int> qref(12);
