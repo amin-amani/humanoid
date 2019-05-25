@@ -56,7 +56,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     YStMax=.123;.06;
     YEndMax=.123;
     Yd=0.055;0.065;.1;0.07-0.0;
-    StepLength=.1;.2;.12;.3;
+    StepLength=.15;.2;.12;.3;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
@@ -67,7 +67,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     //dynamic hamid
 
     TDs =0.7;
-    TSS=0.7;
+    TSS=0.9;
     Tc=TSS+TDs;
     Yd=.0562;
     a_d=-.438;
@@ -76,11 +76,11 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     DesiredVelocity=StepLength*3.6/Tc;
-    AnkleMaximumHeight=0.025;
+    AnkleMaximumHeight=0.035;
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
-    Xe=.04/15*10;0.02;.023;
-    Xs=0.01/15*10;
+    Xe=.04;//15*10;0.02;.023;
+    Xs=0.01;//15*10;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
