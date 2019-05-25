@@ -80,13 +80,13 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
     Xe=.04;//15*10;0.02;.023;
-    Xs=0.01;//15*10;
+    Xs=0.02;//15*10;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
 //    Tc=TSS+TDs;
 
-    Tm=0.35*TSS;
+    Tm=0.45*TSS;
     TGait=TStart+NStride*2*Tc;
     MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
     TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction

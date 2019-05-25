@@ -1123,7 +1123,7 @@ else{
 //PoseRoot(0)=0;
 //PoseLFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
 //PoseRFoot(2)=OnlineTaskSpace._lenghtOfAnkle;
-PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));
+//PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTaskSpace.ReferencePelvisHeight-OnlineTaskSpace._lenghtOfAnkle));
 
                 if(backward){
                     double backward_coeff=.5;
@@ -1137,7 +1137,7 @@ PoseRoot(2)=OnlineTaskSpace.ReferencePelvisHeight*cos(atan2(PoseRoot(1),OnlineTa
                 R_P=MatrixXd::Identity(3,3);
                 R_F_L=MatrixXd::Identity(3,3);
                 R_F_R=MatrixXd::Identity(3,3);
-                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.Yd)*3*M_PI/180;//3 was good
+                double pelvis_roll=-(PoseRoot(1,0)/OnlineTaskSpace.YpMax)*2.5*M_PI/180;//3 was good
                 R_P<<1,0,0,
                       0,cos(pelvis_roll),-sin(pelvis_roll),
                         0,sin(pelvis_roll),cos(pelvis_roll);
