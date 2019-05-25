@@ -27,7 +27,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=StepLength*3.6/DesiredVelocity;
     TDs=.4*Tc;
     TSS=Tc-TDs;
-    XofAnkleMaximumHeight=StepLength*1.7;
+    XofAnkleMaximumHeight=StepLength*1.9;
 
 
 
@@ -42,14 +42,14 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     //test
-    YpMax=.123;.13;.12;105;
-    Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
-    StepLength=.1;.15;.2;.12;.3;
-    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
-    TDs=3;
-    TSS=Tc-TDs;
-    TSS=3;
-    Tc=TSS+TDs;
+//    YpMax=.123;.13;.12;105;
+//    Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
+//    StepLength=.1;.15;.2;.12;.3;
+//    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
+//    TDs=3;
+//    TSS=Tc-TDs;
+//    TSS=3;
+//    Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
     YpMax=0.11-0.0;.123;.123;.13;.12;105;
@@ -77,10 +77,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
     DesiredVelocity=StepLength*3.6/Tc;
     AnkleMaximumHeight=0.035;
-    ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
+    ReferencePelvisHeight=.93;.9;.89;0.86+.02-.055;
 
     Xe=.04;//15*10;0.02;.023;
-    Xs=0.02;//15*10;
+    Xs=0.025;//15*10;
 
 //    TDs=2;//2.5;
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
@@ -340,6 +340,11 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS);
     double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm);
     double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS);
+
+    vz_start=0;
+    vz_cycle=0;
+    vz_end=  0;
+
     //**************** start ***************************//
     //***** x start
     MatrixXd Cx_st_iTime_al(1,2);
@@ -391,7 +396,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iTime_ar(1,3);
     C_cy_iTime_ar<<0, Tm, TSS-T_end_of_SS;
     MatrixXd C_cy_iPos_ar(1,3);
-    C_cy_iPos_ar<<0, StepLength , 2*StepLength;
+    C_cy_iPos_ar<<0, XofAnkleMaximumHeight , 2*StepLength;
     MatrixXd C_cy_iVel_ar(1,3);
     C_cy_iVel_ar<<0,INFINITY, 0;
     MatrixXd C_cy_iAcc_ar(1,3);

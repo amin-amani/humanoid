@@ -739,7 +739,7 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=6;
+    DurationOfStartPhase=3;
     DurationOfendPhase=6;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
@@ -1272,7 +1272,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 //       k_roll_r=0;
 //       k_roll_l=0;
 
-        double k_pitch=.5;
+        double k_pitch=.45;
 
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;
