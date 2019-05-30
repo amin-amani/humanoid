@@ -38,7 +38,7 @@ bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
 int bump_threshold=85;
-bool simulation=false;
+bool simulation=!false;
 bool AnkleZAdaptation=!false;
 
 
