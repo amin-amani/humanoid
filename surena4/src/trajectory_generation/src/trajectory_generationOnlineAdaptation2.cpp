@@ -392,7 +392,7 @@ double  DurationOfStartPhase;
 double  DurationOfendPhase;
 
 
-
+double shoulderPitchOffset;
 void StartPhase(){
     if ( GlobalTime<=DurationOfStartPhase) {
 
@@ -437,6 +437,7 @@ void StartPhase(){
 
 SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,"Body", PoseRoot);
 SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,"Body", PoseRoot);
+shoulderPitchOffset=SURENA.Links[3].JointAngle;
 
         MinimumJerkInterpolation CoefOffline;
         double D_pitch=-1*OnlineTaskSpace.HipPitchModification*(M_PI/180);
@@ -749,7 +750,7 @@ int main(int argc, char **argv)
     double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
-    DurationOfStartPhase=6;
+    DurationOfStartPhase=3;
     DurationOfendPhase=6;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
@@ -1304,7 +1305,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         int q_motor_r[8];int q_motor_l[8];
 
-        q_motor_r[0]=-int(10*cntrl[9]*180/M_PI*120/60)+0*qra_offset[0];
+        q_motor_r[0]=-int(10*.8*saturate(cntrl[9]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qra_offset[0];
         q_motor_r[1]=int(10*(0)*180/M_PI*120/60)+0*qra_offset[1];
         q_motor_r[2]=-int(7*(0)*180/M_PI*100/60)+0*qra_offset[2];
         q_motor_r[3]=int(7*(0)*180/M_PI*100/60)+0*qra_offset[3];
@@ -1314,7 +1315,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         q_motor_r[6]=int((0)*(4000-2050)/(23*M_PI/180));
 
 
-        q_motor_l[0]=int(10*cntrl[3]*180/M_PI*120/60)+0*qla_offset[0];
+        q_motor_l[0]=int(10*.8*saturate(cntrl[3]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qla_offset[0];
         q_motor_l[1]=int(10*(0)*180/M_PI*120/60)+0*qla_offset[1];
         q_motor_l[2]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[2];
         q_motor_l[3]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[3];
