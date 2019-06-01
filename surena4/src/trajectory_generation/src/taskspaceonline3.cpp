@@ -27,7 +27,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=StepLength*3.6/DesiredVelocity;
     TDs=.4*Tc;
     TSS=Tc-TDs;
-    XofAnkleMaximumHeight=StepLength*1.9;
+    XofAnkleMaximumHeight=StepLength*1.99;  // 1.95 is good for Ds=0.25
 
 
 
@@ -76,17 +76,95 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     DesiredVelocity=StepLength*3.6/Tc;
-    AnkleMaximumHeight=0.035;
+    AnkleMaximumHeight=.045;0.035;
     ReferencePelvisHeight=.93;.9;.89;0.86+.02-.055;
 
     Xe=.04;//15*10;0.02;.023;
     Xs=0.025;//15*10;
 
-//    TDs=2;//2.5;
-//    TSS=StepLength*3.6/DesiredVelocity-TDs;
-//    Tc=TSS+TDs;
 
-    Tm=0.45*TSS;
+
+//    //tule game ziad 20sant
+//    ReferencePelvisHeight=.91;
+//    StepLength=.2;
+//    Xe=0.045;0.02;.023;  //TEST
+//    Xs=0.045;
+
+//    //tule game ziad 25sant
+//    ReferencePelvisHeight=.90;
+//    StepLength=.25;
+//    Xe=0.054;
+//    Xs=0.054;
+
+//    //tule game ziad 30sant
+//    ReferencePelvisHeight=.885;
+//    StepLength=.3;
+//    Xe=0.065;
+//    Xs=0.065;
+
+//    //tule game ziad 35sant
+//    ReferencePelvisHeight=.86;
+//    StepLength=.35;
+//    Xe=0.073;
+//    Xs=0.073;
+
+//    //tule game ziad 40sant
+//    ReferencePelvisHeight=.835;
+//    StepLength=.4;
+//    Xe=0.083;
+//    Xs=0.083;
+
+//    //tule game ziad 45sant
+//    ReferencePelvisHeight=.8;
+//    StepLength=.45;
+//    Xe=0.092;
+//    Xs=0.092;
+
+StepLength=.15;
+    switch (int(StepLength*100)) {
+    case 45://ff
+        ReferencePelvisHeight=.8;
+        Xe=0.092;
+        Xs=0.092;
+        break;
+    case 40://ff
+        ReferencePelvisHeight=.835;
+        Xe=0.083;
+        Xs=0.083;
+        break;
+    case 35://ff
+        ReferencePelvisHeight=.86;
+        Xe=0.073;
+        Xs=0.073;
+        break;
+    case 30:
+       // YStMax=.06;
+        ReferencePelvisHeight=.885;
+        Xe=0.065;
+        Xs=0.065;
+        break;
+    case 25:
+        YStMax=.115;
+        ReferencePelvisHeight=.9;
+        Xe=0.07;//0.054;
+        Xs=0.043;//0.054;
+        break;
+    case 20:
+        ReferencePelvisHeight=.91;
+        Xe=0.045;
+        Xs=0.045;
+        break;
+    case 15:
+        ReferencePelvisHeight=.925;93;
+        Xe=0.04;
+        Xs=0.025;
+        break;
+    default:
+        break;
+    }
+
+
+    Tm=0.55*TSS; // 0.45 is good for Ds=0.25
     TGait=TStart+NStride*2*Tc;
     MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
     TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction
@@ -121,7 +199,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
 
-
+    beta_toe=3*M_PI/18*0;
+    beta_heel=-5*M_PI/18*0;
+    t_toe=TDs/2;
+    t_heel=TDs/2;
 
 
 
@@ -481,26 +562,76 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     C_end_y_iAcc<<0 ,INFINITY, 0;
     C_end_y_ar=CoefOffline.Coefficient(C_end_y_iTime,C_end_y_iPos,C_end_y_iVel,C_end_y_iAcc);
 
+    //***** beta cycle
+
+
+    MatrixXd beta_toe_t_cycle(1,2);
+    beta_toe_t_cycle<<0,t_toe;
+    MatrixXd beta_toe_Pos_cycle(1,2);
+    beta_toe_Pos_cycle<<0, beta_toe;
+    MatrixXd beta_toe_Vel_cycle(1,2);
+    beta_toe_Vel_cycle<<0 , 0;
+    MatrixXd beta_toe_Acc_cycle(1,2);
+    beta_toe_Acc_cycle<<0 , 0;
+    C_beta_toe_cycle=CoefOffline.Coefficient(beta_toe_t_cycle,beta_toe_Pos_cycle,beta_toe_Vel_cycle,beta_toe_Acc_cycle);
+
+
+    MatrixXd beta_heel_t_cycle(1,2);
+    beta_heel_t_cycle<<0,t_heel;
+    MatrixXd beta_heel_Pos_cycle(1,2);
+    beta_heel_Pos_cycle<< beta_heel,0;
+    MatrixXd beta_heel_Vel_cycle(1,2);
+    beta_heel_Vel_cycle<<0 , 0;
+    MatrixXd beta_heel_Acc_cycle(1,2);
+    beta_heel_Acc_cycle<<0 , 0;
+    C_beta_heel_cycle=CoefOffline.Coefficient(beta_heel_t_cycle,beta_heel_Pos_cycle,beta_heel_Vel_cycle,beta_heel_Acc_cycle);
+
+
+
+    MatrixXd beta_toe2heel_t_cycle(1,3);
+    beta_toe2heel_t_cycle<<0,Tm,TSS;
+    MatrixXd beta_toe2heel_Pos_cycle(1,3);
+    beta_toe2heel_Pos_cycle<< beta_toe,0,beta_heel;
+    MatrixXd beta_toe2heel_Vel_cycle(1,3);
+    beta_toe2heel_Vel_cycle<<0 ,INFINITY, 0;
+    MatrixXd beta_toe2heel_Acc_cycle(1,3);
+    beta_toe2heel_Acc_cycle<<0 ,INFINITY, 0;
+    C_beta_toe2heel_cycle=CoefOffline.Coefficient(beta_toe2heel_t_cycle,beta_toe2heel_Pos_cycle,beta_toe2heel_Vel_cycle,beta_toe2heel_Acc_cycle);
+
+
+
+
 
 
 }
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
 double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
+
+// Try
+double zmp_min=-0.025;
+double zmp_max=0.025;
+double a_0=(Xe-zmp_max)/0.1;
+double a_Ds=(-Xs-zmp_min)/0.1;
+double A_Ds=(a_Ds-a_0)/(6*TDs);
+double C_Ds=(-Xs-Xe+StepLength-A_Ds*TDs*TDs*TDs-a_0*TDs*TDs/2)/TDs;
+double v_0=C_Ds;
+double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
     //------------------Coefficient of cyclic motion in X direction--------------------
     MatrixXd ord(1,2);
-    ord << 3,3;//3,3
+    ord << 5,5;//3,3 (Gooth Test)
     MatrixXd ttt(1,3);
     ttt <<0 ,TDs, Tc;
     MatrixXd con(3,3);
-    //con<<Xe, StepLength-Xs, StepLength+Xe, vx, INFINITY ,vx, INFINITY, INFINITY ,INFINITY;
-    con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY;
+   // con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY; // (Gooth Test)
+    con<<Xe, StepLength-Xs, StepLength+Xe,v_0,v_Ds ,v_0,a_0, a_Ds ,a_0;
 
     Cx_p_i.resize(2,6);
     Cx_p_i.fill(0);
-    //Cx_p_i.block(0,1,2,5)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();// .block(0,2,2,4)
-    Cx_p_i.block(0,2,2,4)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();
-    Cx_p.resize(1,12);
+    Cx_p_i.block(0,0,2,6)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();//.block(0,1,2,5) .block(0,2,2,4) (comment)
+    //Cx_p_i.block(0,2,2,4)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();
+   // matrix_view(Cx_p_i);
+  Cx_p.resize(1,12);
     Cx_p.fill(0);
     Cx_p.block(0,0,1,6)=Cx_p_i.row(0);
     Cx_p.block(0,6,1,6)=Cx_p_i.row(1);
@@ -595,9 +726,9 @@ double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
     MatrixXd Cx_end_pAccel(1,2);
     //Cx_end_pAccel<<0, 0;
     Cx_end_pAccel<<5*4*Cx_p(0,0)*pow(TDs,4)+4*3*Cx_p(0,1)*pow(TDs,3)+3*2*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3), 0;//like the last moment of first part of trajectory of cycle
-    matrix_view(Cx_end_pVel);
+   // matrix_view(Cx_end_pVel);
 
-    matrix_view(Cx_end_pAccel);
+    //matrix_view(Cx_end_pAccel);
 
     Cx_end_p=CoefOffline.Coefficient(Cx_end_pTime,Cx_end_pPos,Cx_end_pVel,Cx_end_pAccel);
 
@@ -869,6 +1000,8 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
     double x_ar,x_al,z_ar,z_al;
     double yaw_al=0;
     double yaw_ar=0;
+double pitch_al=0;
+double pitch_ar=0;
 
 
     if (n==1){//left foot moves in first step
@@ -939,7 +1072,28 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
             x_ar=currentRightFootX2;
             y_ar=currentRightFootY2;
             z_ar=currentRightFootZ;
+if(localtiming>t_toe){
+    MatrixXd output=CoefOffline.GetAccVelPos(C_beta_toe_cycle,localtiming-t_toe,0,5);
+    pitch_ar=output(0,0);
 
+}
+
+if(localtiming<t_heel&&n>1){
+
+    pitch_al=beta_heel;
+
+}
+
+
+if(localtiming>t_heel&&n>1){
+    MatrixXd output=CoefOffline.GetAccVelPos(C_beta_heel_cycle,localtiming-t_heel,0,5);
+    pitch_al=output(0,0);
+
+}
+
+
+
+//qDebug()<<localtiming<<"\t"<<pitch_ar<<"toe";
         }
 
         else if (localtiming<Tc-T_end_of_SS){//single support of cyclic walking
@@ -950,12 +1104,18 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
                x_al=(footIndex!=0)*currentLeftFootX2+(footIndex==0)*(footIndex==0)*(currentLeftFootX2+output1(0,0));
                x_ar=(footIndex!=0)*(currentRightFootX2+output1(0,0))+(footIndex==0)*currentRightFootX2;
 
+               MatrixXd output2=CoefOffline.GetAccVelPos(C_beta_toe2heel_cycle.row(0),localtiming-TDs,0,5);
+               pitch_ar=output2(0,0);
+            // qDebug()<<localtiming<<"\t"<<pitch_ar<<"toe2heel1";
+
            }
            else{
                 MatrixXd output1=CoefOffline.GetAccVelPos(C_cy_x_ar.row(1),localtiming-TDs,Tm,5);
                x_al=(footIndex!=0)*currentLeftFootX2+(footIndex==0)*(footIndex==0)*(currentLeftFootX2+output1(0,0));
                x_ar=(footIndex!=0)*(currentRightFootX2+output1(0,0))+(footIndex==0)*currentRightFootX2;
-
+               MatrixXd output2=CoefOffline.GetAccVelPos(C_beta_toe2heel_cycle.row(1),localtiming-TDs,Tm,5);
+               pitch_ar=output2(0,0);
+              //qDebug()<<localtiming<<"\t"<<pitch_ar<<"toe2heel2";
            }
 
 
@@ -987,6 +1147,9 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
         }
 
         else if (localtiming<Tc){
+            MatrixXd output1=CoefOffline.GetAccVelPos(C_beta_toe2heel_cycle.row(1),localtiming-TDs,Tm,5);
+            pitch_ar=output1(0,0);
+           //qDebug()<<localtiming<<"\t"<<pitch_ar<<"toe2heel2";
            // qDebug()<<"single support 2\t"<<Tc;
             LeftFootOrientationAdaptator=(footIndex==0);
             RightFootOrientationAdaptator=(footIndex!=0);
@@ -1005,6 +1168,14 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
            y_ar=(footIndex!=0)*(currentRightFootY2-output3(0,0))+(footIndex==0)*currentRightFootY2;
 
        }
+
+
+
+        if(footIndex==0){
+            double temp= pitch_ar;
+            pitch_ar=pitch_al;
+            pitch_al=temp;
+        }
     }
 
     if(n==NStep+2){//end step of walk right foot moves
@@ -1093,8 +1264,27 @@ MatrixXd TaskSpaceOnline3::AnkleTrajectory(double time,int n ,double localtiming
     }
 }
 
+
+
+    if(pitch_ar>=0){
+        z_ar=z_ar-_lenghtOfAnkle+_lenghtOfAnkle*cos(pitch_ar)+lf*sin(pitch_ar);
+        x_ar=x_ar+lf-lf*cos(pitch_ar)+_lenghtOfAnkle*sin(pitch_ar);}
+    else{
+        z_ar=z_ar-_lenghtOfAnkle+_lenghtOfAnkle*cos(pitch_ar)+lb*sin(pitch_ar);
+        x_ar=x_ar-(lb-lb*cos(pitch_ar)+_lenghtOfAnkle*sin(pitch_ar));}
+   // qDebug()<<"time:"<<localtiming<<"\tpitch:"<<pitch_ar<<"\tx:"<<x_ar<<"\tz:"<<z_ar;
+
+    if(pitch_al>=0){
+        z_al=z_al-_lenghtOfAnkle+_lenghtOfAnkle*cos(pitch_al)+lf*sin(pitch_al);
+        x_al=x_al+lf-lf*cos(pitch_al)+_lenghtOfAnkle*sin(pitch_al);}
+    else{
+        z_al=z_al-_lenghtOfAnkle+_lenghtOfAnkle*cos(pitch_al)+lb*sin(pitch_al);
+        x_al=x_al-(lb-lb*cos(pitch_al)+_lenghtOfAnkle*sin(pitch_al));}
+//qDebug()<<"time:"<<localtiming<<"\tpitch:"<<pitch_al<<"\tx:"<<x_al<<"\tz:"<<z_al;
+
+
     MatrixXd footpos(8,1);
-    footpos<<x_al,y_al,z_al,yaw_al,x_ar,y_ar,z_ar,yaw_ar;
+    footpos<<x_al,y_al,z_al,pitch_al,x_ar,y_ar,z_ar,pitch_ar ;
 //qDebug()<<"time="<<time<<"\tzal="<<z_al-.112<<"\tzar="<<z_ar-.112;
     return footpos;
 

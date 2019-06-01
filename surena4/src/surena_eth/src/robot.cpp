@@ -21,6 +21,9 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
     connect(_rosNode,SIGNAL(SetActiveCSP(int)),this,SLOT(ActiveCSP(int)));
     connect(_rosNode,SIGNAL(DoResetAllNodes(int)),this,SLOT(ResetAllNodes(int)));
+    connect(_rosNode,SIGNAL(DoResetHands()),this,SLOT(ResetHands()));
+    connect(_rosNode,SIGNAL(UpdateAllPositions()),this,SLOT(ReadAllInitialPositions()));
+    connect(_rosNode,SIGNAL(DoActivateHands()),this,SLOT(ActivateHands()));
     connect(_rosNode,SIGNAL(DoReadError()),this,SLOT(ReadErrors()));
     connect(_rosNode,SIGNAL(SetHome(int)),this,SLOT(Home(int)));
     connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
@@ -199,7 +202,7 @@ for(int ii=0; ii<28 ; ii++)
 }
 // motor offset dynamixel
 _motorPosition[24]+=3000;
-_motorPosition[25]+=2050;
+_motorPosition[25]+=(2050-300);
 _motorPosition[26]+=2050;
 _motorPosition[16]+=2300;
 _motorPosition[17]+=2050;
@@ -264,6 +267,67 @@ _rosNode->RobotStatus=errorstr;
 _rosNode->OperationCompleted(0); //all good
 
 }
+void Robot::ResetHands(void)
+{
+    try{
+   qDebug()<<"Reset hands...";
+   //12 15
+   //20 //23
+   for(int i=12;i<16;i++)
+   Epos4.ResetNode(i);
+   for(int i=20;i<24;i++)
+   Epos4.ResetNode(i);
+
+   _rosNode->OperationCompleted(0);
+   _rosNode->RobotStatus="Ready";
+      qDebug()<<"operation completed!";
+}
+    catch(const std::runtime_error e)
+    {
+        _rosNode->OperationCompleted(-1);
+        //  timer.start(5);
+        _rosNode->RobotStatus="Ready";
+    }
+}
+
+void Robot::ActivateHands(void)
+{
+    _rosNode->RobotStatus="Hand Motor Activating";
+    qDebug()<<"activating hands";
+    _rosNode->teststr="OK";
+    timer.stop();
+    for(int i=12;i<16;i++)
+        Epos4.ActiveJoint(i);
+    for(int i=20;i<24;i++)
+        Epos4.ActiveJoint(i);
+
+    _rosNode->OperationCompleted(0);
+    _rosNode->RobotStatus="Ready";
+
+
+//    try{
+//   qDebug()<<"Activate hands...";
+//   //12 15
+//   //20 //23
+//   for(int i=12;i<15;i++)
+//   Epos4.ActiveJoint(i);
+//   for(int i=20;i<23;i++)
+//   Epos4.ActiveJoint(i);
+
+//   _rosNode->OperationCompleted(0);
+//   _rosNode->RobotStatus="Ready";
+//      qDebug()<<"operation completed!";
+//}
+//    catch(const std::runtime_error e)
+//    {
+//        _rosNode->OperationCompleted(-1);
+//        //  timer.start(5);
+//        _rosNode->RobotStatus="Ready";
+//    }
+
+
+}
+
 //=================================================================================================
 void Robot::ResetAllNodes(int id)
 {

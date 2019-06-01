@@ -51,6 +51,9 @@ public:
     double _lenghtOfAnkle=0.112;
     double _lengthOfHip=0.10900;
     double _pelvisLength=0.23;
+    double lf=0.17;
+    double lb=.08;
+
 
     double ReferencePelvisHeight;
     double InitialPelvisHeight=0.95100;
@@ -104,6 +107,12 @@ public:
     double T_st_p_ez;
     double T_st_p_sq;
     double T_s_st;
+
+
+    double beta_toe;
+    double beta_heel;
+    double t_toe;
+    double t_heel;
 
     MinimumJerkInterpolation CoefOffline;
 
@@ -271,6 +280,10 @@ public:
     MatrixXd Cx_end_p;
     MatrixXd Cx_p_i;
     MatrixXd Cy_p_i;
+
+   MatrixXd C_beta_heel_cycle;
+   MatrixXd C_beta_toe_cycle;
+   MatrixXd C_beta_toe2heel_cycle;
 //    QVector<double> CoMXVector;
 //    QVector<double> CoMYVector;
 //    QVector<double> CoMZVector;

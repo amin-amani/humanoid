@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
   DataReader _dataReader;
 
-  _dataReader.Load("/home/milad/data.txt");
+  _dataReader.Load("/home/cast/data.txt");
   //Initializes ROS, and sets up a node
   ros::init(argc, argv, "offline_publisher");
   ros::NodeHandle nh,nh2;

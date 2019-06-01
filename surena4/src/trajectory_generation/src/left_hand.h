@@ -31,8 +31,8 @@ public:
     double d_orient=0.2;
     double power=1e-4;
     double left_palm_position_power=1e6;
-    double left_palm_orientation_power=1e2;
-       double qdot_max=.2;
+    double left_palm_orientation_power=1e6;
+       double qdot_max=.5;
     VectorXd qdot;
     //    double q1_ra;
     //    double q2_ra;
@@ -89,6 +89,7 @@ public:
     VectorXd q_next;
     left_hand();
     left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
+    left_hand(VectorXd q_la, VectorXd v, VectorXd r_target, MatrixXd R_target);
     left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
     left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
     double toRad(double d);
