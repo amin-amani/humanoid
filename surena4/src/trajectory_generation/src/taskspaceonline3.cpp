@@ -76,7 +76,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
     DesiredVelocity=StepLength*3.6/Tc;
-    AnkleMaximumHeight=0.035;
+    AnkleMaximumHeight=.03;0.035;
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
     Xe=.04;//15*10;0.02;.023;
