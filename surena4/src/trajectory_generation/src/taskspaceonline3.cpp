@@ -41,15 +41,6 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
 
-    //test
-    YpMax=.123;.13;.12;105;
-    Yd=YpMax;YStMax=YpMax;YEndMax=1.0*YpMax;
-    StepLength=.1;.15;.2;.12;.3;
-    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
-    TDs=3;
-    TSS=Tc-TDs;
-    TSS=3;
-    Tc=TSS+TDs;
 
     //FastWalk17Ordibehesht
     YpMax=0.11-0.0;.123;.123;.13;.12;105;
@@ -57,12 +48,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     YEndMax=.123;
     Yd=0.055;0.065;.1;0.07-0.0;
     StepLength=.15;.2;.12;.3;
-    DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
-    //TDs=3;2.7;
-    //TDs = 1.2;
-    TDs =0.55; .75;2;
-    TSS=.706;
-    Tc=TSS+TDs;
+
 
     //dynamic hamid
 
@@ -79,12 +65,6 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     AnkleMaximumHeight=.03;0.035;
     ReferencePelvisHeight=.92;.9;.89;0.86+.02-.055;
 
-    Xe=.04;//15*10;0.02;.023;
-    Xs=0.02;//15*10;
-
-//    TDs=2;//2.5;
-//    TSS=StepLength*3.6/DesiredVelocity-TDs;
-//    Tc=TSS+TDs;
 
     Tm=0.45*TSS;
     TGait=TStart+NStride*2*Tc;
@@ -120,7 +100,48 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 
 
 
-
+    StepLength=.25;
+        switch (int(StepLength*100)) {
+        case 45://ff
+            ReferencePelvisHeight=.8;
+            Xe=0.092;
+            Xs=0.092;
+            break;
+        case 40://ff
+            ReferencePelvisHeight=.835;
+            Xe=0.083;
+            Xs=0.083;
+            break;
+        case 35://ff
+            ReferencePelvisHeight=.86;
+            Xe=0.073;
+            Xs=0.073;
+            break;
+        case 30:
+           // YStMax=.06;
+            ReferencePelvisHeight=.885;
+            Xe=0.065;
+            Xs=0.065;
+            break;
+        case 25:
+            YStMax=.115;
+            ReferencePelvisHeight=.9;
+            Xe=0.054;0.07;//
+            Xs=0.054;0.043;//
+            break;
+        case 20:
+            ReferencePelvisHeight=.91;
+            Xe=0.045;
+            Xs=0.045;
+            break;
+        case 15:
+            ReferencePelvisHeight=.925;93;
+            Xe=0.04;
+            Xs=0.025;
+            break;
+        default:
+            break;
+        }
 
 
 
@@ -391,7 +412,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iTime_ar(1,3);
     C_cy_iTime_ar<<0, Tm, TSS-T_end_of_SS;
     MatrixXd C_cy_iPos_ar(1,3);
-    C_cy_iPos_ar<<0, StepLength , 2*StepLength;
+    C_cy_iPos_ar<<0, XofAnkleMaximumHeight , 2*StepLength;
     MatrixXd C_cy_iVel_ar(1,3);
     C_cy_iVel_ar<<0,INFINITY, 0;
     MatrixXd C_cy_iAcc_ar(1,3);
@@ -483,23 +504,52 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
 void TaskSpaceOnline3::CoeffArrayPelvis(){
 double vx=(!side_extra_step_length)*DesiredVelocity/3.6*0;
     //------------------Coefficient of cyclic motion in X direction--------------------
+//    MatrixXd ord(1,2);
+//    ord << 3,3;//3,3
+//    MatrixXd ttt(1,3);
+//    ttt <<0 ,TDs, Tc;
+//    MatrixXd con(3,3);
+//    //con<<Xe, StepLength-Xs, StepLength+Xe, vx, INFINITY ,vx, INFINITY, INFINITY ,INFINITY;
+//    con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY;
+
+//    Cx_p_i.resize(2,6);
+//    Cx_p_i.fill(0);
+//    //Cx_p_i.block(0,1,2,5)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();// .block(0,2,2,4)
+//    Cx_p_i.block(0,2,2,4)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();
+//    Cx_p.resize(1,12);
+//    Cx_p.fill(0);
+//    Cx_p.block(0,0,1,6)=Cx_p_i.row(0);
+//    Cx_p.block(0,6,1,6)=Cx_p_i.row(1);
+//matrix_view(Cx_p);
+
+double zmp_min=-0.025;
+double zmp_max=0.025;
+double a_0=(Xe-zmp_max)/0.1;
+double a_Ds=(-Xs-zmp_min)/0.1;
+double A_Ds=(a_Ds-a_0)/(6*TDs);
+double C_Ds=(-Xs-Xe+StepLength-A_Ds*TDs*TDs*TDs-a_0*TDs*TDs/2)/TDs;
+double v_0=C_Ds;
+double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
+    //------------------Coefficient of cyclic motion in X direction--------------------
     MatrixXd ord(1,2);
-    ord << 3,3;//3,3
+    ord << 5,5;//3,3 (Gooth Test)
     MatrixXd ttt(1,3);
     ttt <<0 ,TDs, Tc;
     MatrixXd con(3,3);
-    //con<<Xe, StepLength-Xs, StepLength+Xe, vx, INFINITY ,vx, INFINITY, INFINITY ,INFINITY;
-    con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY;
+   // con<<Xe, StepLength-Xs, StepLength+Xe,INFINITY, INFINITY ,INFINITY,INFINITY, INFINITY ,INFINITY; // (Gooth Test)
+    con<<Xe, StepLength-Xs, StepLength+Xe,v_0,v_Ds ,v_0,a_0, a_Ds ,a_0;
 
     Cx_p_i.resize(2,6);
     Cx_p_i.fill(0);
-    //Cx_p_i.block(0,1,2,5)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();// .block(0,2,2,4)
-    Cx_p_i.block(0,2,2,4)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();
-    Cx_p.resize(1,12);
+    Cx_p_i.block(0,0,2,6)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();//.block(0,1,2,5) .block(0,2,2,4) (comment)
+    //Cx_p_i.block(0,2,2,4)=CoefOffline.Coefficient1(ttt,ord,con,0.1).transpose();
+   // matrix_view(Cx_p_i);
+  Cx_p.resize(1,12);
     Cx_p.fill(0);
     Cx_p.block(0,0,1,6)=Cx_p_i.row(0);
     Cx_p.block(0,6,1,6)=Cx_p_i.row(1);
 //matrix_view(Cx_p);
+
     //------------------Coefficient of cyclic Pelvis motion in Y direction--------------------
     MatrixXd ordY(1,8);
 //  ordY << 3,3,4,4,5,3,4,4; // ordY << 4,3,4,5,4,3,4,5;////// ordY << 3,3,4,5,3,3,4,5;// ordY << 4,4,5,5,4,4,5,5;//  ordY << 3,3,4,4,3,3,4,4;//old

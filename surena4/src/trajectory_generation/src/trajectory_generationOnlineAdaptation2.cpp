@@ -257,7 +257,8 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     if (a<0){a=0;} if (b<0){b=0;} if (c<0){c=0;} if (d<0){d=0;}
     if (e<0){e=0;} if (f<0){f=0;} if (g<0){g=0;} if (h<0){h=0;}
 }
-
+int qra_offset[4];
+int qla_offset[4];
 void qc_initial(const sensor_msgs::JointState & msg){
     if (qc_initial_bool){
 
@@ -265,6 +266,15 @@ void qc_initial(const sensor_msgs::JointState & msg){
             qc_offset[i]=int(msg.position[i+1]);
 
         }
+
+        for (int i = 12; i < 16; ++i){
+            qra_offset[i-12]=int(msg.position[i+1]);
+        }
+
+        for (int i = 16; i < 20; ++i){
+            qla_offset[i-16]=int(msg.position[i+1]);
+        }
+
 
         qc_initial_bool=false;
 
@@ -1291,6 +1301,30 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         vector<int> qref(12);
         qref=QC.ctrldata2qc(cntrl);
 
+
+        int q_motor_r[8];int q_motor_l[8];
+
+        q_motor_r[0]=-int(10*cntrl[9]*180/M_PI*120/60)+0*qra_offset[0];
+        q_motor_r[1]=int(10*(0)*180/M_PI*120/60)+0*qra_offset[1];
+        q_motor_r[2]=-int(7*(0)*180/M_PI*100/60)+0*qra_offset[2];
+        q_motor_r[3]=int(7*(0)*180/M_PI*100/60)+0*qra_offset[3];
+
+        q_motor_r[4]=int((0)*(2048)/M_PI);
+        q_motor_r[5]=int((0)*(4000-2050)/(23*M_PI/180));
+        q_motor_r[6]=int((0)*(4000-2050)/(23*M_PI/180));
+
+
+        q_motor_l[0]=int(10*cntrl[3]*180/M_PI*120/60)+0*qla_offset[0];
+        q_motor_l[1]=int(10*(0)*180/M_PI*120/60)+0*qla_offset[1];
+        q_motor_l[2]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[2];
+        q_motor_l[3]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[3];
+
+        q_motor_l[4]=int((0)*(2048)/M_PI);
+        q_motor_l[5]=-int((0)*(4000-2050)/(23*M_PI/180));
+        q_motor_l[6]=int((0)*(4000-2050)/(23*M_PI/180));
+
+
+
         msg.data.clear();
 
         if(left_first){
@@ -1314,10 +1348,31 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         }
 
 
-        for(int  i = 12;i < 28;i++)
-        {
-            msg.data.push_back(0);
-        }
+        //right hand epose
+        msg.data.push_back(q_motor_r[0]);//12 -y  a,z
+        msg.data.push_back(q_motor_r[1]);//13 +x
+        msg.data.push_back(q_motor_r[2]);//14 -z
+        msg.data.push_back(q_motor_r[3]);//15 +y
+        //right hand dynamixel + fingers
+        msg.data.push_back(q_motor_r[4]);//16
+        msg.data.push_back(q_motor_r[5]);//17
+        msg.data.push_back(q_motor_r[6]);//18
+        msg.data.push_back(q_motor_r[7]);//19
+        //left hand epose
+        msg.data.push_back(q_motor_l[0]);//20 +y
+        msg.data.push_back(q_motor_l[1]);//21 +x
+        msg.data.push_back(q_motor_l[2]);//22 -z
+        msg.data.push_back(q_motor_l[3]);//23 -y
+        //left hand dynamixel + fingers
+        msg.data.push_back(q_motor_l[4]);//24
+        msg.data.push_back(q_motor_l[5]);//25
+        msg.data.push_back(q_motor_l[6]);//26
+        msg.data.push_back(q_motor_l[7]);//27
+
+//        for(int  i = 12;i < 28;i++)
+//        {
+//            msg.data.push_back(0);
+//        }
         if(!simulation){chatter_pub.publish(msg);}
 
         if (simulation){
