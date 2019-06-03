@@ -37,7 +37,7 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=.5;
 bool sidewalk=false;
-int bump_threshold=85;
+int bump_threshold=80;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
 
@@ -1272,7 +1272,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 //       k_roll_r=0;
 //       k_roll_l=0;
 
-        double k_pitch=.5;
+        double k_pitch=0;
 
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;

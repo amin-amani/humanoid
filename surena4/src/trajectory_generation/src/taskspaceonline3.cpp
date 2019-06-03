@@ -6,9 +6,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    XofAnkleMaximumHeight=StepLength;
 //    qDebug()<<XofAnkleMaximumHeight;
     NStride=300;
-    LeftHipRollModification= 2;3.2;3.1;2.7;+.5;
-    RightHipRollModification=2;3.2;3.1;2.7;
-    FirstHipRollModification=2;3.2;3.1;2.7;
+    LeftHipRollModification= 2.5;3.2;3.1;2.7;+.5;
+    RightHipRollModification=2.5;3.2;3.1;2.7;
+    FirstHipRollModification=2.5;3.2;3.1;2.7;
     HipPitchModification=1;//2;
 
     //PelvisRollRange=10*M_PI/180;
@@ -27,7 +27,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     Tc=StepLength*3.6/DesiredVelocity;
     TDs=.4*Tc;
     TSS=Tc-TDs;
-    XofAnkleMaximumHeight=StepLength*1.7;
+    //XofAnkleMaximumHeight=StepLength*1.7;
 
 
 
@@ -57,6 +57,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
     YEndMax=.123;
     Yd=0.055;0.065;.1;0.07-0.0;
     StepLength=.15;.2;.12;.3;
+    XofAnkleMaximumHeight=StepLength*1.7;
     DesiredVelocity=0.1;Tc=StepLength*3.6/DesiredVelocity;
     //TDs=3;2.7;
     //TDs = 1.2;
@@ -86,7 +87,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 //    TSS=StepLength*3.6/DesiredVelocity-TDs;
 //    Tc=TSS+TDs;
 
-    Tm=0.45*TSS;
+    Tm=0.6*TSS;
     TGait=TStart+NStride*2*Tc;
     MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
     TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction
@@ -391,7 +392,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iTime_ar(1,3);
     C_cy_iTime_ar<<0, Tm, TSS-T_end_of_SS;
     MatrixXd C_cy_iPos_ar(1,3);
-    C_cy_iPos_ar<<0, StepLength , 2*StepLength;
+    C_cy_iPos_ar<<0, XofAnkleMaximumHeight , 2*StepLength;
     MatrixXd C_cy_iVel_ar(1,3);
     C_cy_iVel_ar<<0,INFINITY, 0;
     MatrixXd C_cy_iAcc_ar(1,3);
