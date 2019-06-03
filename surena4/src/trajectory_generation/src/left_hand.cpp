@@ -14,22 +14,27 @@ left_hand::left_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target)
     sai_target=sai_calc(R_target);
     theta_target=theta_calc(R_target);
     phi_target=phi_calc(R_target);
-//    if(sai_target>M_PI/2){
-//        sai_target=sai_target-M_PI;
-//        if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//        if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//        theta_target=-theta_target;
-//    }
 
-//    if(sai_target<-M_PI/2){
-//        sai_target=sai_target+M_PI;
-//        if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//        if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//        theta_target=-theta_target;
-//    }
 
 }
 
+left_hand::left_hand(VectorXd q_la,VectorXd v,VectorXd r_target,MatrixXd R_target)
+{
+
+    HO_FK_left_palm(q_la);
+    dist=distance(r_target,r_left_palm);
+    sai_target=sai_calc(R_target);
+    theta_target=theta_calc(R_target);
+    phi_target=phi_calc(R_target);
+    V.resize(3,1);
+    V=v;
+    sai_dot=(sai_target-sai);
+    phi_dot=(phi_target-phi);
+    theta_dot=(theta_target-theta);
+
+    euler2w();
+jacob(q_la);
+}
 
 left_hand::left_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,int i,double d0)
 {
@@ -40,19 +45,7 @@ dist=distance(r_target,r_left_palm);
 sai_target=sai_calc(R_target);
 theta_target=theta_calc(R_target);
 phi_target=phi_calc(R_target);
-//if(sai_target>M_PI/2){
-//    sai_target=sai_target-M_PI;
-//    if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//    if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//    theta_target=-theta_target;
-//}
 
-//if(sai_target<-M_PI/2){
-//    sai_target=sai_target+M_PI;
-//    if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//    if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//    theta_target=-theta_target;
-//}
 
 V.resize(3,1);
 double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
@@ -76,19 +69,7 @@ dist=distance(r_target,r_left_palm);
 sai_target=sai_calc(R_target);
 theta_target=theta_calc(R_target);
 phi_target=phi_calc(R_target);
-//if(sai_target>M_PI/2){
-//    sai_target=sai_target-M_PI;
-//    if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//    if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//    theta_target=-theta_target;
-//}
 
-//if(sai_target<-M_PI/2){
-//    sai_target=sai_target+M_PI;
-//    if(phi_target>M_PI/2 ){phi_target=phi_target-M_PI;}
-//    if(phi_target<-M_PI/2 ){phi_target=phi_target+M_PI;}
-//    theta_target=-theta_target;
-//}
 
 V.resize(3,1);
 //double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
@@ -129,38 +110,6 @@ double  left_hand::sai_calc(MatrixXd R){
 
 
 
-//
-//    double theta = -acos(R(2,2));
-//    if(abs(sin(theta))>1e-6){ return -acos(-R(1,2)/sin(theta));/* atan2(R(0,2)/sin(theta),-R(1,2)/sin(theta));*/}
-//     else{ return 0.0;/*atan2(R(1,0),R(0,0));*/  }
-//   }
-
-//double left_hand::theta_calc(MatrixXd R){
-//            return -acos(R(2,2));
-//   }
-
-//double  left_hand::sai_calc(MatrixXd R){
-//    double theta = -acos(R(2,2));
-//    if(abs(sin(theta))>1e-6){ return -acos(R(2,1)/sin(theta)); /*atan2(R(2,0)/sin(theta),R(2,1)/sin(theta));*/}
-//     else{ return -acos(R(0,0));  }
-//   }
-
-
-//double left_hand::theta_calc(MatrixXd R){
-//        return acos(R(2,2));
-//   }
-
-//double  left_hand::phi_calc(MatrixXd R){
-//    double theta = acos(R(2,2));
-//    if(abs(sin(theta))>1e-6){ return atan2(R(2,0),-R(2,1));}
-//     else{ return atan2(R(0,1),R(0,0));  }
-//   }
-
-//double  left_hand::sai_calc(MatrixXd R){
-//    double theta = acos(R(2,2));
-//    if(abs(sin(theta))>1e-6){ return atan2(R(0,2),R(1,2));}
-//     else{ return 0.0;  }
-//   }
 
 MatrixXd left_hand::rot(int axis , double q ,int dim){
     if (dim==3){
@@ -356,14 +305,14 @@ g.fill(0.0);
 G=G+2*left_palm_position_power*J_left_palm.transpose()*J_left_palm;
 g=g-2* left_palm_position_power*J_left_palm.transpose()*V;
 if (dist<d_orient){
-G=G+pow(tanh(3*(d_orient-dist)/d_orient),2)*left_palm_orientation_power*2*J_w_left_palm.transpose()*J_w_left_palm;
-g=g+pow(tanh(3*(d_orient-dist)/d_orient),2)*left_palm_orientation_power*(-2)*J_w_left_palm.transpose()*w_left_palm;
+G=G+pow(tanh(5*(d_orient-dist)/d_orient),2)*left_palm_orientation_power*2*J_w_left_palm.transpose()*J_w_left_palm;
+g=g+pow(tanh(5*(d_orient-dist)/d_orient),2)*left_palm_orientation_power*(-2)*J_w_left_palm.transpose()*w_left_palm;
 }
 
 vector<double> minimum(7);
 vector<double> maximum(7);
 minimum={-110.0,0.0,-60.0,-90.0,-60.0,-20.0,-20.0};
-maximum={80.0 ,90.0 ,60.0 ,-5.0 ,60.0 ,20.0 ,20.0 };
+maximum={80.0 ,90.0 ,60.0 ,-1.0 ,60.0 ,20.0 ,20.0 };
 
     CI.resize(7,14);
     CI<<MatrixXd::Identity(7,7)*(-1),MatrixXd::Identity(7,7);

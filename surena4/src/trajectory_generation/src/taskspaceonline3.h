@@ -40,8 +40,8 @@ public:
     double NStep;
     int StepNumber=1;
 
-    double TStart=6;
-    double TEnd=8;//8
+    double TStart;
+    double TEnd;
 
     double StepLength;//0.0840000;
     double DesiredVelocity;//0.050;
@@ -68,6 +68,10 @@ public:
     double Tc;
     double TDs;
     double TSS;
+    double Tx;
+    double TDs_S;
+    double TSS_S_i;
+    double TSS_S;
     double TGait;
     double MotionTime;
     double TMinPelvisY; // The time that pelvis reaches its minimum distance in y direction
@@ -271,6 +275,7 @@ public:
     MatrixXd Cx_end_p;
     MatrixXd Cx_p_i;
     MatrixXd Cy_p_i;
+    MatrixXd Cy_p_i_S;
 //    QVector<double> CoMXVector;
 //    QVector<double> CoMYVector;
 //    QVector<double> CoMZVector;
@@ -285,6 +290,7 @@ public:
 
     MatrixXd Cx_p;
     MatrixXd Cy_p;
+     MatrixXd Cy_p_S;
     MatrixXd Cy_end_pa;
     MatrixXd Cy_end_pb;
     MatrixXd Cy_st_pa;

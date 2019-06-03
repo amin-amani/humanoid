@@ -987,7 +987,7 @@ else{
                 double local_time_cycle=0;
                 if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.TStart){
                   AnkleZR=m7;
-                  if(GlobalTime-DurationOfStartPhase<OnlineTaskSpace.T_s_st*3/2){
+                  if(GlobalTime-DurationOfStartPhase<OnlineTaskSpace.Tx+OnlineTaskSpace.Tc){
                           AnkleZL=m3;
                   }
                   else{
@@ -1305,7 +1305,8 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         int q_motor_r[8];int q_motor_l[8];
 
-        q_motor_r[0]=-int(10*.8*saturate(cntrl[9]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qra_offset[0];
+      //  q_motor_r[0]=-int(10*.8*saturate(cntrl[9]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qra_offset[0];
+        q_motor_r[0]=int(10*(asin((PoseLFoot(0,0)-PoseRoot(0,0))/.6))*180/M_PI*120/60)+0*qra_offset[0];
         q_motor_r[1]=int(10*(0)*180/M_PI*120/60)+0*qra_offset[1];
         q_motor_r[2]=-int(7*(0)*180/M_PI*100/60)+0*qra_offset[2];
         q_motor_r[3]=int(7*(0)*180/M_PI*100/60)+0*qra_offset[3];
@@ -1313,9 +1314,10 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         q_motor_r[4]=int((0)*(2048)/M_PI);
         q_motor_r[5]=int((0)*(4000-2050)/(23*M_PI/180));
         q_motor_r[6]=int((0)*(4000-2050)/(23*M_PI/180));
+        q_motor_r[7]=14;
 
-
-        q_motor_l[0]=int(10*.8*saturate(cntrl[3]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qla_offset[0];
+       // q_motor_l[0]=int(10*.8*saturate(cntrl[3]-shoulderPitchOffset,-10,M_PI/6)*(GlobalTime>=DurationOfStartPhase)*180/M_PI*120/60)+0*qla_offset[0];
+        q_motor_l[0]=-int(10*(asin((PoseRFoot(0,0)-PoseRoot(0,0))/.6))*180/M_PI*120/60)+0*qla_offset[0];
         q_motor_l[1]=int(10*(0)*180/M_PI*120/60)+0*qla_offset[1];
         q_motor_l[2]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[2];
         q_motor_l[3]=-int(7*(0)*180/M_PI*100/60)+0*qla_offset[3];
@@ -1323,7 +1325,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         q_motor_l[4]=int((0)*(2048)/M_PI);
         q_motor_l[5]=-int((0)*(4000-2050)/(23*M_PI/180));
         q_motor_l[6]=int((0)*(4000-2050)/(23*M_PI/180));
-
+        q_motor_l[7]=14;
 
 
         msg.data.clear();
