@@ -154,7 +154,7 @@ const unsigned char _bumpSensorCommand[8]={0x01,0x01,0x01,0x20,0x01,0x01,0x01,0x
     unsigned char GetSDOCODE(int len);
     void InitErrorMap();
 
-    QByteArray MtorDataToArray(int canID, int position);
+    QByteArray MotorDataToArray(int canID, int position);
     QByteArray CreateHandPacket(QList<int> motorPositions);
     QByteArray CreatePDOPacket(int canID, int value1, int value2);
     QByteArray CreateDynamixelPacket(int canID, int motorID, int motorPosition, int velocity);

@@ -416,7 +416,7 @@ bool Epos::SetPosition(int canID,int devId,int position,int velocity)
     return true;
 }
 //========================================================================
-inline QByteArray  Epos::MtorDataToArray(int canID,int position)
+inline QByteArray  Epos::MotorDataToArray(int canID,int position)
 {
     QByteArray data;
     data.append((canID>>8)&0xff);
@@ -517,7 +517,7 @@ void Epos::SetAllPositionCST(QList<int> motorPositions)
 {
     QByteArray command;
    for(int i=0; i< 12; i++)
-    command.append(MtorDataToArray(0x401,motorPositions.at(i)));
+    command.append(MotorDataToArray(0x401,motorPositions.at(i)));
     command.append(CreateHandPacket(motorPositions));
     command.append(CreateWaistAndHeadCommand());
     command.append(CreateBumpRequestCommand());
