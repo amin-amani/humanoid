@@ -4,9 +4,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 {
 
     NStride=300;
-    LeftHipRollModification= 2;3.2;3.1;2.7;+.5;
-    RightHipRollModification=2;3.2;3.1;2.7;
-    FirstHipRollModification=2;3.2;3.1;2.7;
+    LeftHipRollModification= 2;3.2;3.1;2.7;2;
+    RightHipRollModification=2;3.2;3.1;2.7;2;
+    FirstHipRollModification=2;3.2;3.1;2.7;2;
     HipPitchModification=1;//2;
     NStep=NStride*2;
 
@@ -45,15 +45,15 @@ TaskSpaceOnline3::TaskSpaceOnline3()
             Xs=0.045;
             break;
         case 15:
-            ReferencePelvisHeight=.925;
-            Xe=0.04;0.035;
-            Xs=0.025;0.035;
+            ReferencePelvisHeight=.92;
+            Xe=0.034;0.040;
+            Xs=0.034;0.025;
             break;
         default:
             break;
         }
 
-        XofAnkleMaximumHeight=StepLength*1.98;
+        XofAnkleMaximumHeight=StepLength*1.8;
         AnkleMaximumHeight=0.035;.03;
         Yd=.0562;
         a_d=-.438;
@@ -80,7 +80,7 @@ Tx=2;
 
         TEnd=8;
 
-        Tm=0.7*TSS;
+        Tm=0.6*TSS;
         TGait=TStart+NStride*2*Tc;
         MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
 
