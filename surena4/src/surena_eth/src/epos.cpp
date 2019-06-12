@@ -611,10 +611,14 @@ inline void Epos::GetIMUDataFromPacket(EthernetReceivedPacketType*packet)
     tf2::Quaternion myQuaternion;
     myQuaternion.setRPY( incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
     //--------------------orientation
-    IMU.orientation.x=myQuaternion.getX();
-    IMU.orientation.y=myQuaternion.getY();
-    IMU.orientation.z=myQuaternion.getZ();
-    IMU.orientation.w=myQuaternion.getW();
+//    IMU.orientation.x=myQuaternion.getX();
+//    IMU.orientation.y=myQuaternion.getY();
+//    IMU.orientation.z=myQuaternion.getZ();
+//    IMU.orientation.w=myQuaternion.getW();
+    IMU.orientation.x=incommingPacket->IMU.roll;
+    IMU.orientation.y=incommingPacket->IMU.pitch;
+    IMU.orientation.z=incommingPacket->IMU.yaw;
+    IMU.orientation.w=0;
     //--------------------lenear acc
     IMU.linear_acceleration.x=incommingPacket->IMU.ax;
     IMU.linear_acceleration.y=incommingPacket->IMU.ay;

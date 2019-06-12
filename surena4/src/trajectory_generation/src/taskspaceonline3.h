@@ -63,8 +63,8 @@ public:
     double timeStepT;
 
     double T_beta;
-
-    double Tm;
+    double Tm1;
+    double Tm2;
     double Tc;
     double TDs;
     double TSS;

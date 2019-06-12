@@ -38,7 +38,8 @@ public:
     vector<int> data2qc(QList<LinkM> links, vector<double> cntrl);
     vector<int> ctrldata2qc(vector<double> cntrl);
     vector<int> trajdata2qc(QList<LinkM> links);
-    double ankle_mechanism_offset=0.032;
+    double ankle_mechanism_offsetR=0.032;//0.034;//
+    double ankle_mechanism_offsetL=0.032;//0.033;//
 };
 
 #endif // QCGENERATOR_H

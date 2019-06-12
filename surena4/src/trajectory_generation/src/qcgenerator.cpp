@@ -10,7 +10,6 @@ double ankle_pitch(double joint_angle, double offset){
 
     double theta_0=atan(.025/(0.08385+offset));
     double N=sqrt((.025*.025)+(0.08385+offset)*(0.08385+offset));
-
     double X_A,Y_A,theta,psi_0;
     double X_B , Y_B;
     double X_M=-.00594;
@@ -54,12 +53,12 @@ vector<int> QCgenerator::data2qc(QList<LinkM> links,vector<double> cntrl){
 vector<int> qref(12);
     qref[0]=int((links[6].JointAngle+cntrl[6])*(1/(2*M_PI))*(2304)*100);
     //qref[1]=int((links[5].JointAngle+cntrl[5])*(1)*(1/(2*M_PI))*(2304)*100);
-    qref[1]=int(ankle_pitch((links[5].JointAngle+cntrl[5]),ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[1]=int(ankle_pitch((links[5].JointAngle+cntrl[5]),ankle_mechanism_offsetR)*(1)*(1/(2*M_PI))*(2304)*100);
 
     qref[2]=int((links[4].JointAngle+cntrl[4])*(1/(2*M_PI))*(2304)*50);
     qref[3]=int((links[3].JointAngle+cntrl[3])*1*(1/(2*M_PI))*(2304)*80);
     //qref[4]=int((links[11].JointAngle+cntrl[11])*(1/(2*M_PI))*(2304)*100);
-    qref[4]=int(ankle_pitch((links[11].JointAngle+cntrl[11]),ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[4]=int(ankle_pitch((links[11].JointAngle+cntrl[11]),ankle_mechanism_offsetL)*(1)*(1/(2*M_PI))*(2304)*100);
 
     qref[5]=int((links[12].JointAngle+cntrl[12])*(1/(2*M_PI))*(2304)*100);
     qref[6]=int((links[10].JointAngle+cntrl[10])*1*(1/(2*M_PI))*(2304)*50);
@@ -136,12 +135,12 @@ vector<int> QCgenerator::trajdata2qc(QList<LinkM> links){
 vector<int> qref(12);
     qref[0]=int((links[6].JointAngle)*(1/(2*M_PI))*(2304)*100);
     //qref[1]=int((links[5].JointAngle)*(1)*(1/(2*M_PI))*(2304)*100);
-    qref[1]=int(ankle_pitch((links[5].JointAngle),ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[1]=int(ankle_pitch((links[5].JointAngle),ankle_mechanism_offsetR)*(1)*(1/(2*M_PI))*(2304)*100);
 
     qref[2]=int((links[4].JointAngle)*(1/(2*M_PI))*(2304)*50);
     qref[3]=int((links[3].JointAngle)*1*(1/(2*M_PI))*(2304)*80);
 //    qref[4]=int((links[11].JointAngle)*(1/(2*M_PI))*(2304)*100);
-    qref[4]=int(ankle_pitch((links[11].JointAngle),ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[4]=int(ankle_pitch((links[11].JointAngle),ankle_mechanism_offsetL)*(1)*(1/(2*M_PI))*(2304)*100);
 
     qref[5]=int((links[12].JointAngle)*(1/(2*M_PI))*(2304)*100);
     qref[6]=int((links[10].JointAngle)*1*(1/(2*M_PI))*(2304)*50);
@@ -217,11 +216,11 @@ vector<int> QCgenerator::ctrldata2qc(vector<double> cntrl){
 vector<int> qref(12);
     qref[0]=int((cntrl[6])*(1/(2*M_PI))*(2304)*100);
     //qref[1]=int((cntrl[5])*(1)*(1/(2*M_PI))*(2304)*100);
-    qref[1]=int(ankle_pitch(cntrl[5],ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[1]=int(ankle_pitch(cntrl[5],ankle_mechanism_offsetR)*(1)*(1/(2*M_PI))*(2304)*100);
     qref[2]=int((cntrl[4])*(1/(2*M_PI))*(2304)*50);
     qref[3]=int((cntrl[3])*1*(1/(2*M_PI))*(2304)*80);
     //qref[4]=int((cntrl[11])*(1/(2*M_PI))*(2304)*100);
-    qref[4]=int(ankle_pitch(cntrl[11],ankle_mechanism_offset)*(1)*(1/(2*M_PI))*(2304)*100);
+    qref[4]=int(ankle_pitch(cntrl[11],ankle_mechanism_offsetL)*(1)*(1/(2*M_PI))*(2304)*100);
    // qDebug()<<"R: before:"<<qref[1]<<"now:"<<qref1_test<<"L: before:"<<qref[4]<<"now:"<<qref4_test;
     qref[5]=int((cntrl[12])*(1/(2*M_PI))*(2304)*100);
     qref[6]=int((cntrl[10])*1*(1/(2*M_PI))*(2304)*50);

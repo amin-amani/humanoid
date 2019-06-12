@@ -294,6 +294,45 @@ void FT_right_feedback(const geometry_msgs::Wrench &msg){
     Fzr=msg.force.z;
     Mxr=msg.torque.x;
 }
+
+MatrixXd quater2rot(double w,double x,double y, double z){
+    MatrixXd R(3,3);
+    R<<w*w+x*x-y*y-z*z,2*x*y-2*w*z,2*x*z+2*w*y,
+            2*x*y+2*w*z,w*w-x*x+y*y-z*z,2*y*z-2*w*x,
+            2*x*z-2*w*y,2*y*z+2*w*x,w*w-x*x-y*y+z*z;
+    return R;
+}
+
+//*****quaternion to euler params in ankle
+double quaternion2euler_pitch(double q0,double q1,double q2,double q3){
+    double R11,R32,R33,R31,theta;
+    R31=2*(q1*q3-q0*q2);
+    R32=2*(q0*q1+q2*q3);
+    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+    theta=atan2(-R31,sqrt(R32*R32+R33*R33));
+    return theta;
+}
+
+double quaternion2euler_roll(double q0,double q1,double q2,double q3){
+    double phi,R33,R32;
+    R32=2*(q0*q1+q2*q3);
+    R33=q0*q0-q1*q1-q2*q2+q3*q3;
+    phi=atan2(R32,R33);
+    return phi;
+}
+
+
+double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
+
+void imu_data_process(const sensor_msgs::Imu &msg){
+ //MatrixXd R_pelvis(3,3);
+ //R_pelvis=quater2rot(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
+pelvis_orientation_roll=msg.orientation.x;
+pelvis_orientation_pitch=msg.orientation.y;
+pelvis_orientation_yaw=msg.orientation.z;
+}
+
+
 bool wrench_init_bool;
 void WrenchHomming(){
     double threshold= .5;
@@ -319,13 +358,7 @@ void WrenchHomming(){
     }
 }
 
-MatrixXd quater2rot(double w,double x,double y, double z){
-    MatrixXd R(3,3);
-    R<<w*w+x*x-y*y-z*z,2*x*y-2*w*z,2*x*z+2*w*y,
-            2*x*y+2*w*z,w*w-x*x+y*y-z*z,2*y*z-2*w*x,
-            2*x*z-2*w*y,2*y*z+2*w*x,w*w-x*x-y*y+z*z;
-    return R;
-}
+
 
 void ankle_states(const gazebo_msgs::LinkStates& msg){
     double x_left, x_right,y_left, y_right,z_left, z_right;
@@ -773,6 +806,7 @@ int main(int argc, char **argv)
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
+    ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
         pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -837,6 +871,20 @@ int main(int argc, char **argv)
     bool firstcontactR=true;
     bool fullcontactL=false;
     bool fullcontactR=false;
+
+    //*****loging data in a file
+       QByteArray data;
+       QTime pc_time;
+       QString name;
+       name="/home/cast/Desktop/robot_data_save/data_";
+       name+=QString::number(pc_time.currentTime().hour())+"_";
+       name+=QString::number(pc_time.currentTime().minute())+"_";
+       name+=QString::number(pc_time.currentTime().second())+"_";
+       name+=".txt";
+       QFile myfile(name);
+
+
+
     while (ros::ok())
     {
 
@@ -1013,7 +1061,7 @@ else{
 
 
 
-                    if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
+                    if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.Tm2){
                         rightzstop=false;
                         AnkleZR=m7;
                         AnkleZ_offsetR=0;
@@ -1036,7 +1084,7 @@ else{
                     }
                     //else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
 
-                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2){
+                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.Tm2){
 
 //                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
 //                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
@@ -1052,14 +1100,14 @@ else{
                     // AnkleZL=m3;
 
                    // if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
-                     if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2){
+                     if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.Tm2){
 
                          //                    AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
 //                         AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
                          AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,0,OnlineTaskSpace.TDs);
 
                      }
-                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
+                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.Tm2){
                         leftzstop=false;
                         AnkleZL=m3;
                         AnkleZ_offsetL=0;
@@ -1093,14 +1141,7 @@ else{
 //                    AnkleZL+=AnkleZ_offsetL;
                 }
 }
-//                if(local_time_cycle>OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2&&local_time_cycle<OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
 
-
-//                }
-
-//                if(local_time_cycle>OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2&&local_time_cycle<OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
-
-//                }
 
 
 
@@ -1422,6 +1463,10 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         trajectory_data.data.push_back(cntrl[10]);
         trajectory_data.data.push_back(cntrl[11]);
         trajectory_data.data.push_back(cntrl[12]);
+        trajectory_data.data.push_back(pelvis_orientation_roll);
+        trajectory_data.data.push_back(pelvis_orientation_pitch);
+        trajectory_data.data.push_back(pelvis_orientation_yaw);
+
         trajectory_data_pub.publish(trajectory_data);
 
 
@@ -1433,16 +1478,22 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
                      //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
 //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
+            //qDebug()<<"pelvis roll:"<<pelvis_orientation_roll<<"\tpitch:"<<pelvis_orientation_pitch<<"\tyaw:"<<pelvis_orientation_yaw;
         }
 
-        //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.T_end_of_first_SS){break;}
+        //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+4*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS){break;}
 //if((e>100||f>100||g>100||h>100)&&GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
 //   break;}
+        data.append(QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
+                    QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
+                    QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+"\n");
         ros::spinOnce();
         loop_rate.sleep();
         ++count;
     }
-
+    myfile.open(QFile::ReadWrite);
+    myfile.write(data);
+    myfile.close();
     return 0;
 }
 

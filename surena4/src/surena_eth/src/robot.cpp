@@ -210,7 +210,8 @@ _motorPosition[18]+=2050;
 Epos4.SetAllPositionCST(_motorPosition);
 }
 //=================================================================================================
-void  Robot::FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<int32_t> positionsInc,QList<uint16_t> bump_sensor_list,QList<float> imu_data_list)
+void  Robot::FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<int32_t> positionsInc,QList<uint16_t> bump_sensor_list,QList<float>
+                              _data_list)
 {
     for(int i=0;i<12;i++){
 CurrentAbsPositions[i]=positions[i];
