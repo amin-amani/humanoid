@@ -876,7 +876,7 @@ int main(int argc, char **argv)
        QByteArray data;
        QTime pc_time;
        QString name;
-       name="/home/cast/Desktop/robot_data_save/data_";
+       name="/home/milad/Desktop/robot_data_save/data_";
        name+=QString::number(pc_time.currentTime().hour())+"_";
        name+=QString::number(pc_time.currentTime().minute())+"_";
        name+=QString::number(pc_time.currentTime().second())+"_";
@@ -1324,7 +1324,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 //       k_roll_r=0;
 //       k_roll_l=0;
 
-        double k_pitch=1;
+        double k_pitch=1;0.8;
 
         cntrl[0]=0.0;
         cntrl[1]=links[1].JointAngle;

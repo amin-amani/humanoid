@@ -65,7 +65,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         TDs =0.7;
         TSS=0.9;
         TEnd=8;
-        Tm1=0.35*TSS;
+        Tm1=0.4*TSS;
         Tm2=0.68*TSS;
         Tc=TSS+TDs;
         Tx=2;
