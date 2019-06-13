@@ -1061,7 +1061,7 @@ else{
 
 
 
-                    if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.Tm2){
+                    if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TStartofAnkleAdaptation){
                         rightzstop=false;
                         AnkleZR=m7;
                         AnkleZ_offsetR=0;
@@ -1084,7 +1084,7 @@ else{
                     }
                     //else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
 
-                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.Tm2){
+                    else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.TStartofAnkleAdaptation){
 
 //                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
 //                        AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs ,2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
@@ -1100,14 +1100,14 @@ else{
                     // AnkleZL=m3;
 
                    // if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS){
-                     if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.Tm2){
+                     if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.TStartofAnkleAdaptation){
 
                          //                    AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.T_end_of_SS);
 //                         AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,OnlineTaskSpace.TDs ,OnlineTaskSpace.Tc-OnlineTaskSpace.TSS/2);
                          AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,0,OnlineTaskSpace.TDs);
 
                      }
-                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.Tm2){
+                    else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TStartofAnkleAdaptation){
                         leftzstop=false;
                         AnkleZL=m3;
                         AnkleZ_offsetL=0;
@@ -1157,14 +1157,14 @@ else{
                         m6,
                         AnkleZR,
                         0,
-                        -1*m8*(M_PI/180),
+                       m8,
                         0;
 
                 PoseLFoot<<m1,
                         m2,
                         AnkleZL,
                         0,
-                        -1*m4*(M_PI/180),
+                        m4,
                         0;
 
 
@@ -1209,7 +1209,13 @@ R_P=R_P*R_P2;
 //                        0,0,1;
 
 
+R_F_L<<cos(PoseLFoot(4)),0,sin(PoseLFoot(4)),
+                0,1,0,
+        -sin(PoseLFoot(4)),0,cos(PoseLFoot(4));
 
+R_F_R<<cos(PoseRFoot(4)),0,sin(PoseRFoot(4)),
+                0,1,0,
+        -sin(PoseRFoot(4)),0,cos(PoseRFoot(4));
 
 if(!turning && !sidewalk)
 {
@@ -1440,9 +1446,11 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         trajectory_data.data.push_back(PoseRFoot(0));
         trajectory_data.data.push_back(PoseRFoot(1));
         trajectory_data.data.push_back(PoseRFoot(2));
+        trajectory_data.data.push_back(PoseRFoot(4));
         trajectory_data.data.push_back(PoseLFoot(0));
         trajectory_data.data.push_back(PoseLFoot(1));
         trajectory_data.data.push_back(PoseLFoot(2));
+        trajectory_data.data.push_back(PoseLFoot(4));
         trajectory_data.data.push_back(double(a)/500);
         trajectory_data.data.push_back(double(b)/500);
         trajectory_data.data.push_back(double(c)/500);
