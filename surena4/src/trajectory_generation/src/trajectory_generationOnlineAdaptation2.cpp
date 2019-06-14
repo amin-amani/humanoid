@@ -259,7 +259,14 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 }
 int qra_offset[4];
 int qla_offset[4];
+
+int inc_feedback[12];
 void qc_initial(const sensor_msgs::JointState & msg){
+    for (int i = 0; i < 12; ++i) {
+        inc_feedback[i]=int(msg.position[i+1]);
+    }
+
+
     if (qc_initial_bool){
 
         for (int i = 0; i < 12; ++i) {
@@ -282,6 +289,13 @@ void qc_initial(const sensor_msgs::JointState & msg){
                  qc_offset[0],qc_offset[1],qc_offset[2],qc_offset[3],qc_offset[4],
                 qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
                 qc_offset[10],qc_offset[11]);}
+}
+
+int abs_feedback[12];
+void abs_feedback_func(const sensor_msgs::JointState & msg){
+    for (int i = 0; i < 12; ++i) {
+        abs_feedback[i]=int(msg.position[i+1]);
+    }
 }
 
 double Fzl,Fzr,Mxl,Mxr;
@@ -323,15 +337,22 @@ double quaternion2euler_roll(double q0,double q1,double q2,double q3){
 
 
 double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
-
+double pelvis_acceleration[3];
+double pelvis_angularVelocity[3];
+PIDController pelvis_pitch_pid;
 void imu_data_process(const sensor_msgs::Imu &msg){
  //MatrixXd R_pelvis(3,3);
  //R_pelvis=quater2rot(msg.orientation.w,msg.orientation.x,msg.orientation.y,msg.orientation.z);
 pelvis_orientation_roll=msg.orientation.x;
 pelvis_orientation_pitch=msg.orientation.y;
 pelvis_orientation_yaw=msg.orientation.z;
+pelvis_acceleration[0]=msg.linear_acceleration.x;
+pelvis_acceleration[1]=msg.linear_acceleration.y;
+pelvis_acceleration[2]=msg.linear_acceleration.z;
+pelvis_angularVelocity[0]=msg.angular_velocity.x;
+pelvis_angularVelocity[1]=msg.angular_velocity.y;
+pelvis_angularVelocity[2]=msg.angular_velocity.z;
 }
-
 
 bool wrench_init_bool;
 void WrenchHomming(){
@@ -771,7 +792,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < 12; ++i) {
         qc_offset[i]=0;
     }
-
+//pelvis_pitch_pid.Init();
 
     teta_motor_L=0;
     teta_motor_R=0;
@@ -806,6 +827,7 @@ int main(int argc, char **argv)
     ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
+    ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
     ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
@@ -873,15 +895,48 @@ int main(int argc, char **argv)
     bool fullcontactR=false;
 
     //*****loging data in a file
-       QByteArray data;
+
        QTime pc_time;
-       QString name;
-       name="/home/milad/Desktop/robot_data_save/data_";
-       name+=QString::number(pc_time.currentTime().hour())+"_";
-       name+=QString::number(pc_time.currentTime().minute())+"_";
-       name+=QString::number(pc_time.currentTime().second())+"_";
-       name+=".txt";
-       QFile myfile(name);
+       QByteArray data_pose;
+       QString name_pose;
+       name_pose="/home/milad/Desktop/robot_data_save/";
+       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
+       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
+       name_pose+=QString::number(pc_time.currentTime().second())+"_";
+       name_pose+="_pose.txt";
+       QFile myfile_pose(name_pose);
+
+
+       QByteArray data_abs;
+       QString name_abs;
+       name_abs="/home/milad/Desktop/robot_data_save/";
+       name_abs+=QString::number(pc_time.currentTime().hour())+"_";
+       name_abs+=QString::number(pc_time.currentTime().minute())+"_";
+       name_abs+=QString::number(pc_time.currentTime().second())+"_";
+       name_abs+="_abs.txt";
+       QFile myfile_abs(name_abs);
+
+       QByteArray data_inc;
+       QString name_inc;
+       name_inc="/home/milad/Desktop/robot_data_save/";
+       name_inc+=QString::number(pc_time.currentTime().hour())+"_";
+       name_inc+=QString::number(pc_time.currentTime().minute())+"_";
+       name_inc+=QString::number(pc_time.currentTime().second())+"_";
+       name_inc+="_inc.txt";
+       QFile myfile_inc(name_inc);
+
+       QByteArray data_demand;
+       QString name_demand;
+       name_demand="/home/milad/Desktop/robot_data_save/";
+       name_demand+=QString::number(pc_time.currentTime().hour())+"_";
+       name_demand+=QString::number(pc_time.currentTime().minute())+"_";
+       name_demand+=QString::number(pc_time.currentTime().second())+"_";
+       name_demand+="_demand.txt";
+       QFile myfile_demand(name_demand);
+
+
+
+
 
 
 
@@ -1492,16 +1547,41 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+4*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS){break;}
 //if((e>100||f>100||g>100||h>100)&&GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
 //   break;}
-        data.append(QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
+        data_pose.append(QString::number(GlobalTime)+","+QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
                     QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
                     QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+"\n");
+
+        data_inc.append(QString::number(GlobalTime));
+        data_abs.append(QString::number(GlobalTime));
+        data_demand.append(QString::number(GlobalTime));
+        for (int i = 0; i < 12; ++i) {
+          data_inc.append(","+QString::number(inc_feedback[i]));
+          data_abs.append(","+QString::number(abs_feedback[i]));
+          data_demand.append(","+QString::number(qref[i]));
+
+        }
+        data_inc.append("\n");
+        data_abs.append("\n");
+        data_demand.append("\n");
+
         ros::spinOnce();
+
         loop_rate.sleep();
         ++count;
     }
-    myfile.open(QFile::ReadWrite);
-    myfile.write(data);
-    myfile.close();
+    myfile_pose.open(QFile::ReadWrite);
+    myfile_pose.write(data_pose);
+    myfile_pose.close();
+    myfile_inc.open(QFile::ReadWrite);
+    myfile_inc.write(data_inc);
+    myfile_inc.close();
+    myfile_abs.open(QFile::ReadWrite);
+    myfile_abs.write(data_abs);
+    myfile_abs.close();
+    myfile_abs.open(QFile::ReadWrite);
+    myfile_abs.write(data_abs);
+    myfile_abs.close();
+
     return 0;
 }
 

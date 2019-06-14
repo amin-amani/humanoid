@@ -114,10 +114,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         T_end_a_e=TGait+TDs+0.5*TEnd;
         T_end_a_d=TGait+TDs+.6*(T_end_a_e-T_end_a_s);0.45;
 
-        beta_toe=3*M_PI/180;
-            beta_heel=-5*M_PI/180;
-            t_toe=0.5*TDs;
-            t_heel=0.5*TDs;
+        beta_toe=3*M_PI/18*0;
+        beta_heel=-5*M_PI/18*0;
+        t_toe=0.5*TDs;
+        t_heel=0.5*TDs;
 
 
 
