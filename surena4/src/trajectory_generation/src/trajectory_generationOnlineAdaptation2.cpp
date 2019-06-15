@@ -262,9 +262,9 @@ int qla_offset[4];
 
 int inc_feedback[12];
 void qc_initial(const sensor_msgs::JointState & msg){
-    for (int i = 0; i < 12; ++i) {
-        inc_feedback[i]=int(msg.position[i+1]);
-    }
+//    for (int i = 0; i < 12; ++i) {
+//        inc_feedback[i]=int(msg.position[i+1]);
+//    }
 
 
     if (qc_initial_bool){
@@ -824,11 +824,11 @@ int main(int argc, char **argv)
     std_msgs::Float32MultiArray trajectory_data;
 
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
-    ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
-    ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
+ //   ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
+   // ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-    ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
-    ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
+  //  ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
+   // ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
         pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -896,43 +896,43 @@ int main(int argc, char **argv)
 
     //*****loging data in a file
 
-       QTime pc_time;
-       QByteArray data_pose;
-       QString name_pose;
-       name_pose="/home/milad/Desktop/robot_data_save/";
-       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
-       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
-       name_pose+=QString::number(pc_time.currentTime().second())+"_";
-       name_pose+="_pose.txt";
-       QFile myfile_pose(name_pose);
+//       QTime pc_time;
+//       QByteArray data_pose;
+//       QString name_pose;
+//       name_pose="/home/milad/Desktop/robot_data_save/";
+//       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
+//       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
+//       name_pose+=QString::number(pc_time.currentTime().second())+"_";
+//       name_pose+="_pose.txt";
+//       QFile myfile_pose(name_pose);
 
 
-       QByteArray data_abs;
-       QString name_abs;
-       name_abs="/home/milad/Desktop/robot_data_save/";
-       name_abs+=QString::number(pc_time.currentTime().hour())+"_";
-       name_abs+=QString::number(pc_time.currentTime().minute())+"_";
-       name_abs+=QString::number(pc_time.currentTime().second())+"_";
-       name_abs+="_abs.txt";
-       QFile myfile_abs(name_abs);
+//       QByteArray data_abs;
+//       QString name_abs;
+//       name_abs="/home/milad/Desktop/robot_data_save/";
+//       name_abs+=QString::number(pc_time.currentTime().hour())+"_";
+//       name_abs+=QString::number(pc_time.currentTime().minute())+"_";
+//       name_abs+=QString::number(pc_time.currentTime().second())+"_";
+//       name_abs+="_abs.txt";
+//       QFile myfile_abs(name_abs);
 
-       QByteArray data_inc;
-       QString name_inc;
-       name_inc="/home/milad/Desktop/robot_data_save/";
-       name_inc+=QString::number(pc_time.currentTime().hour())+"_";
-       name_inc+=QString::number(pc_time.currentTime().minute())+"_";
-       name_inc+=QString::number(pc_time.currentTime().second())+"_";
-       name_inc+="_inc.txt";
-       QFile myfile_inc(name_inc);
+//       QByteArray data_inc;
+//       QString name_inc;
+//       name_inc="/home/milad/Desktop/robot_data_save/";
+//       name_inc+=QString::number(pc_time.currentTime().hour())+"_";
+//       name_inc+=QString::number(pc_time.currentTime().minute())+"_";
+//       name_inc+=QString::number(pc_time.currentTime().second())+"_";
+//       name_inc+="_inc.txt";
+//       QFile myfile_inc(name_inc);
 
-       QByteArray data_demand;
-       QString name_demand;
-       name_demand="/home/milad/Desktop/robot_data_save/";
-       name_demand+=QString::number(pc_time.currentTime().hour())+"_";
-       name_demand+=QString::number(pc_time.currentTime().minute())+"_";
-       name_demand+=QString::number(pc_time.currentTime().second())+"_";
-       name_demand+="_demand.txt";
-       QFile myfile_demand(name_demand);
+//       QByteArray data_demand;
+//       QString name_demand;
+//       name_demand="/home/milad/Desktop/robot_data_save/";
+//       name_demand+=QString::number(pc_time.currentTime().hour())+"_";
+//       name_demand+=QString::number(pc_time.currentTime().minute())+"_";
+//       name_demand+=QString::number(pc_time.currentTime().second())+"_";
+//       name_demand+="_demand.txt";
+//       QFile myfile_demand(name_demand);
 
 
 
@@ -954,15 +954,15 @@ int main(int argc, char **argv)
 
 
 
-        if(wrench_init_bool){
-            WrenchHomming();
-            for(int  i = 0;i < 12;i++){msg.data.push_back(qc_offset[i]);}
-            for(int  i = 12;i < 28;i++){msg.data.push_back(0);}
-            chatter_pub.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
-            continue;
-        }
+//        if(wrench_init_bool){
+//            WrenchHomming();
+//            for(int  i = 0;i < 12;i++){msg.data.push_back(qc_offset[i]);}
+//            for(int  i = 12;i < 28;i++){msg.data.push_back(0);}
+//            chatter_pub.publish(msg);
+//            ros::spinOnce();
+//            loop_rate.sleep();
+//            continue;
+//        }
 
 
         if(OnlineTaskSpace.localTiming<.1){contact_flag_timing=-contact_flag_timing;}//flag to show expected contact according to timing,sign of flag changes
@@ -1547,40 +1547,42 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         //if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+4*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS){break;}
 //if((e>100||f>100||g>100||h>100)&&GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){
 //   break;}
-        data_pose.append(QString::number(GlobalTime)+","+QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
-                    QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
-                    QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+"\n");
 
-        data_inc.append(QString::number(GlobalTime));
-        data_abs.append(QString::number(GlobalTime));
-        data_demand.append(QString::number(GlobalTime));
-        for (int i = 0; i < 12; ++i) {
-          data_inc.append(","+QString::number(inc_feedback[i]));
-          data_abs.append(","+QString::number(abs_feedback[i]));
-          data_demand.append(","+QString::number(qref[i]));
 
-        }
-        data_inc.append("\n");
-        data_abs.append("\n");
-        data_demand.append("\n");
+//        data_pose.append(QString::number(GlobalTime)+","+QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
+//                    QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
+//                    QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+"\n");
+
+//        data_inc.append(QString::number(GlobalTime));
+//        data_abs.append(QString::number(GlobalTime));
+//        data_demand.append(QString::number(GlobalTime));
+//        for (int i = 0; i < 12; ++i) {
+//          data_inc.append(","+QString::number(inc_feedback[i]));
+//          data_abs.append(","+QString::number(abs_feedback[i]));
+//          data_demand.append(","+QString::number(qref[i]));
+
+//        }
+//        data_inc.append("\n");
+//        data_abs.append("\n");
+//        data_demand.append("\n");
 
         ros::spinOnce();
 
         loop_rate.sleep();
         ++count;
     }
-    myfile_pose.open(QFile::ReadWrite);
-    myfile_pose.write(data_pose);
-    myfile_pose.close();
-    myfile_inc.open(QFile::ReadWrite);
-    myfile_inc.write(data_inc);
-    myfile_inc.close();
-    myfile_abs.open(QFile::ReadWrite);
-    myfile_abs.write(data_abs);
-    myfile_abs.close();
-    myfile_abs.open(QFile::ReadWrite);
-    myfile_abs.write(data_abs);
-    myfile_abs.close();
+//    myfile_pose.open(QFile::ReadWrite);
+//    myfile_pose.write(data_pose);
+//    myfile_pose.close();
+//    myfile_inc.open(QFile::ReadWrite);
+//    myfile_inc.write(data_inc);
+//    myfile_inc.close();
+//    myfile_abs.open(QFile::ReadWrite);
+//    myfile_abs.write(data_abs);
+//    myfile_abs.close();
+//    myfile_abs.open(QFile::ReadWrite);
+//    myfile_abs.write(data_abs);
+//    myfile_abs.close();
 
     return 0;
 }

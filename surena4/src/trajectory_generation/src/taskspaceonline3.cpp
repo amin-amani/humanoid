@@ -4,9 +4,9 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 {
 
     NStride=300;
-    LeftHipRollModification= 2+1;3.2;3.1;2.7;2;
-    RightHipRollModification=2+1;3.2;3.1;2.7;2;
-    FirstHipRollModification=2+1;3.2;3.1;2.7;2;
+    LeftHipRollModification= 2;3.2;3.1;2.7;2;
+    RightHipRollModification=2;3.2;3.1;2.7;2;
+    FirstHipRollModification=2;3.2;3.1;2.7;2;
     HipPitchModification=1;//2;
     NStep=NStride*2;
 
@@ -56,7 +56,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         }
 
 
-        AnkleMaximumHeight=0.035;.03;
+        AnkleMaximumHeight=0.03;0.035;.03;
         Yd=.0562;
         a_d=-.438;
     //dynamic hamid
@@ -66,7 +66,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         TSS=0.9;
         TEnd=8;
         Tm1=0.4*TSS;
-        Tm2=0.68*TSS;
+        Tm2=0.68*TSS;0.68*TSS;
         TStartofHeel=0.4*TSS; //Tm2 (ver43)
         TStartofAnkleAdaptation=0.75*TSS; // Tm2 (ver43)
         Tc=TSS+TDs;
@@ -95,12 +95,12 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
         TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
         // last step: timing parameter of pelvis motion
-        T_end_of_first_SS=.001;
+        T_end_of_first_SS=.001;0;
         //    T_end_of_SS=.9;
-        T_end_of_SS=.0005;//TSS*.3;
-        T_end_of_last_SS=.001;
+        T_end_of_SS=.0005;0;//TSS*.3;
+        T_end_of_last_SS=.001;0;
 
-        h_end_of_SS=.00000000015;
+        h_end_of_SS=.00000000015;0;
 
 
 
@@ -343,6 +343,9 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS);
     double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm2);
     double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS);
+//    vz_start=0;
+//    vz_cycle=0;
+//    vz_end=0;
     //**************** start ***************************//
     //***** x start
     MatrixXd Cx_st_iTime_al(1,2);
