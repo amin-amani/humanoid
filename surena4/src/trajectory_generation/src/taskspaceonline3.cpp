@@ -114,8 +114,8 @@ _timeStep=.005;
 
         beta_toe=7*M_PI/18*0;
         beta_heel=-3*M_PI/180;
-        beta_toe=0*M_PI/18*0;
-        beta_heel=0*M_PI/180;
+//        beta_toe=0*M_PI/18*0;
+//        beta_heel=0*M_PI/180;
         t_toe=0.5*TDs;
         t_heel=0.5*TDs;
 
