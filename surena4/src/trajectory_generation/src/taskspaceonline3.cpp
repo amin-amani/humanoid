@@ -2,7 +2,7 @@
 
 TaskSpaceOnline3::TaskSpaceOnline3()
 {
-
+_timeStep=.005;
     NStride=300;
     LeftHipRollModification= 2;3.2;3.1;2.7;2;
     RightHipRollModification=2;3.2;3.1;2.7;2;
@@ -56,7 +56,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         }
 
 
-        AnkleMaximumHeight=0.03;0.035;.03;
+        AnkleMaximumHeight=.045;0.035;0.03;.03;
         Yd=.0562;
         a_d=-.438;
     //dynamic hamid
@@ -95,12 +95,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
         TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
         // last step: timing parameter of pelvis motion
-        T_end_of_first_SS=.001;0;
-        //    T_end_of_SS=.9;
-        T_end_of_SS=.0005;0;//TSS*.3;
-        T_end_of_last_SS=.001;0;
-
-        h_end_of_SS=.00000000015;0;
+        T_end_of_first_SS=1e-4;0;
+        T_end_of_SS=      1e-4;0;
+        T_end_of_last_SS= 1e-4;0;
+        h_end_of_SS=      1e-6;0;
 
 
 
@@ -114,8 +112,10 @@ TaskSpaceOnline3::TaskSpaceOnline3()
         T_end_a_e=TGait+TDs+0.5*TEnd;
         T_end_a_d=TGait+TDs+.6*(T_end_a_e-T_end_a_s);0.45;
 
-        beta_toe=3*M_PI/18*0;
-        beta_heel=-5*M_PI/18*0;
+        beta_toe=7*M_PI/18*0;
+        beta_heel=-3*M_PI/180;
+        beta_toe=0*M_PI/18*0;
+        beta_heel=0*M_PI/180;
         t_toe=0.5*TDs;
         t_heel=0.5*TDs;
 
@@ -129,7 +129,7 @@ TaskSpaceOnline3::TaskSpaceOnline3()
 }
 
 void TaskSpaceOnline3::numplot(double num,double min,double max){
-  //⬛
+  //
 
   QString str;
   int l=100;
@@ -340,9 +340,9 @@ void TaskSpaceOnline3::CoeffSideStartEnd(){
 
 void TaskSpaceOnline3::CoeffArrayAnkle(){
     //different velocities for lowering foot in end of ss
-    double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS);
-    double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm2);
-    double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS);
+    double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS)/4;
+    double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm2)/4;
+    double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS)/4;
 //    vz_start=0;
 //    vz_cycle=0;
 //    vz_end=0;
@@ -526,11 +526,11 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
         MatrixXd beta_toe2heel_t_cycle(1,3);
         beta_toe2heel_t_cycle<<0,TStartofHeel,TSS;
         MatrixXd beta_toe2heel_Pos_cycle(1,3);
-        beta_toe2heel_Pos_cycle<< beta_toe,0,beta_heel;
+        beta_toe2heel_Pos_cycle<< beta_toe,INFINITY,beta_heel;
         MatrixXd beta_toe2heel_Vel_cycle(1,3);
-        beta_toe2heel_Vel_cycle<<0 ,0, 0;  // 0 ,INFINITY, 0
+        beta_toe2heel_Vel_cycle<<  0 ,INFINITY, 0;//0 ,0, 0;
         MatrixXd beta_toe2heel_Acc_cycle(1,3);
-        beta_toe2heel_Acc_cycle<<0 ,0, 0; // 0 ,INFINITY, 0
+        beta_toe2heel_Acc_cycle<< 0 ,INFINITY, 0; //0 ,0, 0;
         C_beta_toe2heel_cycle=CoefOffline.Coefficient(beta_toe2heel_t_cycle,beta_toe2heel_Pos_cycle,beta_toe2heel_Vel_cycle,beta_toe2heel_Acc_cycle);
 
 

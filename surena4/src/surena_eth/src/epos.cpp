@@ -5,14 +5,14 @@ Epos::Epos(QObject *parent) : QObject(parent)
 {
     for(int i=0;i<8;i++)
     {
-    bump_sensor_list.append(0x1);
+        bump_sensor_list.append(0x1);
     }
     for(int i=0;i<16;i++)
     {
-    positions.append((char)0x00);
-    positionsInc.append((char)0x00);
-    imu_data_list.append((char)0x00);
-    ft.append((char)0x00);
+        positions.append((char)0x00);
+        positionsInc.append((char)0x00);
+        imu_data_list.append((char)0x00);
+        ft.append((char)0x00);
     }
     InitErrorMap();
     qDebug()<<"all printed values are hex";
@@ -33,7 +33,7 @@ bool Epos::ActiveCSP(int nodeID,bool switchOn)
     RunWithPostDelay(StartNode(nodeID),700);
     RunWithPostDelay(SetMode(nodeID,CSP),700);
     RunWithPostDelay(SwitchOff(nodeID),700);
-   if(switchOn) RunWithPostDelay(SwitchOn(nodeID),700);
+    if(switchOn) RunWithPostDelay(SwitchOn(nodeID),700);
     return OK;
 }
 //========================================================================
@@ -55,7 +55,27 @@ bool Epos::ActiveHand(int nodeID,bool switchOn) //13,2
     SwitchOff(devid,nodeID);
     WaitMs(700);
     if(!switchOn)return OK;
-     SwitchOn(devid,nodeID);
+    SwitchOn(devid,nodeID);
+    WaitMs(700);
+    return OK;
+}
+
+//========================================================================
+
+bool Epos::ActiveWaist() //14
+{
+    int nodeID=1;
+    int devID=14;
+    SetPreoperationalMode(devID,nodeID);
+    WaitMs(700);
+    StartNode(devID);
+    WaitMs(700);
+    SetMode(devID,PPM,nodeID);
+    WaitMs(700);
+    SwitchOff(devID,nodeID);
+    WaitMs(700);
+    //  if(!switchOn)return OK;
+    SwitchOn(devID,nodeID);
     WaitMs(700);
     return OK;
 }
@@ -64,27 +84,27 @@ bool Epos::ActiveAllHands(bool switchOn) //13,2
 {
     WaitMs(700);
     for(int i=0 ;i<4;i++){
-    SetPreoperationalMode(12,i+1);
-    SetPreoperationalMode(13,i+1);
+        SetPreoperationalMode(12,i+1);
+        SetPreoperationalMode(13,i+1);
     }
     WaitMs(700);
     StartNode(12);
     StartNode(13);
     WaitMs(700);
     for(int i=0 ;i<4;i++){
-    SetMode(12,PPM,i+1);
-    SetMode(13,PPM,i+1);
+        SetMode(12,PPM,i+1);
+        SetMode(13,PPM,i+1);
     }
     WaitMs(700);
     for(int i=0 ;i<4;i++){
-    SwitchOff(12,i+1);
-    SwitchOff(13,i+1);
+        SwitchOff(12,i+1);
+        SwitchOff(13,i+1);
     }
     WaitMs(700);
     if(!switchOn)return OK;
     for(int i=0 ;i<4;i++){
-    SwitchOn(12,i+1);
-    SwitchOn(13,i+1);
+        SwitchOn(12,i+1);
+        SwitchOn(13,i+1);
     }
     WaitMs(700);
     return OK;
@@ -103,10 +123,10 @@ bool Epos::ActivePPMPDO(int nodeID,int canID) //13,2
 void Epos::ResetNode(int devID)throw(std::runtime_error)
 {
     try{
-    QByteArray data,replay;
-    data.append(0x81);
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(0,devID,data);
+        QByteArray data,replay;
+        data.append(0x81);
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(0,devID,data);
     }
     catch(std::runtime_error e)
     {
@@ -127,35 +147,35 @@ EPOSErrors Epos::EnableDevice(int devID,EPOSOperationMode mode)
 void Epos::SetPreoperationalMode(int devID,int nodeID)
 {
     try{
-    QByteArray data,replay;
-    data.append(0x80);     // ???????????? check 0x80 (for 0x01)
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(00,devID,data);
-}
+        QByteArray data,replay;
+        data.append(0x80);     // ???????????? check 0x80 (for 0x01)
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(00,devID,data);
+    }
     catch(...)
     {}
 }
 //========================================================================
 void  Epos::ResetComunication(int devID)
 {    try{
-    QByteArray data,replay;
-    data.append(0x82);
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(0,devID,data);
+        QByteArray data,replay;
+        data.append(0x82);
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(0,devID,data);
      }
-    catch(...)
-    {}
+     catch(...)
+     {}
 
 }
 //========================================================================
 void Epos::StartNode(int devID)
 {
     try{
-    QByteArray data,replay;
-    data.append(0x01);
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        QByteArray data,replay;
+        data.append(0x01);
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
 
-    replay=can.WriteMessage(0,devID,data);
+        replay=can.WriteMessage(0,devID,data);
     }
     catch(...)
     {}
@@ -165,10 +185,10 @@ void Epos::StartNode(int devID)
 void Epos::StopNode(int devID)
 {
     try{
-    QByteArray data,replay;
-    data.append(0x02);
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(0,devID,data);
+        QByteArray data,replay;
+        data.append(0x02);
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(0,devID,data);
     }
     catch(...)
     {}
@@ -178,10 +198,10 @@ void Epos::StopNode(int devID)
 void Epos::SetMode(int devID,EPOSOperationMode mode,int canID)
 {
     try{
-    QByteArray data,replay;
-    data.append(mode);
-    data.append(QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(0x300+canID,devID,data);
+        QByteArray data,replay;
+        data.append(mode);
+        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(0x300+canID,devID,data);
     }
     catch(...)
     {
@@ -192,11 +212,11 @@ void Epos::SetMode(int devID,EPOSOperationMode mode,int canID)
 //========================================================================
 void Epos::SwitchOn(int devID ,int canID)
 {
-        try{
-    QByteArray data,replay;
-    data.append(0x0f);
-    data.append( QByteArray(7, Qt::Initialization::Uninitialized));
-    replay=can.WriteMessage(0x200+canID,devID,data);
+    try{
+        QByteArray data,replay;
+        data.append(0x0f);
+        data.append( QByteArray(7, Qt::Initialization::Uninitialized));
+        replay=can.WriteMessage(0x200+canID,devID,data);
     }
     catch(...)
     {}
@@ -206,10 +226,10 @@ void Epos::SwitchOn(int devID ,int canID)
 void Epos::SwitchOff(int devID,int canID)
 {
     try{
-    QByteArray data,replay;
-    data.append(0x06);
-    data.append( QByteArray(7, Qt::Initialization::Uninitialized));
-    replay= can.WriteMessage(0x200+canID,devID,data);
+        QByteArray data,replay;
+        data.append(0x06);
+        data.append( QByteArray(7, Qt::Initialization::Uninitialized));
+        replay= can.WriteMessage(0x200+canID,devID,data);
     }
     catch(...)
     {}
@@ -226,7 +246,7 @@ EPOSErrors Epos::ActivePPM(int canID,int devId){
     WriteRegister(0x6040,0,canID,devId,0x0f,2);//set mode
     QThread::sleep(1);
     WriteRegister(0x6040,0,canID,devId,0x010f,2);//set mode
-   return OK;
+    return OK;
 }
 //========================================================================
 EPOSErrors Epos::SDOWriteCommand( int id,unsigned long int input,int index,unsigned char subIndex,unsigned char len,char devID)
@@ -265,7 +285,7 @@ void Epos::SDOReadCommand( int id,int index,unsigned char subIndex,char devID,QB
     data.append((index >> 8)&0xff);
     data.append(subIndex&0xff);
     data.append( QByteArray(4, Qt::Initialization::Uninitialized));
-   replay=can.WriteMessage(id,devID,data);
+    replay=can.WriteMessage(id,devID,data);
 }
 //========================================================================
 unsigned char Epos::GetSDOCODE(int len)
@@ -281,36 +301,36 @@ unsigned char Epos::GetSDOCODE(int len)
 //========================================================================
 int32_t Epos::ReadRegister(int index,int subIndex,int canID, int devID,int timeout,int trycount)
 {
-     return  ReadRegisterValue(index,subIndex,canID,devID,timeout);
+    return  ReadRegisterValue(index,subIndex,canID,devID,timeout);
 }
 //========================================================================
 int32_t  Epos::ReadRegisterValue(int index,int subIndex,int canID, int devID,int timeout)throw(std::runtime_error)
 {
     try{
-    uint16_t inpid;
-    QByteArray replay;
-    int32_t value;
+        uint16_t inpid;
+        QByteArray replay;
+        int32_t value;
 
-    can.ReadMessage(devID);
-    can.ReadMessage(devID);
-    SDOReadCommand(canID+0x600,index,subIndex,devID,replay);
-    replay=can.ReadMessage(devID);
+        can.ReadMessage(devID);
+        can.ReadMessage(devID);
+        SDOReadCommand(canID+0x600,index,subIndex,devID,replay);
+        replay=can.ReadMessage(devID);
 
-    inpid=replay[1]&0xff;
-    inpid<<=8;
-    inpid+=replay[0]&0xff;
-    if((inpid==0x580+canID))
-    {
-        // PAGE 150 APPLICATION NOTE COLLECTIOIN
-        value=0;
-        value=replay[9]&0xff;
-        value=value<<8;
-        value+=replay[8]&0xff;
-        value=(value)<<8;
-        value+=replay[7]&0xff;
-        value=(value)<<8;
-        value+=replay[6]&0xff;
-    }
+        inpid=replay[1]&0xff;
+        inpid<<=8;
+        inpid+=replay[0]&0xff;
+        if((inpid==0x580+canID))
+        {
+            // PAGE 150 APPLICATION NOTE COLLECTIOIN
+            value=0;
+            value=replay[9]&0xff;
+            value=value<<8;
+            value+=replay[8]&0xff;
+            value=(value)<<8;
+            value+=replay[7]&0xff;
+            value=(value)<<8;
+            value+=replay[6]&0xff;
+        }
         return value;
     }
     catch(const std::runtime_error e)
@@ -324,13 +344,13 @@ EPOSErrors Epos::ReadAllRegisters(int index,int subIndex,int canID,QList< int32_
     uint16_t inpid;
     QByteArray replay;
 
- QLOG_TRACE()<<"Read 255";
+    QLOG_TRACE()<<"Read 255";
     can.ReadMessage(255);
-     QLOG_TRACE()<<"Read 255";
+    QLOG_TRACE()<<"Read 255";
     can.ReadMessage(255);
 
     replay.clear();
-     QLOG_TRACE()<<"sdo read";
+    QLOG_TRACE()<<"sdo read";
     SDOReadCommand(canID+0x600,index,subIndex,255,replay);
     //can.ReadMessage(255,replay);
     if(replay.length()!=169)
@@ -339,18 +359,18 @@ EPOSErrors Epos::ReadAllRegisters(int index,int subIndex,int canID,QList< int32_
         QLOG_ERROR()<<"Read All invalid lengh:"<<replay.length()<<" data:"<<replay.toHex();
         return SDO_BAD_REPLAY;
     }
- QLOG_TRACE()<<"befor for:"<<replay.toHex();
- replay=replay.remove(0,4);
-for(int i=0;i<16;i++)
+    QLOG_TRACE()<<"befor for:"<<replay.toHex();
+    replay=replay.remove(0,4);
+    for(int i=0;i<16;i++)
 
-{
-    inpid=replay[i*10+1]&0xff;
-    inpid<<=8;
-    inpid+=replay[i*10+0]&0xff;
-   // if(inpid==(0x580+1))
-   // {
+    {
+        inpid=replay[i*10+1]&0xff;
+        inpid<<=8;
+        inpid+=replay[i*10+0]&0xff;
+        // if(inpid==(0x580+1))
+        // {
         // PAGE 150 APPLICATION NOTE COLLECTIOIN
-    int tempValue=0;
+        int tempValue=0;
         tempValue=replay[i*10+9]&0xff;
         tempValue=tempValue<<8;
         tempValue+=replay[i*10+8]&0xff;
@@ -359,8 +379,8 @@ for(int i=0;i<16;i++)
         tempValue=(tempValue)<<8;
         tempValue+=replay[i*10+6]&0xff;
         value.append(tempValue);
-QLOG_TRACE()<<"Read result "<<i<<" ="<<QString::number(tempValue,16)<<QString::number(inpid,16);
-}
+        QLOG_TRACE()<<"Read result "<<i<<" ="<<QString::number(tempValue,16)<<QString::number(inpid,16);
+    }
 
     return OK;
 }
@@ -416,7 +436,7 @@ bool Epos::SetPosition(int canID,int devId,int position,int velocity)
     return true;
 }
 //========================================================================
-inline QByteArray  Epos::MtorDataToArray(int canID,int position)
+inline QByteArray  Epos::MotorDataToArray(int canID,int position)
 {
     QByteArray data;
     data.append((canID>>8)&0xff);
@@ -431,7 +451,7 @@ inline QByteArray  Epos::MtorDataToArray(int canID,int position)
 //========================================================================
 inline QByteArray  Epos::CreatePDOPacket(int canID,int value1,int value2)
 {
-QByteArray data;
+    QByteArray data;
     data.append((canID>>8)&0xff);
     data.append((canID>>0)&0xff);
 
@@ -467,29 +487,29 @@ inline QByteArray Epos::CreateHandPacket(QList<int> motorPositions)
     QByteArray data;
 
     if(handDeviceID<4){
-    data.append(CreatePDOPacket(0x401+handDeviceID,motorPositions.at(12+handDeviceID),0x3f));
-    data.append(CreatePDOPacket(0x401+handDeviceID,motorPositions.at(12+8+handDeviceID),0x3f));
-    handDeviceID++;
+        data.append(CreatePDOPacket(0x401+handDeviceID,motorPositions.at(12+handDeviceID),0x3f));
+        data.append(CreatePDOPacket(0x401+handDeviceID,motorPositions.at(12+8+handDeviceID),0x3f));
+        handDeviceID++;
     }
     else if(handDeviceID> 3 && handDeviceID<7)
     {
-    data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[12+handDeviceID],40));
-    data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[8+12+handDeviceID],40));
-    handDeviceID++;
+        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[12+handDeviceID],40));
+        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[8+12+handDeviceID],40));
+        handDeviceID++;
     }
     else if(handDeviceID==7)
     {
-    ///right palm
-    data.append(CreatePDOPacket(palmCanID,motorPositions[19] &0xff,0));
-    ///left palm
-    data.append(CreatePDOPacket(palmCanID,motorPositions[27] &0xff,0));
-    handDeviceID++;
+        ///right palm
+        data.append(CreatePDOPacket(palmCanID,motorPositions[19] &0xff,0));
+        ///left palm
+        data.append(CreatePDOPacket(palmCanID,motorPositions[27] &0xff,0));
+        handDeviceID++;
     }
     else if(handDeviceID==8)//start move into controlworld for hands
     {
-    data.append(CreatePDOPacket(0x501,0x0f,0x0f));
-    data.append(CreatePDOPacket(0x501,0x0f,0x0f));
-    handDeviceID=0;
+        data.append(CreatePDOPacket(0x501,0x0f,0x0f));
+        data.append(CreatePDOPacket(0x501,0x0f,0x0f));
+        handDeviceID=0;
 
     }
     return data;
@@ -506,22 +526,56 @@ inline QByteArray Epos::CreateBumpRequestCommand()
     return command;
 }
 //========================================================================
-inline QByteArray Epos::CreateWaistAndHeadCommand()
+inline QByteArray Epos::CreateWaistAndHeadCommand(QList<int> motorPositions)
 {
+    static int state=0;
+
     QByteArray command;
-    command.append(QByteArray(10, Qt::Initialization::Uninitialized));
+    if(state==0)
+    {
+
+        command.append(CreatePDOPacket(0x401,motorPositions.at(28),0x3f));//waist
+    }
+    else if(state==1){
+
+   command.append(CreatePDOPacket(0x402,motorPositions.at(28),0x3f));
+    }
+    else if(state==2){
+
+   command.append(CreatePDOPacket(0x403,motorPositions.at(28),0x3f));
+    }
+    else if(state==3){
+
+   command.append(CreatePDOPacket(0x404,motorPositions.at(28),0x3f));
+    }
+    else if(state==4){
+
+          command.append(CreatePDOPacket(0x405,motorPositions.at(28),0x3f));
+    }
+    else if(state==5){
+
+   command.append(CreatePDOPacket(0x406,motorPositions.at(28),0x3f));
+
+    }
+    else if(state==6){
+
+      command.append(CreatePDOPacket(0x501,0x0f,0x0f));//move
+
+    }
+    // QLOG_TRACE()<<"state:"<<state;
+    if(state++>5)state=0;
     return command;
 }
 //========================================================================
 void Epos::SetAllPositionCST(QList<int> motorPositions)
 {
     QByteArray command;
-   for(int i=0; i< 12; i++)
-    command.append(MtorDataToArray(0x401,motorPositions.at(i)));
+    for(int i=0; i< 12; i++)
+        command.append(MotorDataToArray(0x401,motorPositions.at(i)));
     command.append(CreateHandPacket(motorPositions));
-    command.append(CreateWaistAndHeadCommand());
+    command.append(CreateWaistAndHeadCommand(motorPositions));
     command.append(CreateBumpRequestCommand());
-//    //packet must be 300 bytes 180 byte zero
+    //    //packet must be 300 bytes 180 byte zero
     command.append(QByteArray(ReserveByteCount, Qt::Initialization::Uninitialized));
     can.WriteRunCommand(command);
 }
@@ -554,7 +608,7 @@ inline bool Epos::IsValidRunPacket(QByteArray packet)
     if((packet[3]&0xff)!= 0x55 )
         return false;
 
- return true;
+    return true;
 
 }
 //========================================================================
@@ -573,7 +627,7 @@ inline void Epos::GetFTSensorDataFromPacket(EthernetReceivedPacketType*packet)
     ForceTorqSensorRight.torque.x=packet->FTsensor[9];
     ForceTorqSensorRight.torque.y=packet->FTsensor[10];
     ForceTorqSensorRight.torque.z=packet->FTsensor[11];
-     //5000 * (? / (((double)65535) * (gainFTnow) * (sensitivityFTnow) * (ExFTnow)));
+    //5000 * (? / (((double)65535) * (gainFTnow) * (sensitivityFTnow) * (ExFTnow)));
     ForceTorqSensorRight.force.x -=offsetFTRight[0];
     ForceTorqSensorRight.force.y -=offsetFTRight[1];
     ForceTorqSensorRight.force.z -=offsetFTRight[2];
@@ -611,27 +665,23 @@ inline void Epos::GetIMUDataFromPacket(EthernetReceivedPacketType*packet)
     tf2::Quaternion myQuaternion;
     myQuaternion.setRPY( incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
     //--------------------orientation
-//    IMU.orientation.x=myQuaternion.getX();
-//    IMU.orientation.y=myQuaternion.getY();
-//    IMU.orientation.z=myQuaternion.getZ();
-//    IMU.orientation.w=myQuaternion.getW();
-    IMU.orientation.x=incommingPacket->IMU.roll;
-    IMU.orientation.y=incommingPacket->IMU.pitch;
-    IMU.orientation.z=incommingPacket->IMU.yaw;
-    IMU.orientation.w=0;
+    IMU.orientation.x=myQuaternion.getX();
+    IMU.orientation.y=myQuaternion.getY();
+    IMU.orientation.z=myQuaternion.getZ();
+    IMU.orientation.w=myQuaternion.getW();
     //--------------------lenear acc
     IMU.linear_acceleration.x=incommingPacket->IMU.ax;
     IMU.linear_acceleration.y=incommingPacket->IMU.ay;
-     IMU.linear_acceleration.z=incommingPacket->IMU.az;
-     //--------------------angular velocity
-     IMU.angular_velocity.x=incommingPacket->IMU.wx;
-     IMU.angular_velocity.y=incommingPacket->IMU.wy;
-     IMU.angular_velocity.z=incommingPacket->IMU.wz;
-     //free acc
-     Acceleration.linear.x=incommingPacket->IMU.fax;
-     Acceleration.linear.y=incommingPacket->IMU.fay;
-     Acceleration.linear.z=incommingPacket->IMU.faz;
-     //mag feild
+    IMU.linear_acceleration.z=incommingPacket->IMU.az;
+    //--------------------angular velocity
+    IMU.angular_velocity.x=incommingPacket->IMU.wx;
+    IMU.angular_velocity.y=incommingPacket->IMU.wy;
+    IMU.angular_velocity.z=incommingPacket->IMU.wz;
+    //free acc
+    Acceleration.linear.x=incommingPacket->IMU.fax;
+    Acceleration.linear.y=incommingPacket->IMU.fay;
+    Acceleration.linear.z=incommingPacket->IMU.faz;
+    //mag feild
     MagneticSensor.magnetic_field.x=incommingPacket->IMU.mx;
     MagneticSensor.magnetic_field.y=incommingPacket->IMU.my;
     MagneticSensor.magnetic_field.z=incommingPacket->IMU.mz;
@@ -640,23 +690,23 @@ inline void Epos::GetIMUDataFromPacket(EthernetReceivedPacketType*packet)
 inline void Epos::GetBumpDataFromPacket(BumpSensorPacket *packet)
 {
     if((packet->ID&0xffff)==0x0481){
-    for(int i=0;i<4;i++){
-    bump_sensor_list[i]=packet->data[i]&0xffff;
-    }
+        for(int i=0;i<4;i++){
+            bump_sensor_list[i]=packet->data[i]&0xffff;
+        }
     }
 
     if((packet->ID&0xffff)==0x0482){
-    for(int i=0;i<4;i++){
-    bump_sensor_list[i+4]=packet->data[i]&0xffff;
+        for(int i=0;i<4;i++){
+            bump_sensor_list[i+4]=packet->data[i]&0xffff;
         }
-        }
+    }
 }
 //========================================================================
 void Epos::GetPositionDataFromPacket(EthernetReceivedPacketType*packet)
 {
     for(int i=0;i<16;i++){
-    positionsInc[i]=(packet->MotorData[i].Valu1);
-    positions[i]=(packet->MotorData[i].Valu2);
+        positionsInc[i]=(packet->MotorData[i].Valu1);
+        positions[i]=(packet->MotorData[i].Valu2);
     }
 }
 //========================================================================
@@ -684,7 +734,7 @@ void Epos::WaitMs(int ms)
     q.exec();
     if(tT.isActive()){
 
-      tT.stop();
+        tT.stop();
     } else {
 
     }
@@ -694,139 +744,139 @@ void Epos::WaitMs(int ms)
 //====================================================================================
 void Epos::InitErrorMap()
 {
-  ErrorCodes.insert(  0x0,"OK");
-  ErrorCodes.insert(  0x1000,"Generic error");
-  ErrorCodes.insert(  0x1080,"Generic initialization error");
-  ErrorCodes.insert(  0x1081,"Generic initialization error");
-  ErrorCodes.insert(  0x1082,"Generic initialization error");
-  ErrorCodes.insert(  0x1083,"Generic initialization error");
-  ErrorCodes.insert(0x1090,"Firmware incompatibility error");
-  ErrorCodes.insert(0x2310,"Overcurrent error");
-  ErrorCodes.insert(0x2320,"Power stage protection error");
-  ErrorCodes.insert(0x3210,"Overvoltage error");
-  ErrorCodes.insert(0x3220,"Undervoltage error");
-  ErrorCodes.insert(0x4210,"Thermal overload error");
-  ErrorCodes.insert(0x5113,"Logic supply voltage too low error");
-  ErrorCodes.insert(0x5280,"Hardware defect error");
-  ErrorCodes.insert(0x5281,"Hardware incompatibility error");
-  ErrorCodes.insert(0x5480,"Hardware error");
-  ErrorCodes.insert(0x5481,"Hardware error");
-  ErrorCodes.insert(0x5482,"Hardware error");
-  ErrorCodes.insert(0x5483,"Hardware error");
-  ErrorCodes.insert(0x6080,"Sign of life error");
-  ErrorCodes.insert(0x6081,"Extension 1 watchdog error");
-  ErrorCodes.insert(0x6320,"Software parameter error");
-  ErrorCodes.insert(0x7320,"Position sensor error");
-  ErrorCodes.insert(0x7380,"Position sensor breach error");
-  ErrorCodes.insert(0x7381,"Position sensor resolution error");
-  ErrorCodes.insert(0x7382,"Position sensor index error");
-  ErrorCodes.insert(0x7388,"Hall sensor error");
-  ErrorCodes.insert(0x7389,"Hall sensor not found error");
-  ErrorCodes.insert(0x738A,"Hall angle detection error");
-  ErrorCodes.insert(0x738C,"SSI sensor error");
-  ErrorCodes.insert(0x7390,"Missing main sensor error");
-  ErrorCodes.insert(0x7391,"Missing commutation sensor error");
-  ErrorCodes.insert(0x7392,"Main sensor direction error");
-  ErrorCodes.insert(0x8110,"CAN overrun error (object lost)");
-  ErrorCodes.insert(0x8111,"CAN overrun error");
-  ErrorCodes.insert(0x8120,"CAN passive mode error");
-  ErrorCodes.insert(0x8130,"CAN heartbeat error");
-  ErrorCodes.insert(0x8150,"CAN PDO COB-ID collision");
-  ErrorCodes.insert(0x8180,"EtherCAT communication error");
-  ErrorCodes.insert(0x8181,"EtherCAT initialization error");
-  ErrorCodes.insert(0x81FD,"CAN bus turned off");
-  ErrorCodes.insert(0x81FE,"CAN Rx queue overflow");
-  ErrorCodes.insert(0x81FF,"CAN Tx queue overflow");
-  ErrorCodes.insert(0x8210,"CAN PDO length error");
-  ErrorCodes.insert(0x8250,"RPDO timeout");
-  ErrorCodes.insert(0x8280,"EtherCAT PDO communication error");
-  ErrorCodes.insert(0x8281,"EtherCAT SDO communication error");
-  ErrorCodes.insert(0x8611,"Following error");
-  ErrorCodes.insert(0x8A80,"Negative limit switch error");
-  ErrorCodes.insert(0x8A81,"Positive limit switch error");
-  ErrorCodes.insert(0x8A82,"Software position limit error");
-  ErrorCodes.insert(0x8A88,"STO error");
-  ErrorCodes.insert(0xFF01,"System overloaded error");
-  ErrorCodes.insert(0xFF02,"Watchdog error");
-  ErrorCodes.insert(0xFF0B,"System peak overloaded error");
-  ErrorCodes.insert(0xFF10,"Controller gain error");
-  ErrorCodes.insert(0xFF12,"Auto tuning current limit error");
-  ErrorCodes.insert(0xFF13,"Auto tuning identification current error");
-  ErrorCodes.insert(0xFF14,"Auto tuning buffer overflow error");
-  ErrorCodes.insert(0xFF15,"Auto tuning sample mismatch error");
-  ErrorCodes.insert(0xFF16,"Auto tuning parameter error");
-  ErrorCodes.insert(0xFF17,"Auto tuning amplitude mismatch error");
-  ErrorCodes.insert(0xFF18,"Auto tuning period length error");
-  ErrorCodes.insert(0xFF19,"Auto tuning timeout error");
-  ErrorCodes.insert(0xFF20,"Auto tuning standstill error");
-  ErrorCodes.insert(0xFF21,"Auto tuning torque invalid error");
+    ErrorCodes.insert(  0x0,"OK");
+    ErrorCodes.insert(  0x1000,"Generic error");
+    ErrorCodes.insert(  0x1080,"Generic initialization error");
+    ErrorCodes.insert(  0x1081,"Generic initialization error");
+    ErrorCodes.insert(  0x1082,"Generic initialization error");
+    ErrorCodes.insert(  0x1083,"Generic initialization error");
+    ErrorCodes.insert(0x1090,"Firmware incompatibility error");
+    ErrorCodes.insert(0x2310,"Overcurrent error");
+    ErrorCodes.insert(0x2320,"Power stage protection error");
+    ErrorCodes.insert(0x3210,"Overvoltage error");
+    ErrorCodes.insert(0x3220,"Undervoltage error");
+    ErrorCodes.insert(0x4210,"Thermal overload error");
+    ErrorCodes.insert(0x5113,"Logic supply voltage too low error");
+    ErrorCodes.insert(0x5280,"Hardware defect error");
+    ErrorCodes.insert(0x5281,"Hardware incompatibility error");
+    ErrorCodes.insert(0x5480,"Hardware error");
+    ErrorCodes.insert(0x5481,"Hardware error");
+    ErrorCodes.insert(0x5482,"Hardware error");
+    ErrorCodes.insert(0x5483,"Hardware error");
+    ErrorCodes.insert(0x6080,"Sign of life error");
+    ErrorCodes.insert(0x6081,"Extension 1 watchdog error");
+    ErrorCodes.insert(0x6320,"Software parameter error");
+    ErrorCodes.insert(0x7320,"Position sensor error");
+    ErrorCodes.insert(0x7380,"Position sensor breach error");
+    ErrorCodes.insert(0x7381,"Position sensor resolution error");
+    ErrorCodes.insert(0x7382,"Position sensor index error");
+    ErrorCodes.insert(0x7388,"Hall sensor error");
+    ErrorCodes.insert(0x7389,"Hall sensor not found error");
+    ErrorCodes.insert(0x738A,"Hall angle detection error");
+    ErrorCodes.insert(0x738C,"SSI sensor error");
+    ErrorCodes.insert(0x7390,"Missing main sensor error");
+    ErrorCodes.insert(0x7391,"Missing commutation sensor error");
+    ErrorCodes.insert(0x7392,"Main sensor direction error");
+    ErrorCodes.insert(0x8110,"CAN overrun error (object lost)");
+    ErrorCodes.insert(0x8111,"CAN overrun error");
+    ErrorCodes.insert(0x8120,"CAN passive mode error");
+    ErrorCodes.insert(0x8130,"CAN heartbeat error");
+    ErrorCodes.insert(0x8150,"CAN PDO COB-ID collision");
+    ErrorCodes.insert(0x8180,"EtherCAT communication error");
+    ErrorCodes.insert(0x8181,"EtherCAT initialization error");
+    ErrorCodes.insert(0x81FD,"CAN bus turned off");
+    ErrorCodes.insert(0x81FE,"CAN Rx queue overflow");
+    ErrorCodes.insert(0x81FF,"CAN Tx queue overflow");
+    ErrorCodes.insert(0x8210,"CAN PDO length error");
+    ErrorCodes.insert(0x8250,"RPDO timeout");
+    ErrorCodes.insert(0x8280,"EtherCAT PDO communication error");
+    ErrorCodes.insert(0x8281,"EtherCAT SDO communication error");
+    ErrorCodes.insert(0x8611,"Following error");
+    ErrorCodes.insert(0x8A80,"Negative limit switch error");
+    ErrorCodes.insert(0x8A81,"Positive limit switch error");
+    ErrorCodes.insert(0x8A82,"Software position limit error");
+    ErrorCodes.insert(0x8A88,"STO error");
+    ErrorCodes.insert(0xFF01,"System overloaded error");
+    ErrorCodes.insert(0xFF02,"Watchdog error");
+    ErrorCodes.insert(0xFF0B,"System peak overloaded error");
+    ErrorCodes.insert(0xFF10,"Controller gain error");
+    ErrorCodes.insert(0xFF12,"Auto tuning current limit error");
+    ErrorCodes.insert(0xFF13,"Auto tuning identification current error");
+    ErrorCodes.insert(0xFF14,"Auto tuning buffer overflow error");
+    ErrorCodes.insert(0xFF15,"Auto tuning sample mismatch error");
+    ErrorCodes.insert(0xFF16,"Auto tuning parameter error");
+    ErrorCodes.insert(0xFF17,"Auto tuning amplitude mismatch error");
+    ErrorCodes.insert(0xFF18,"Auto tuning period length error");
+    ErrorCodes.insert(0xFF19,"Auto tuning timeout error");
+    ErrorCodes.insert(0xFF20,"Auto tuning standstill error");
+    ErrorCodes.insert(0xFF21,"Auto tuning torque invalid error");
 }
 //========================================================================
 bool Epos::CheckZynq()
 {
-//    int i=0;
-//    QByteArray data;
-//    uchar checkPoint[8]={0x00,0x55,0xaa,0x55,0xff,0xcc,0x33,0xcc};
-//    QByteArray ck;
+    //    int i=0;
+    //    QByteArray data;
+    //    uchar checkPoint[8]={0x00,0x55,0xaa,0x55,0xff,0xcc,0x33,0xcc};
+    //    QByteArray ck;
 
-//    data.append((char)0x00);  // mode 0: Test
-//    data.append(0xAA);  // Header check
-//    data.append(0x55);  // Header check
-//    data.append(0xAA);  // Header check
+    //    data.append((char)0x00);  // mode 0: Test
+    //    data.append(0xAA);  // Header check
+    //    data.append(0x55);  // Header check
+    //    data.append(0xAA);  // Header check
 
 
 
-//    data.append(0xFF);  // Parity | 0xFF
-//    data.append(0xCC);  // Tailer
-//    data.append(0x33);  // Tailer
-//    data.append(0xCC);  // Tailer
-//bool result;
-//  QByteArray resp=  tcp.SendCommand(data,result,10);  // send 128 Byte Packet
-//  if(LastPacketreceived.toHex()=="0055aa55ffcc33cc")
-//  {
+    //    data.append(0xFF);  // Parity | 0xFF
+    //    data.append(0xCC);  // Tailer
+    //    data.append(0x33);  // Tailer
+    //    data.append(0xCC);  // Tailer
+    //bool result;
+    //  QByteArray resp=  tcp.SendCommand(data,result,10);  // send 128 Byte Packet
+    //  if(LastPacketreceived.toHex()=="0055aa55ffcc33cc")
+    //  {
 
-//  qDebug()<<"valid resp!";
-//  return true;
-//  }
-//  return false;
+    //  qDebug()<<"valid resp!";
+    //  return true;
+    //  }
+    //  return false;
 
 }
 //========================================================================
 EPOSErrors Epos::Init(int tryCount)
 {
-static bool lastresult=false;
+    static bool lastresult=false;
 
 
     int numberOfSuccess=0;
     int pingCount=0;
 
     if(lastresult)return OK;
-       qDebug()<<"ping";
+    qDebug()<<"ping";
     while(! ping.Start("192.168.1.10") && pingCount<tryCount )
     {
         QThread::msleep(500);
-            qDebug()<<"waiting zynq ethernet..";
+        qDebug()<<"waiting zynq ethernet..";
         pingCount++;
     }
-if(pingCount==tryCount)return NETWOR_ERROR;
+    if(pingCount==tryCount)return NETWOR_ERROR;
 
-      qDebug()<<"Ping OK";
-//===========================
-QList<int32_t> values;
+    qDebug()<<"Ping OK";
+    //===========================
+    QList<int32_t> values;
 
-if(ReadAllRegisters(0x1000,0,1,values,10)!=OK)
-{
+    if(ReadAllRegisters(0x1000,0,1,values,10)!=OK)
+    {
 
-    qDebug()<<"Read error";
-    return NO_ANSER;
-}
-if(values.count()<12){    qDebug()<<"response lengh error"<<values.count();return SDO_REJECT;}
-for(int i=0;i<12;i++){
-qDebug()<<"read val "<<QString::number(i)<<"="<<QString::number(values[i],16);
-if(values[i]!=0x20192)return SDO_BAD_REPLAY;
-}
+        qDebug()<<"Read error";
+        return NO_ANSER;
+    }
+    if(values.count()<12){    qDebug()<<"response lengh error"<<values.count();return SDO_REJECT;}
+    for(int i=0;i<12;i++){
+        qDebug()<<"read val "<<QString::number(i)<<"="<<QString::number(values[i],16);
+        if(values[i]!=0x20192)return SDO_BAD_REPLAY;
+    }
 
-lastresult=true;
+    lastresult=true;
     return OK;
 
 }

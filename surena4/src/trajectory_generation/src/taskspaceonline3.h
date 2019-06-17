@@ -21,6 +21,7 @@ using namespace Eigen;
 class TaskSpaceOnline3
 {
 public:
+    double _timeStep;
 
     double LeftHipRollModification;
     double RightHipRollModification;
@@ -217,7 +218,7 @@ public:
 //    double  Rla_end_f;
     double globalTime;
     double time;
-    double _timeStep=.005;
+
     QVector<double> timeVector;
 
 
