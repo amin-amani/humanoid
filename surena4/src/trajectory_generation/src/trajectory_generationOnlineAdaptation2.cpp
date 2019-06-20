@@ -51,6 +51,27 @@ double saturate(double a, double min, double max){
 }
 
 
+void matrix_view(MatrixXd M){
+
+for (int i = 0; i <M.rows() ; ++i) {
+    QString str;
+    for (int j = 0; j <M.cols() ; ++j) {
+   str+=QString::number(M(i,j));
+   str+="   ";
+    }
+    qDebug()<<str;
+}
+qDebug()<<"";
+}
+
+
+void matrix_view(VectorXd M){
+QString str;
+for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
+qDebug()<<str;
+qDebug()<<"";
+}
+
 double move_rest_back(double max,double t_local,double T_start ,double T_move,double T_rest,double T_back){
     double c3=(10*max)/pow(T_move,3);
     double c4=-(15*max)/pow(T_move,4);
@@ -80,6 +101,26 @@ double move2pose(double max,double t_local,double T_start ,double T_end){
     return theta;
 }
 
+void TaskSpaceOnline3::matrix_view(MatrixXd M){
+
+for (int i = 0; i <M.rows() ; ++i) {
+    QString str;
+    for (int j = 0; j <M.cols() ; ++j) {
+   str+=QString::number(M(i,j));
+   str+="   ";
+    }
+    qDebug()<<str;
+}
+qDebug()<<"";
+}
+
+
+void TaskSpaceOnline3::matrix_view(VectorXd M){
+QString str;
+for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
+qDebug()<<str;
+qDebug()<<"";
+}
 
 
 ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
@@ -523,7 +564,6 @@ shoulderPitchOffset=SURENA.Links[3].JointAngle;
 void EndPhase(){
 
     if (GlobalTime>=(DurationOfStartPhase+OnlineTaskSpace.MotionTime) && GlobalTime<=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime) {
-
         MinimumJerkInterpolation Coef;
         MatrixXd ZPosition(1,2);
         //ZPosition<<Pz(0,0),Pz(0,0)-OnlineTaskSpace.ReferencePelvisHeight+OnlineTaskSpace.InitialPelvisHeight;//this one should be edited
@@ -809,7 +849,7 @@ int main(int argc, char **argv)
 
     GlobalTime=0;
     DurationOfStartPhase=3;
-    DurationOfendPhase=6;
+    DurationOfendPhase=3;
 
     MatrixXd RollModified(2,1);RollModified<<0,0;//parameters for hip roll angles charge, for keep pelvis straight
     PitchModified=0;
@@ -903,11 +943,11 @@ int main(int argc, char **argv)
        QTime pc_time;
        QByteArray data_pose;
        QString name_pose;
-       name_pose="/home/cast/Desktop/robot_data_save/";
-       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
-       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
-       name_pose+=QString::number(pc_time.currentTime().second())+"_";
-       name_pose+="_pose.txt";
+       name_pose="/media/cast/UBUNTU1604/robot_data/";
+//       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
+//       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
+//       name_pose+=QString::number(pc_time.currentTime().second())+"_";
+       name_pose+="pose.txt";
        QFile myfile_pose(name_pose);
 
 
@@ -1194,11 +1234,14 @@ else{
                 }
                 else{
                     AnkleZR=m7;
-                    AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,GlobalTime,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs ,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+OnlineTaskSpace.TEnd/2-OnlineTaskSpace.T_end_of_last_SS);
+                    AnkleZL=m3;//OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,GlobalTime,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs ,DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+OnlineTaskSpace.TEnd/2-OnlineTaskSpace.T_end_of_last_SS);
 
 //                    AnkleZR+=AnkleZ_offsetR;
 //                    AnkleZL+=AnkleZ_offsetL;
                 }
+
+//qDebug()<<GlobalTime<<"\t"<<local_time_cycle<<"\t"<<AnkleZL<<"\t"<<AnkleZR;
+
 }
 
 
@@ -1226,8 +1269,25 @@ else{
                         m4,
                         0;
 
+double pitch_ar=m8;
+double pitch_al=m4;
+
+if(pitch_ar>=0){
+    PoseRFoot(2)=PoseRFoot(2)-(OnlineTaskSpace._lenghtOfAnkle*(1-cos(pitch_ar)))+OnlineTaskSpace.lf*sin(pitch_ar);
+    PoseRFoot(0)=PoseRFoot(0)+(OnlineTaskSpace.lf*(1-cos(pitch_ar)))+OnlineTaskSpace._lenghtOfAnkle*sin(pitch_ar);}
+else{
+    PoseRFoot(2)=PoseRFoot(2)-(OnlineTaskSpace._lenghtOfAnkle*(1-cos(pitch_ar)))-OnlineTaskSpace.lb*sin(pitch_ar);//+lb*sin(pitch_ar)
+    PoseRFoot(0)=PoseRFoot(0)-(OnlineTaskSpace.lb*(1-cos(pitch_ar)))+OnlineTaskSpace._lenghtOfAnkle*sin(pitch_ar);} // +_lenghtOfAnkle*sin(pitch_ar)
+
+if(pitch_al>=0){
+    PoseLFoot(2)=PoseLFoot(2)-(OnlineTaskSpace._lenghtOfAnkle*(1-cos(pitch_al)))+OnlineTaskSpace.lf*sin(pitch_al);
+    PoseLFoot(0)= PoseLFoot(0)+(OnlineTaskSpace.lf*(1-cos(pitch_al)))+OnlineTaskSpace._lenghtOfAnkle*sin(pitch_al);}
+else{
+    PoseLFoot(2)=PoseLFoot(2)-(OnlineTaskSpace._lenghtOfAnkle*(1-cos(pitch_al)))-OnlineTaskSpace.lb*sin(pitch_al); //+lb*sin(pitch_al)
+    PoseLFoot(0)=PoseLFoot(0)-(OnlineTaskSpace.lb*(1-cos(pitch_al)))+OnlineTaskSpace._lenghtOfAnkle*sin(pitch_al);} //+_lenghtOfAnkle*sin(pitch_al)
 
 
+//qDebug()<<"time"<<GlobalTime<<"\tR"<<PoseRFoot(2)<<"\tL"<<PoseLFoot(2);
 
 //PoseLFoot(0)=0;
 //PoseRFoot(0)=0;
@@ -1278,10 +1338,23 @@ R_F_R<<cos(PoseRFoot(4)),0,sin(PoseRFoot(4)),
 
 if(!turning && !sidewalk)
 {
+
+//    qDebug()<<"R_P:"; matrix_view(R_P);
+//    qDebug()<<"R_F_L:"; matrix_view(R_F_L);
+//    qDebug()<<"R_F_R:"; matrix_view(R_F_R);
+
     SURENA.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
     SURENA.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
+     //   SURENA.ForwardKinematic(1);
 
-    SURENA.ForwardKinematic(1);
+
+//        VectorXd temp(3);
+//        temp=SURENA.Links[6].PositionInWorldCoordinate-PoseRFoot.block(0,0,3,1);
+//        matrix_view(temp);
+
+   //qDebug()<<GlobalTime<<"\tpitch sum"<< SURENA.Links[3].JointAngle<<"\t"<<SURENA.Links[4].JointAngle<<"\t"<<SURENA.Links[5].JointAngle;
+
+
 }
 
 if(turning){
@@ -1406,6 +1479,8 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         cntrl[11]=saturate(links[11].JointAngle,-M_PI/5,M_PI/4)+ankle_adaptation_switch*teta_motor_L;
         cntrl[12]=links[12].JointAngle+ankle_adaptation_switch*(phi_motor_L);
 
+
+
         vector<int> qref(12);
         qref=QC.ctrldata2qc(cntrl);
 
@@ -1478,7 +1553,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         msg.data.push_back(q_motor_l[5]);//25
         msg.data.push_back(q_motor_l[6]);//26
         msg.data.push_back(q_motor_l[7]);//27
-//        msg.data.push_back(0);
+       msg.data.push_back(0);
 //        for(int  i = 12;i < 28;i++)
 //        {
 //            msg.data.push_back(0);
@@ -1531,9 +1606,22 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         trajectory_data.data.push_back(cntrl[10]);
         trajectory_data.data.push_back(cntrl[11]);
         trajectory_data.data.push_back(cntrl[12]);
+        trajectory_data.data.push_back(cntrl[12]);
         trajectory_data.data.push_back(pelvis_orientation_roll);
         trajectory_data.data.push_back(pelvis_orientation_pitch);
         trajectory_data.data.push_back(pelvis_orientation_yaw);
+        trajectory_data.data.push_back(qc_offset[0]);
+        trajectory_data.data.push_back(qc_offset[1]);
+        trajectory_data.data.push_back(qc_offset[2]);
+        trajectory_data.data.push_back(qc_offset[3]);
+        trajectory_data.data.push_back(qc_offset[4]);
+        trajectory_data.data.push_back(qc_offset[5]);
+        trajectory_data.data.push_back(qc_offset[6]);
+        trajectory_data.data.push_back(qc_offset[7]);
+        trajectory_data.data.push_back(qc_offset[8]);
+        trajectory_data.data.push_back(qc_offset[9]);
+        trajectory_data.data.push_back(qc_offset[10]);
+        trajectory_data.data.push_back(qc_offset[11]);
 
         trajectory_data_pub.publish(trajectory_data);
 
@@ -1556,8 +1644,11 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
 
         data_pose.append(QString::number(GlobalTime)+","+QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
                     QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
-                    QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+"\n");
+                    QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+","+
+                         QString::number(PoseRFoot(4))+","+QString::number(PoseLFoot(4))+"\n");
 
+
+       // qDebug()<<GlobalTime<<"\t"<<PoseRFoot(2);
 //        data_inc.append(QString::number(GlobalTime));
 //        data_abs.append(QString::number(GlobalTime));
 //        data_demand.append(QString::number(GlobalTime));
@@ -1576,6 +1667,7 @@ if(sidewalk&&turning){ROS_INFO("unable to turn and walk to side!"); break;}
         loop_rate.sleep();
         ++count;
     }
+    myfile_pose.remove();
     myfile_pose.open(QFile::ReadWrite);
     myfile_pose.write(data_pose);
     myfile_pose.close();

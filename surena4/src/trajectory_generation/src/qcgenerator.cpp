@@ -46,6 +46,45 @@ double ankle_pitch(double joint_angle, double offset){
     return motor_angle;
 }
 
+double ankle_pitch_reverse(double motor_angle, double offset){
+  double joint_angle;
+
+  double theta_0=atan(.025/(0.08385+offset));
+  double N=sqrt((.025*.025)+(0.08385+offset)*(0.08385+offset));
+  double X_A,Y_A,theta,psi_0;
+  double X_B , Y_B;
+  double X_M=-.00594;
+  double Y_M=.22992;
+  double L=0.23;
+  double R=0.0875;
+  double a,b,x,y,alfa;
+
+  theta=M_PI-theta_0;
+  X_A=N*cos(theta);
+  Y_A=N*sin(theta);
+  a=X_A-X_M; b=Y_A-Y_M;
+  alfa= (L*L-R*R-a*a-b*b)/-2;
+  y=(b*alfa+sqrt(b*b*alfa*alfa-(a*a+b*b)*(alfa*alfa-a*a*R*R)))/(a*a+b*b);
+  x=-sqrt(R*R-y*y);
+  X_B=x+X_M;
+  Y_B=y+Y_M;
+  psi_0=atan2(Y_B-Y_M,X_B-X_M);
+//qDebug()<<psi_0;
+
+  Y_B=R*sin(motor_angle+psi_0)+Y_M;
+  X_B=R*cos(motor_angle+psi_0)+X_M;
+  a=X_B; b=Y_B;
+  alfa= (L*L-N*N-a*a-b*b)/-2;
+  y=(b*alfa-sqrt(b*b*alfa*alfa-(a*a+b*b)*(alfa*alfa-a*a*N*N)))/(a*a+b*b);
+  x=-sqrt(N*N-y*y);
+  X_A=x;
+  Y_A=y;
+
+  theta=atan2(Y_A,X_A);
+  joint_angle=theta-M_PI+theta_0;
+  return joint_angle;
+}
+
 vector<int> QCgenerator::data2qc(QList<LinkM> links,vector<double> cntrl){
 
 
@@ -234,8 +273,8 @@ vector<int> qref(12);
     qref[11]=int((cntrl[7])*1*(1/(2*M_PI))*(2304)*120);
 
 
-
-
+//qDebug()<<ankle_pitch_reverse(ankle_pitch(cntrl[5],ankle_mechanism_offsetR),ankle_mechanism_offsetR)-cntrl[5];
+//qDebug()<<ankle_pitch_reverse(ankle_pitch(cntrl[11],ankle_mechanism_offsetL),ankle_mechanism_offsetL)-cntrl[11];
     vector<double> minimum(12);
     vector<double> maximum(12);
 

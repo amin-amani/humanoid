@@ -56,7 +56,7 @@ public:
     double lb=.08;
 
     double ReferencePelvisHeight;
-    double InitialPelvisHeight=0.95100;
+    double InitialPelvisHeight=0.9510;
     double OldPelvisZ;
     double NewPlevisZ;
     double T_end_of_SS;
@@ -74,6 +74,7 @@ public:
     double TDs;
     double TSS;
     double Tx;
+    double TE;
     double TDs_S;
     double TSS_S_i;
     double TSS_S;
@@ -165,7 +166,7 @@ public:
     bool LeftFootOrientationAdaptator;
 //    double ToeOffAnglePitch;
 
-    double YOffsetOfAnkletrajectory;
+    double YOffsetOfAnkletrajectory=0;
 
 //    double RollTimeSS;
 //    double RollTimeDs;
@@ -291,6 +292,7 @@ public:
     MatrixXd Cx_p_i;
     MatrixXd Cy_p_i;
     MatrixXd Cy_p_i_S;
+    MatrixXd Cy_p_i_E;
 //    QVector<double> CoMXVector;
 //    QVector<double> CoMYVector;
 //    QVector<double> CoMZVector;
@@ -306,6 +308,8 @@ public:
     MatrixXd Cx_p;
     MatrixXd Cy_p;
      MatrixXd Cy_p_S;
+     MatrixXd Cy_p_E;
+
     MatrixXd Cy_end_pa;
     MatrixXd Cy_end_pb;
     MatrixXd Cy_st_pa;
