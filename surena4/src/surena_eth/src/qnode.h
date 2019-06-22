@@ -120,7 +120,7 @@ public:
     //=================================================================================================
 	void Log( const LogLevel &level, const std_msgs::Float64 &msg);
     //=================================================================================================
-    void SendDataToMotors(const std_msgs::Int32MultiArray &msg);
+    void NewJointDataReady(const std_msgs::Int32MultiArray &msg);
     //=================================================================================================
     bool ActiveCSP(robot_teleop::active_csp::Request &req, robot_teleop::active_csp::Response &res);
     //=================================================================================================

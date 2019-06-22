@@ -25,13 +25,7 @@
 #include <QStringListModel>
 #include <std_msgs/Bool.h>
 #include "std_msgs/String.h"
-
-#include "robot_teleop/active_csp.h"
-#include "robot_teleop/reset_node.h"
-#include "robot_teleop/home.h"
-
 #include <std_srvs/Empty.h>
-#include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Imu.h>
@@ -45,6 +39,8 @@
 #include <interactive_markers/menu_handler.h>
 #include <tf/transform_datatypes.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <QtTest/QSignalSpy>
+#include <std_srvs/Trigger.h>
 
 
 /*****************************************************************************
@@ -66,11 +62,7 @@ private:
     char** init_argv;
     ros::Subscriber _jointsSubscriber;
     ros::Publisher chatter_publisher;
-    ros::Publisher _jointPublisher;
-    QStringListModel logging_model;
-    ros::ServiceClient _getstatusService ;
-ros::ServiceClient _activeCspService;
-ros::ServiceClient _resetNodeService ;
+       QStringListModel logging_model;
 
 public:
     /*********************
@@ -83,16 +75,7 @@ public:
              Error,
              Fatal
      };
-
-    std_msgs::Int32MultiArray  JointsData;
-
-
-    bool PositioningIsActive;
-    double IncPositions[30];
-
-
-
-     //=================================================================================================
+        //=================================================================================================
     QNode();
     //=================================================================================================
 	QNode(int argc, char** argv );
@@ -112,30 +95,15 @@ public:
 	void Log( const LogLevel &level, const std_msgs::Float64 &msg);
     //=================================================================================================
     void NewJointDataReady(const std_msgs::Int32MultiArray &msg);
-    //=================================================================================================
-    bool ActiveCSP(robot_teleop::active_csp::Request &req, robot_teleop::active_csp::Response &res);
-    //=================================================================================================
-    bool Home(robot_teleop::home::Request &req, robot_teleop::home::Response &res);
-    //=================================================================================================
-   // bool ResetAllNodes(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
-    //=================================================================================================
-
-    void DoPositioning();
-    void ResetAllNodes();
 Q_SIGNALS:
+
+    //=================================================================================================
+    void NewjointDataReceived();
     //=================================================================================================
 	void loggingUpdated();
     //=================================================================================================
     void rosShutdown();
-    //=================================================================================================
-    void NewjointDataReceived();
-    //=================================================================================================
-    void SetActiveCSP();
-    //=================================================================================================
-    void DoResetAllNodes();
-    //=================================================================================================
-    void SetHome();
-    //=================================================================================================
+
 };
 
 //}  // namespace my_qt_gui_subscriber
