@@ -344,6 +344,7 @@ public:
     void matrix_view(VectorXd M);
         void matrix_view(MatrixXd M);
         void numplot(double num,double min,double max);
+        double move2pose(double max, double t_local, double T_start, double T_end);
 };
 
 #endif // TASKSPACEONLINE3_H

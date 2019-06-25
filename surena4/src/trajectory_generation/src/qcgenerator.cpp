@@ -275,50 +275,50 @@ vector<int> qref(12);
 
 //qDebug()<<ankle_pitch_reverse(ankle_pitch(cntrl[5],ankle_mechanism_offsetR),ankle_mechanism_offsetR)-cntrl[5];
 //qDebug()<<ankle_pitch_reverse(ankle_pitch(cntrl[11],ankle_mechanism_offsetL),ankle_mechanism_offsetL)-cntrl[11];
-    vector<double> minimum(12);
-    vector<double> maximum(12);
+//    vector<double> minimum(12);
+//    vector<double> maximum(12);
 
-    vector<int> minimumQC(12);
-    vector<int> maximumQC(12);
-    minimum={-14.0,-55.0,0.0,-50.0,-55.0,-14.0,0.0,-50.0,-23.0,-15.0,-15.0,-23.0};
-    maximum={14.0,26.0,75.0,35.0,26.0,14.0,75.0,35.0,23.0,10.0,10.0,23.0};
+//    vector<int> minimumQC(12);
+//    vector<int> maximumQC(12);
+//    minimum={-14.0,-55.0,0.0,-50.0,-55.0,-14.0,0.0,-50.0,-23.0,-15.0,-15.0,-23.0};
+//    maximum={14.0,26.0,75.0,35.0,26.0,14.0,75.0,35.0,23.0,10.0,10.0,23.0};
 
-    minimumQC[0]=int(minimum[0]*(1/(2*M_PI))*(2304)*100);
-    minimumQC[1]=int(minimum[1]*(1)*(1/(2*M_PI))*(2304)*100);
-    minimumQC[2]=int(minimum[2]*(1/(2*M_PI))*(2304)*50);
-    minimumQC[3]=int(minimum[3]*1*(1/(2*M_PI))*(2304)*80);
-    minimumQC[4]=int(minimum[4]*(1/(2*M_PI))*(2304)*100);
-    minimumQC[5]=int(minimum[5]*(1/(2*M_PI))*(2304)*100);
-    minimumQC[6]=int(minimum[6]*1*(1/(2*M_PI))*(2304)*50);
-    minimumQC[7]=int(minimum[7]*(1/(2*M_PI))*(2304)*80);
-    minimumQC[8]=int(minimum[8]*(1)*(1/(2*M_PI))*(2304)*120);
-    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*(2304)*120);
-    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*(2304)*120);
-//    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*8192);
-//    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*8192);
-    minimumQC[11]=int(minimum[11]*1*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[0]=int(minimum[0]*(1/(2*M_PI))*(2304)*100);
+//    minimumQC[1]=int(minimum[1]*(1)*(1/(2*M_PI))*(2304)*100);
+//    minimumQC[2]=int(minimum[2]*(1/(2*M_PI))*(2304)*50);
+//    minimumQC[3]=int(minimum[3]*1*(1/(2*M_PI))*(2304)*80);
+//    minimumQC[4]=int(minimum[4]*(1/(2*M_PI))*(2304)*100);
+//    minimumQC[5]=int(minimum[5]*(1/(2*M_PI))*(2304)*100);
+//    minimumQC[6]=int(minimum[6]*1*(1/(2*M_PI))*(2304)*50);
+//    minimumQC[7]=int(minimum[7]*(1/(2*M_PI))*(2304)*80);
+//    minimumQC[8]=int(minimum[8]*(1)*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*(2304)*120);
+//    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*(2304)*120);
+////    minimumQC[9]=int(minimum[9]*(1/(2*M_PI))*8192);
+////    minimumQC[10]=int(minimum[10]*(1/(2*M_PI))*8192);
+//    minimumQC[11]=int(minimum[11]*1*(1/(2*M_PI))*(2304)*120);
 
-    maximumQC[0]=int(maximum[0]*(1/(2*M_PI))*(2304)*100);
-    maximumQC[1]=int(maximum[1]*(1)*(1/(2*M_PI))*(2304)*100);
-    maximumQC[2]=int(maximum[2]*(1/(2*M_PI))*(2304)*50);
-    maximumQC[3]=int(maximum[3]*1*(1/(2*M_PI))*(2304)*80);
-    maximumQC[4]=int(maximum[4]*(1/(2*M_PI))*(2304)*100);
-    maximumQC[5]=int(maximum[5]*(1/(2*M_PI))*(2304)*100);
-    maximumQC[6]=int(maximum[6]*1*(1/(2*M_PI))*(2304)*50);
-    maximumQC[7]=int(maximum[7]*(1/(2*M_PI))*(2304)*80);
-    maximumQC[8]=int(maximum[8]*(1)*(1/(2*M_PI))*(2304)*120);
-    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*(2304)*120);
-    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*(2304)*120);
-//    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*8192);
-//    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*8192);
-    maximumQC[11]=int(maximum[11]*1*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[0]=int(maximum[0]*(1/(2*M_PI))*(2304)*100);
+//    maximumQC[1]=int(maximum[1]*(1)*(1/(2*M_PI))*(2304)*100);
+//    maximumQC[2]=int(maximum[2]*(1/(2*M_PI))*(2304)*50);
+//    maximumQC[3]=int(maximum[3]*1*(1/(2*M_PI))*(2304)*80);
+//    maximumQC[4]=int(maximum[4]*(1/(2*M_PI))*(2304)*100);
+//    maximumQC[5]=int(maximum[5]*(1/(2*M_PI))*(2304)*100);
+//    maximumQC[6]=int(maximum[6]*1*(1/(2*M_PI))*(2304)*50);
+//    maximumQC[7]=int(maximum[7]*(1/(2*M_PI))*(2304)*80);
+//    maximumQC[8]=int(maximum[8]*(1)*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*(2304)*120);
+//    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*(2304)*120);
+////    maximumQC[9]=int(maximum[9]*(1/(2*M_PI))*8192);
+////    maximumQC[10]=int(maximum[10]*(1/(2*M_PI))*8192);
+//    maximumQC[11]=int(maximum[11]*1*(1/(2*M_PI))*(2304)*120);
 
 
-    for (int i = 0; i < 12; ++i) {
-        if(qref[i]<minimumQC[i]){qref[i]=minimumQC[i];
-        }
-        if(qref[i]>maximumQC[i]){qref[i]=maximumQC[i];}
-    }
+//    for (int i = 0; i < 12; ++i) {
+//        if(qref[i]<minimumQC[i]){qref[i]=minimumQC[i];
+//        }
+//        if(qref[i]>maximumQC[i]){qref[i]=maximumQC[i];}
+//    }
     qref[1] = -qref[1];
     qref[3] = -qref[3];
     qref[6] = -qref[6];
