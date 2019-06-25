@@ -59,7 +59,7 @@ _timeStep=.005;
         }
 
 
-        AnkleMaximumHeight=.06;0.035;0.03;.03;
+        AnkleMaximumHeight=.045;0.035;0.03;.03;
         Yd=.0562;
         a_d=-.438;
 
@@ -303,9 +303,9 @@ void TaskSpaceOnline3::CoeffSideStartEnd(){
 
 void TaskSpaceOnline3::CoeffArrayAnkle(){
     //different velocities for lowering foot in end of ss
-    double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS)/8;
-    double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm2)/8;
-    double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS)/8;
+    double vz_start=-(AnkleMaximumHeight-h_end_of_SS)*2/(T_s_st/2-T_end_of_first_SS)/4;
+    double vz_cycle=-(AnkleMaximumHeight-h_end_of_SS)*2/(TSS-T_end_of_SS-Tm2)/4;
+    double vz_end=-(AnkleMaximumHeight-h_end_of_SS)*2/((T_end_a_e-T_end_a_s)/2-T_end_of_last_SS)/4;
 //    vz_start=0;
 //    vz_cycle=0;
 //    vz_end=0;
@@ -554,7 +554,7 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          MatrixXd tttY_e(1,5);
          tttY_e <<TGait+TDs,TGait+TDs+TSS/2,TGait+Tc,TGait+Tc+TE*.5,TGait+Tc+TE;
          MatrixXd conY_e(3,5);
-         conY_e<<Yd,1.2*YEndMax,Yd,-0.001,0,
+         conY_e<<Yd,1.15*YEndMax,Yd,-0.001,0,
                  v_d,0,-v_d,0,0,
                  a_d,a_p_max,a_d,0,0;
 
