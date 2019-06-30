@@ -290,14 +290,14 @@ install(TARGETS trajectory_generation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_D
 #    Qt5::PrintSupport
 #)
 #install(TARGETS trajectory_generationOnlineAdaptation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-add_executable(imu_stick src/imu_stick.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(imu_stick
+add_executable(AnkleOrientation src/AnkleOrientation.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(AnkleOrientation
     ${catkin_LIBRARIES}
     Qt5::Core
     Qt5::Widgets
     Qt5::PrintSupport
 )
-install(TARGETS imu_stick RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS AnkleOrientation RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 add_executable(trajectory_generationOfflinePublisher src/trajectory_generationOfflinePublisher.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
