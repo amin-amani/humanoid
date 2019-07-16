@@ -29,6 +29,7 @@ bool Epos::ActiveJoint(int joint,bool enableDrive)
 //========================================================================
 bool Epos::ActiveCSP(int nodeID,bool switchOn)
 {
+    if(nodeID>12 && nodeID!=255)return false;
     RunWithPostDelay(SetPreoperationalMode(nodeID),700);
     RunWithPostDelay(StartNode(nodeID),700);
     RunWithPostDelay(SetMode(nodeID,CSP),700);
@@ -62,7 +63,7 @@ bool Epos::ActiveHand(int nodeID,bool switchOn) //13,2
 
 //========================================================================
 
-bool Epos::ActiveWaist() //14
+bool Epos::ActiveWaist(bool enableDrive) //14
 {
     int nodeID=1;
     int devID=14;
@@ -74,7 +75,7 @@ bool Epos::ActiveWaist() //14
     WaitMs(700);
     SwitchOff(devID,nodeID);
     WaitMs(700);
-    //  if(!switchOn)return OK;
+      if(!enableDrive)return OK;
     SwitchOn(devID,nodeID);
     WaitMs(700);
     return OK;
@@ -531,30 +532,31 @@ inline QByteArray Epos::CreateWaistAndHeadCommand(QList<int> motorPositions)
     static int state=0;
 
     QByteArray command;
+
     if(state==0)
     {
 
-        command.append(CreatePDOPacket(0x401,motorPositions.at(28),0x3f));//waist
+        command.append(CreatePDOPacket(0x401,motorPositions.at(28),0x3f));//waist max
     }
     else if(state==1){
 
-   command.append(CreatePDOPacket(0x402,motorPositions.at(28),0x3f));
+   command.append(CreateDynamixelPacket(0x211,4,motorPositions.at(29),40));//waist dx
     }
     else if(state==2){
 
-   command.append(CreatePDOPacket(0x403,motorPositions.at(28),0x3f));
+      command.append(CreateDynamixelPacket(0x211,1,motorPositions.at(30),40));
     }
     else if(state==3){
 
-   command.append(CreatePDOPacket(0x404,motorPositions.at(28),0x3f));
+     command.append(CreateDynamixelPacket(0x211,2,motorPositions.at(31),40));
     }
     else if(state==4){
 
-          command.append(CreatePDOPacket(0x405,motorPositions.at(28),0x3f));
+        command.append(CreateDynamixelPacket(0x211,3,motorPositions.at(32),40));
     }
     else if(state==5){
 
-   command.append(CreatePDOPacket(0x406,motorPositions.at(28),0x3f));
+        command.append(CreateDynamixelPacket(0x211,5,motorPositions.at(33),40));
 
     }
     else if(state==6){
@@ -562,7 +564,7 @@ inline QByteArray Epos::CreateWaistAndHeadCommand(QList<int> motorPositions)
       command.append(CreatePDOPacket(0x501,0x0f,0x0f));//move
 
     }
-    // QLOG_TRACE()<<"state:"<<state;
+   // QLOG_TRACE()<<"state:"<<state<<" adad:"<<motorPositions.at(30);
     if(state++>5)state=0;
     return command;
 }
@@ -665,10 +667,14 @@ inline void Epos::GetIMUDataFromPacket(EthernetReceivedPacketType*packet)
     tf2::Quaternion myQuaternion;
     myQuaternion.setRPY( incommingPacket->IMU.roll,incommingPacket->IMU.pitch,incommingPacket->IMU.yaw);
     //--------------------orientation
-    IMU.orientation.x=myQuaternion.getX();
-    IMU.orientation.y=myQuaternion.getY();
-    IMU.orientation.z=myQuaternion.getZ();
-    IMU.orientation.w=myQuaternion.getW();
+//    IMU.orientation.x=myQuaternion.getX();
+//    IMU.orientation.y=myQuaternion.getY();
+//    IMU.orientation.z=myQuaternion.getZ();
+//    IMU.orientation.w=myQuaternion.getW();
+    IMU.orientation.x=incommingPacket->IMU.roll;
+    IMU.orientation.y=incommingPacket->IMU.pitch;
+    IMU.orientation.z=incommingPacket->IMU.yaw;
+    IMU.orientation.w=0;
     //--------------------lenear acc
     IMU.linear_acceleration.x=incommingPacket->IMU.ax;
     IMU.linear_acceleration.y=incommingPacket->IMU.ay;
@@ -707,7 +713,11 @@ void Epos::GetPositionDataFromPacket(EthernetReceivedPacketType*packet)
     for(int i=0;i<16;i++){
         positionsInc[i]=(packet->MotorData[i].Valu1);
         positions[i]=(packet->MotorData[i].Valu2);
+    //    qDebug()<<positions[i];
+
     }
+   // qDebug()<<"<-------------------->";
+
 }
 //========================================================================
 void Epos::DataReceived(QByteArray data)

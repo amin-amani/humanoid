@@ -8,8 +8,8 @@ QCgenerator::QCgenerator()
 double ankle_pitch(double joint_angle, double offset){
     double motor_angle;
 
-    double theta_0=atan(.025/(0.08385+offset));
-    double N=sqrt((.025*.025)+(0.08385+offset)*(0.08385+offset));
+    double theta_0=atan(.025/(0.0822+offset));
+    double N=sqrt((.025*.025)+(0.0822+offset)*(0.0822+offset));
     double X_A,Y_A,theta,psi_0;
     double X_B , Y_B;
     double X_M=-.00594;
@@ -49,8 +49,8 @@ double ankle_pitch(double joint_angle, double offset){
 double ankle_pitch_reverse(double motor_angle, double offset){
   double joint_angle;
 
-  double theta_0=atan(.025/(0.08385+offset));
-  double N=sqrt((.025*.025)+(0.08385+offset)*(0.08385+offset));
+  double theta_0=atan(.025/(0.0822+offset));
+  double N=sqrt((.025*.025)+(0.0822+offset)*(0.0822+offset));
   double X_A,Y_A,theta,psi_0;
   double X_B , Y_B;
   double X_M=-.00594;

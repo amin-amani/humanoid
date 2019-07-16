@@ -9,7 +9,7 @@ _timeStep=.005;
     FirstHipRollModification=2;3.2;3.1;2.7;2;
     HipPitchModification=1;//2;
     beta_toe=7*M_PI/18*0;
-    beta_heel=-1*M_PI/180;
+    beta_heel=-1*M_PI/18*0;
 
     NStep=NStride*2;
 
@@ -71,7 +71,7 @@ _timeStep=.005;
         TStartofHeel=0.4*TSS; //Tm2 (ver43)
         TStartofAnkleAdaptation=Tm2;//0.75*TSS; // Tm2 (ver43)
         Tc=TSS+TDs;
-        Tx=2;
+        Tx=3;
         TE=2;
         TStart=Tx+TSS/2+Tc;
         TEnd=Tc+TE;
@@ -538,7 +538,7 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          tttY_S <<0,Tx,Tx+TSS/2,Tx+Tc/2,Tx+Tc/2+TDs/2,Tx+Tc,TStart;
          MatrixXd conY_S(3,7);
 
-         conY_S<<0,YpMax,Yd,0,-1*Yd,-1*YpMax,-1*Yd,
+         conY_S<<0,YpMax,Yd,0,-1*Yd,-1.4*YpMax,-1*Yd,
                  0,0,-v_d,-c_h, -v_d,0,v_d,
                  0,a_p_max,a_d, 0 ,-a_d,-a_p_max,-a_d;
          Cy_p_i_S.resize(6,6);

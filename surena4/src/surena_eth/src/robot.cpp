@@ -165,9 +165,11 @@ bool Robot::ReadAllInitialPositions()
         //  positionInc.append(result);
         numberOfSuccess++;
         qDebug()<<"ABS "<<i<<"=" << result;
-
+//(int index,int subIndex,int canID, int devID,int timeout,int trycount)
     }
-
+result=Epos4.ReadRegister(0x60e4,2,1,14,10,3);
+_rosNode->ActualPositions[29]=result;
+qDebug()<<"ABS waist"<<"=" << result;
     return true;
 
 }
@@ -212,6 +214,12 @@ void Robot::NewjointDataReceived()
     _motorPosition[16]+=2300;
     _motorPosition[17]+=2050;
     _motorPosition[18]+=2050;
+
+    _motorPosition[29]+=2048;
+    _motorPosition[30]+=3080;
+    _motorPosition[31]+=2048;
+    _motorPosition[32]+=2051;
+
     Epos4.SetAllPositionCST(_motorPosition);
 }
 //=================================================================================================
@@ -223,6 +231,7 @@ void  Robot::FeedBackReceived(QList<int16_t> ft, QList<int32_t> positions,QList<
         _rosNode->ActualPositions[i+1]=(positions[i]-offset[i])*ratio[i]*2*M_PI/8192;
         _rosNode->IncPositions[i+1]=positionsInc[i];  //  _rosNode->ActualJointState.position.push_back( _rosNode->ActualPositions[i+1]);
     }
+    _rosNode->ActualPositions[28]=(positions[14]-offset[13])*ratio[13]*2*M_PI/8192;
     if(bump_sensor_list.count()==8)
         for(int i=0;i<8;i++){
             _rosNode->BumpSensor[i]= bump_sensor_list[i];
@@ -250,11 +259,11 @@ void Robot::ActiveCSP(int id)
     //    }
     //    else
     //    {
-    Epos4.ActiveJoint(id);
+    Epos4.ActiveJoint(id,true);
     //  }
 
 
-    Epos4.ActiveWaist();
+    Epos4.ActiveWaist(true);
     _rosNode->OperationCompleted(0);
     _rosNode->RobotStatus="Ready";
 }
@@ -436,6 +445,11 @@ void Robot::HommingLoop()
     double max=20.0;
     double kp=2000*2*M_PI/8192;//230400/2/3.14/2;
     j=HomeOrder[currentHomeIndex];
+
+
+
+
+
     if(abs((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<=max){_motorPosition[j]+= ((offset[j]-CurrentAbsPositions[j]))*kp*Direction[j];}
     if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])>max){_motorPosition[j]+=(max);}
     if(((offset[j]-CurrentAbsPositions[j])*kp*Direction[j])<-max){_motorPosition[j]-=(max);}

@@ -97,7 +97,7 @@ bool QNode::Init() {
      //_resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _getRobotStatus = n.advertiseService("GetRobotStatus", &QNode::GetRobotStatus, this);
 
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 30; i++) {
     ActualPositions.append(0);
     IncPositions.append(0);
 
