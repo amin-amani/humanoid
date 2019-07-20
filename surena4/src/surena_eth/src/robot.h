@@ -33,7 +33,7 @@ class Robot : public QObject
 //    const double offset[12]={ -775  ,-86, 315, 433, 614, -245   , -33 ,374, -277, 573  , 728  , 339};
     //using home stand first check
     //const double offset[12]={ -772  ,-143,-127, 443, 669, -264 ,  342 ,399, 324, 575  , 739  , 270};
-    const double offset[13]={ -780  ,-144,-114, 443, 646, -250 ,  337 ,399, 574, 577  , 738  , 294,-712};
+    const double offset[13]={ -780  ,-144,-114, 443, 646, -250 ,  337 ,399, 574, 577  , 738  , 294,-755};
 
     const double ratio[13]={ 1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1,1};
     //const double Direction[12]={1,-1,1,-1,1,1,-1,1,-1,1,1,-1};

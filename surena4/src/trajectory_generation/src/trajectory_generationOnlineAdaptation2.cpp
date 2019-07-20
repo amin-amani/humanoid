@@ -42,9 +42,90 @@ bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-double k_pitch=.8;//1;0.8;
+double k_pitch=0;//.8;
 double pelvis_roll_range=2.5;
+bool waist_pitch_bool=false;
 
+
+
+ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
+ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
+ros::Publisher pub9; ros::Publisher pub10; ros::Publisher pub11; ros::Publisher pub12;
+ros::Publisher pub13; ros::Publisher pub14; ros::Publisher pub15; ros::Publisher pub16;
+ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher pub20;
+ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
+ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
+ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
+
+double Mxl=0.0;
+double Myl=0.0;
+double Myr=0.0;
+double Mxr=0.0;
+VectorXd CoPR(2);
+VectorXd CoPL(2);
+double fzl=0.0;
+double fzr=0.0;
+
+MinimumJerkInterpolation CoefGen;
+
+//data of left foot sensor
+int a,b,c,d,e,f,g,h;
+
+double PitchModified;
+
+double AnkleZR,AnkleZL;
+double AnkleZ_offsetR=0;
+double AnkleZ_offsetL=0;
+
+
+int qc_offset[12];
+bool qc_initial_bool;
+
+//
+int bump_pushed[8];
+int bump_notpushed[8];
+bool bump_initialize;
+
+int qra_offset[4];
+int qla_offset[4];
+
+int inc_feedback[12];
+int abs_feedback[2];
+
+double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
+double pelvis_acceleration[3];
+double pelvis_angularVelocity[3];
+
+Robot SURENA;//model of robot & kinematics funcs(IK & FK)
+Robot SURENA_turning_side;
+TaskSpaceOnline3 OnlineTaskSpace;
+QList<LinkM> links;
+MatrixXd PoseRoot;//position of pelvis respected to global coordinate
+MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
+MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
+double GlobalTime;
+double  DurationOfStartPhase;
+double  DurationOfendPhase;
+double shoulderPitchOffset;
+MatrixXd CoefZStart;
+
+double teta_motor_L=0;
+double teta_motor_R=0;//pitch
+double phi_motor_L=0;
+double phi_motor_R=0;//roll
+
+PIDController teta_PID_L;
+PIDController teta_PID_R;
+PIDController phi_PID_L;
+PIDController phi_PID_R;
+
+double k1=0.00004;
+double k2=0.00004;
+double k3=0.00004;
+double k4=0.00004;
+
+double threshold=4;
+double threshold2=100;
 
 double saturate(double a, double min, double max){
     if(a<min){return min;ROS_INFO("subceeding!");}
@@ -103,14 +184,7 @@ double move2pose(double max,double t_local,double T_start ,double T_end){
     return theta;
 }
 
-ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
-ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
-ros::Publisher pub9; ros::Publisher pub10; ros::Publisher pub11; ros::Publisher pub12;
-ros::Publisher pub13; ros::Publisher pub14; ros::Publisher pub15; ros::Publisher pub16;
-ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher pub20;
-ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
-ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
-ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
+
 
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
     if(links.count()<28){qDebug()<<"index err";return;}
@@ -208,25 +282,7 @@ int getch()
     return c;
 }
 
-MinimumJerkInterpolation CoefGen;
 
-//data of left foot sensor
-int a,b,c,d,e,f,g,h;
-
-double PitchModified;
-
-double AnkleZR,AnkleZL;
-double AnkleZ_offsetR=0;
-double AnkleZ_offsetL=0;
-
-
-int qc_offset[12];
-bool qc_initial_bool;
-
-//
-int bump_pushed[8];
-int bump_notpushed[8];
-bool bump_initialize;
 void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 {
     if (msg.data.size()!=8) {
@@ -283,10 +339,9 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     if (a<0){a=0;} if (b<0){b=0;} if (c<0){c=0;} if (d<0){d=0;}
     if (e<0){e=0;} if (f<0){f=0;} if (g<0){g=0;} if (h<0){h=0;}
 }
-int qra_offset[4];
-int qla_offset[4];
 
-int inc_feedback[12];
+
+
 void qc_initial(const sensor_msgs::JointState & msg){
     //    for (int i = 0; i < 12; ++i) {
     //        inc_feedback[i]=int(msg.position[i+1]);
@@ -317,22 +372,25 @@ void qc_initial(const sensor_msgs::JointState & msg){
                 qc_offset[10],qc_offset[11]);}
 }
 
-int abs_feedback[12];
+
 void abs_feedback_func(const sensor_msgs::JointState & msg){
     for (int i = 0; i < 12; ++i) {
         abs_feedback[i]=int(msg.position[i+1]);
     }
 }
 
-double Fzl,Fzr,Mxl,Mxr;
+
+
 void FT_left_feedback(const geometry_msgs::Wrench &msg){
-    Fzl=msg.force.z;
-    Mxl=msg.torque.y;
+fzl=msg.force.z;
+    Mxl=-msg.torque.y;
+    Myl=msg.torque.x;
 }
 
 void FT_right_feedback(const geometry_msgs::Wrench &msg){
-    Fzr=msg.force.z;
-    Mxr=msg.torque.x;
+fzr=msg.force.z;
+ Mxr=-msg.torque.x;
+ Myr=-msg.torque.y;
 }
 
 MatrixXd quater2rot(double w,double x,double y, double z){
@@ -362,9 +420,7 @@ double quaternion2euler_roll(double q0,double q1,double q2,double q3){
 }
 
 
-double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
-double pelvis_acceleration[3];
-double pelvis_angularVelocity[3];
+
 
 void imu_data_process(const sensor_msgs::Imu &msg){
     //MatrixXd R_pelvis(3,3);
@@ -378,6 +434,7 @@ void imu_data_process(const sensor_msgs::Imu &msg){
     pelvis_angularVelocity[0]=msg.angular_velocity.x;
     pelvis_angularVelocity[1]=msg.angular_velocity.y;
     pelvis_angularVelocity[2]=msg.angular_velocity.z;
+    //qDebug()<<pelvis_orientation_roll;
 }
 
 
@@ -434,18 +491,7 @@ void ankle_states(const gazebo_msgs::LinkStates& msg){
 }
 
 
-Robot SURENA;//model of robot & kinematics funcs(IK & FK)
-Robot SURENA_turning_side;
-TaskSpaceOnline3 OnlineTaskSpace;
-QList<LinkM> links;
-MatrixXd PoseRoot;//position of pelvis respected to global coordinate
-MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
-MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
-double GlobalTime;
-double  DurationOfStartPhase;
-double  DurationOfendPhase;
-double shoulderPitchOffset;
-MatrixXd CoefZStart;
+
 void StartPhase(){
     if ( GlobalTime<=DurationOfStartPhase) {
 
@@ -487,6 +533,8 @@ void StartPhase(){
             PitchModified=move2pose(D_pitch,GlobalTime,TstartofPitchModify,TendofPitchModify);
         }
     }
+
+    if(fabs(GlobalTime-DurationOfStartPhase)<.001){waist_pitch_bool=true;}
 }
 
 void EndPhase(){
@@ -527,23 +575,7 @@ void EndPhase(){
 }
 
 
-double teta_motor_L=0;
-double teta_motor_R=0;//pitch
-double phi_motor_L=0;
-double phi_motor_R=0;//roll
 
-PIDController teta_PID_L;
-PIDController teta_PID_R;
-PIDController phi_PID_L;
-PIDController phi_PID_R;
-
-double k1=0.00004;
-double k2=0.00004;
-double k3=0.00004;
-double k4=0.00004;
-
-double threshold=4;
-double threshold2=100;
 void ankleOrientationAdaptationLeft(){
     //parameters of ankle adaptation
     if(a>threshold2 &&b>threshold2&&c>threshold2&&d>threshold2){
@@ -637,7 +669,11 @@ int main(int argc, char **argv)
     qc_initial_bool=!simulation;
     bump_initialize=false;
 
-
+PIDController pitch4zmp;
+double max_waist_pitch=M_PI/18;
+double min_waist_pitch=-M_PI/18;
+double k_waist_pitch=5e-3;
+pitch4zmp.Init( OnlineTaskSpace._timeStep,max_waist_pitch,min_waist_pitch,k_waist_pitch,0,0);
 
     bool leftzstop=false;
     bool rightzstop=false;
@@ -684,11 +720,11 @@ int main(int argc, char **argv)
     std_msgs::Float32MultiArray trajectory_data;
 
     ros::Subscriber sub = nh.subscribe("/surena/bump_sensor_state", 1000, receiveFootSensor);
-    //   ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
-    // ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
+    ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
+    ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-    //  ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
-    // ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
+      ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
+     ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
         pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -774,15 +810,16 @@ int main(int argc, char **argv)
     QFile myfile_time(name_time);
 
 
+double waist_pitch=0;
 
 
-
-
-
+int waist_pitch_counter=0;
 
     while (ros::ok())
     {
 
+//qDebug()<<fzl<<"\t"<<fzr<<"\t"<<Mxr<<"\t"<<Myr<<"\t"<<Mxl<<"\t"<<Myl;
+//qDebug()<<pelvis_orientation_roll;
         //MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
 
         if (qc_initial_bool) {
@@ -790,6 +827,26 @@ int main(int argc, char **argv)
             ros::spinOnce();
             continue;
         }
+         StartPhase();
+
+
+        if (waist_pitch_bool){
+            double zmpx=(Myl+Myr)/(fzl+fzr);
+            waist_pitch-=pitch4zmp.Calculate(0,zmpx);
+            waist_pitch=saturate(waist_pitch,-M_PI/18,M_PI/18);
+            qDebug()<<waist_pitch<<"\t"<<fzl<<"\t"<<fzr<<"\t"<<Myr<<"\t"<<Myl<<"\t"<<zmpx;
+            if(fabs(zmpx)>.002){waist_pitch_counter=0;}
+            if(fabs(zmpx)<.002){waist_pitch_counter++;}
+            if((waist_pitch_counter>20)||(waist_pitch>=max_waist_pitch)||(waist_pitch<=min_waist_pitch)){
+                waist_pitch_bool=false;
+//                break;
+            }
+
+        }
+
+
+
+  else{
 
 
         if (GlobalTime>DurationOfStartPhase+OnlineTaskSpace.TStart&&GlobalTime<DurationOfStartPhase+OnlineTaskSpace.MotionTime-OnlineTaskSpace.TEnd-OnlineTaskSpace.TDs) {
@@ -820,7 +877,7 @@ int main(int argc, char **argv)
         }
 
 
-        StartPhase();
+
 
 
 
@@ -1130,7 +1187,7 @@ int main(int argc, char **argv)
         if(turning || sidewalk) {links = SURENA_turning_side.GetLinks();}
         else{links = SURENA.GetLinks();}
         EndPhase();
-
+}
 
         double k_roll_r=1;
         double k_roll_l=1;
@@ -1182,6 +1239,8 @@ int main(int argc, char **argv)
         q_motor_l[6]=int((0)*(4000-2050)/(23*M_PI/180));
         q_motor_l[7]=14;
 
+        int q_waist_pitch=waist_pitch*(1/(2*M_PI))*(2304)*100;
+
 
         msg.data.clear();
 
@@ -1226,7 +1285,7 @@ int main(int argc, char **argv)
         msg.data.push_back(q_motor_l[5]);//25
         msg.data.push_back(q_motor_l[6]);//26
         msg.data.push_back(q_motor_l[7]);//27
-        msg.data.push_back(0);
+        msg.data.push_back(q_waist_pitch);
         //        for(int  i = 12;i < 28;i++)
         //        {
         //            msg.data.push_back(0);
@@ -1344,7 +1403,6 @@ int main(int argc, char **argv)
 */
 
         ros::spinOnce();
-
         loop_rate.sleep();
         ++count;
 
@@ -1376,5 +1434,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
 
