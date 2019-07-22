@@ -42,7 +42,7 @@ bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-double k_pitch=0;//.8;
+double k_pitch=.8;
 double pelvis_roll_range=2.5;
 bool waist_pitch_bool=false;
 

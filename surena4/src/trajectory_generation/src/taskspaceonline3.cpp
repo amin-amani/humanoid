@@ -13,7 +13,7 @@ _timeStep=.005;
 
     NStep=NStride*2;
 
-    StepLength=.25;
+    StepLength=.15;
     XofAnkleMaximumHeight=StepLength*1.8;
         switch (int(StepLength*100)) {
         case 45://ff
