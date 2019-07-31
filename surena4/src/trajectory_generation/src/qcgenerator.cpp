@@ -29,10 +29,10 @@ double ankle_pitch(double joint_angle, double offset){
     x=-sqrt(R*R-y*y);
     X_B=x+X_M;
     Y_B=y+Y_M;
-    psi_0=atan2(Y_B-Y_M,X_B-X_M);
+    psi_0=atan2(Y_B-Y_M,-(X_B-X_M));
 //qDebug()<<psi_0;
 
-    theta=M_PI-theta_0+joint_angle;
+    theta=M_PI-theta_0-joint_angle;
     X_A=N*cos(theta);
     Y_A=N*sin(theta);
     a=X_A-X_M; b=Y_A-Y_M;
@@ -41,7 +41,7 @@ double ankle_pitch(double joint_angle, double offset){
     x=-sqrt(R*R-y*y);
     X_B=x+X_M;
     Y_B=y+Y_M;
-    motor_angle=atan2(Y_B-Y_M,X_B-X_M)-psi_0;
+    motor_angle=atan2(Y_B-Y_M,-(X_B-X_M))-psi_0;
 
     return motor_angle;
 }

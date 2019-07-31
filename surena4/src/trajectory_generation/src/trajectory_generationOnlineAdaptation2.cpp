@@ -37,7 +37,7 @@ bool backward=false;
 bool turning=false;
 double TurningRadius=1;//for on spot .01;
 bool sidewalk=false;
-int bump_threshold=75;//85;
+int bump_threshold=55;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
@@ -1329,11 +1329,11 @@ int main(int argc, char **argv)
 
         }
 
-//if(GlobalTime>=DurationOfStartPhase){break;}
+//if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.Tx+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){break;}
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-            //     ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+//                 ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
             //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
             //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
@@ -1342,7 +1342,7 @@ int main(int argc, char **argv)
 
         /*
 */
-
+//qDebug()<<"y_p="<<PoseRoot(1);
         ros::spinOnce();
 
         loop_rate.sleep();

@@ -9,7 +9,7 @@ _timeStep=.005;
     FirstHipRollModification=2;3.2;3.1;2.7;2;
     HipPitchModification=1;//2;
     beta_toe=7*M_PI/18*0;
-    beta_heel=-1*M_PI/18*0;
+    beta_heel=-1*M_PI/180;
 
     NStep=NStride*2;
 
@@ -60,7 +60,7 @@ _timeStep=.005;
 
 
         AnkleMaximumHeight=.045;0.035;0.03;.03;
-        Yd=.0562;
+        Yd=.0562+.008;
         a_d=-.438;
 
         //times
@@ -537,7 +537,7 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          MatrixXd tttY_S(1,7);
          tttY_S <<0,Tx,Tx+TSS/2,Tx+Tc/2,Tx+Tc/2+TDs/2,Tx+Tc,TStart;
          MatrixXd conY_S(3,7);
-
+//qDebug()<<YpMax;
          conY_S<<0,YpMax,Yd,0,-1*Yd,-1.4*YpMax,-1*Yd,
                  0,0,-v_d,-c_h, -v_d,0,v_d,
                  0,a_p_max,a_d, 0 ,-a_d,-a_p_max,-a_d;
