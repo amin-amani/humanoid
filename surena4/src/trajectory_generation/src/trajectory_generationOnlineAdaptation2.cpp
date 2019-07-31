@@ -41,7 +41,7 @@ int bump_threshold=55;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
-double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
+double ankle_adaptation_switch=1;// 1 for activating adaptation 0 for siktiring adaptation
 double k_pitch=.8;//1;0.8;
 double pelvis_roll_range=2.5;
 

@@ -60,7 +60,7 @@ _timeStep=.005;
 
 
         AnkleMaximumHeight=.045;0.035;0.03;.03;
-        Yd=.0562+.008;
+        Yd=.0562+0.008;
         a_d=-.438;
 
         //times
