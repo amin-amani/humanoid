@@ -9,7 +9,7 @@ _timeStep=.005;
     FirstHipRollModification=2;3.2;3.1;2.7;2;
     HipPitchModification=1;//2;
     beta_toe=7*M_PI/18*0;
-    beta_heel=-1*M_PI/180;
+    beta_heel=-1*M_PI/18*0;
 
     NStep=NStride*2;
 
@@ -39,9 +39,9 @@ _timeStep=.005;
             break;
         case 25:
             YStMax=.115;
-            ReferencePelvisHeight=.91; // 0.913 is gouth for xe=0.06 and xs=0.047
-            Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
-            Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            ReferencePelvisHeight=.895; // 0.913 is gouth for xe=0.06 and xs=0.047
+            Xe=0.0577;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            Xs=0.0115;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
             break;
         case 20:
@@ -60,8 +60,8 @@ _timeStep=.005;
 
 
         AnkleMaximumHeight=.045;0.035;0.03;.03;
-        Yd=.0562+0.008;
-        a_d=-.438;
+        Yd=0.0623; // .0562+0.008
+        a_d=-0.3035;  // -.438
 
         //times
         TDs =0.7;
@@ -451,8 +451,8 @@ double v_beta_toe=2*beta_toe/t_toe;
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
     //------------------Coefficient of cyclic motion in X direction--------------------
-double zmp_min=-0.025; // -0.025
-double zmp_max=0.025; // 0.025
+double zmp_min=0.0391; // -0.025
+double zmp_max=0.0051; // 0.025
 double a_0=(Xe-zmp_max)/0.1;
 double a_Ds=(-Xs-zmp_min)/0.1;
 double A_Ds=(a_Ds-a_0)/(6*TDs);

@@ -41,9 +41,9 @@ int bump_threshold=55;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
-double ankle_adaptation_switch=1;// 1 for activating adaptation 0 for siktiring adaptation
-double k_pitch=.8;//1;0.8;
-double pelvis_roll_range=2.5;
+double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
+double k_pitch=0*.8;//1;0.8;
+double pelvis_roll_range=1*2.5;
 
 
 double saturate(double a, double min, double max){
@@ -933,7 +933,7 @@ int main(int argc, char **argv)
                                     if (AnkleZR<=0.132)
                                     {
                                         //AnkleZR-=AnkleZR_PID.Calculate(bump_threshold,(e+f+g+h)/4);
-                                    cout<<"AnkleZR_PID"<<AnkleZR_PID.Calculate(bump_threshold,(e+f+g+h)/4)<<endl;
+                                   // cout<<"AnkleZR_PID"<<AnkleZR_PID.Calculate(bump_threshold,(e+f+g+h)/4)<<endl;
                                     }
 
                                 }
@@ -973,7 +973,7 @@ int main(int argc, char **argv)
                                     if (AnkleZL<=0.132)
                                     {
                                     //    AnkleZL-=AnkleZL_PID.Calculate(bump_threshold,(a+b+c+d)/4);
-                                    cout<<"AnkleZL_PID"<<AnkleZL_PID.Calculate(bump_threshold,(a+b+c+d)/4)<<endl;
+                                   // cout<<"AnkleZL_PID"<<AnkleZL_PID.Calculate(bump_threshold,(a+b+c+d)/4)<<endl;
                                     }
                                 }
                             }
@@ -1329,7 +1329,7 @@ int main(int argc, char **argv)
 
         }
 
-//if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.Tx+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2){break;}
+//if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.Tx+OnlineTaskSpace.Tc+OnlineTaskSpace.TSS/2+OnlineTaskSpace.Tc){break;}
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);

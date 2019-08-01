@@ -494,8 +494,8 @@ inline QByteArray Epos::CreateHandPacket(QList<int> motorPositions)
     }
     else if(handDeviceID> 3 && handDeviceID<7)
     {
-        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[12+handDeviceID],40));
-        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[8+12+handDeviceID],40));
+        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[12+handDeviceID],100));
+        data.append(CreateDynamixelPacket(0x581,handDeviceID-3,motorPositions[8+12+handDeviceID],100));
         handDeviceID++;
     }
     else if(handDeviceID==7)

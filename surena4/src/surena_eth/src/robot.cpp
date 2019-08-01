@@ -312,10 +312,11 @@ void Robot::ActivateHands(void)
     qDebug()<<"activating hands";
     _rosNode->teststr="OK";
     timer.stop();
-    for(int i=12;i<16;i++)
-        Epos4.ActiveJoint(i);
-    for(int i=20;i<24;i++)
-        Epos4.ActiveJoint(i);
+//    for(int i=12;i<16;i++)
+//        Epos4.ActiveJoint(i);
+//    for(int i=20;i<24;i++)
+//        Epos4.ActiveJoint(i);
+    Epos4.ActiveAllHands(true);
 
     _rosNode->OperationCompleted(0);
     _rosNode->RobotStatus="Ready";
