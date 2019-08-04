@@ -39,9 +39,9 @@ _timeStep=.005;
             break;
         case 25:
             YStMax=.115;
-            ReferencePelvisHeight=.895; // 0.913 is gouth for xe=0.06 and xs=0.047
-            Xe=0.0577;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
-            Xs=0.0115;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            ReferencePelvisHeight=.91; // 0.913 is gouth for xe=0.06 and xs=0.047
+            Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
             break;
         case 20:
@@ -60,8 +60,8 @@ _timeStep=.005;
 
 
         AnkleMaximumHeight=.045;0.035;0.03;.03;
-        Yd=.0562;//0.0623; // +0.008
-        a_d= -.438;//-0.3035;  //
+        Yd=.0562+0.008;
+        a_d= -.438;
 
         //times
         TDs =0.7;
@@ -538,7 +538,7 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          tttY_S <<0,Tx,Tx+TSS/2,Tx+Tc/2,Tx+Tc/2+TDs/2,Tx+Tc,TStart;
          MatrixXd conY_S(3,7);
 //qDebug()<<YpMax;
-         conY_S<<0,YpMax,Yd,0,-1*Yd,-1.4*YpMax,-1*Yd,
+         conY_S<<0,YpMax,Yd,0,-1*Yd,-1.1*YpMax,-1*Yd,
                  0,0,-v_d,-c_h, -v_d,0,v_d,
                  0,a_p_max,a_d, 0 ,-a_d,-a_p_max,-a_d;
          Cy_p_i_S.resize(6,6);

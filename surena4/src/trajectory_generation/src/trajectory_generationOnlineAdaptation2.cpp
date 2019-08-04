@@ -40,9 +40,9 @@ bool sidewalk=false;
 int bump_threshold=55;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
-bool LogDataSend=false;
+bool LogDataSend=!false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
-double k_pitch=0*.8;//1;0.8;
+double k_pitch=.8;//1;0.8;
 double pelvis_roll_range=1*2.5;
 
 
@@ -758,13 +758,7 @@ int main(int argc, char **argv)
 
     QTime pc_time;
     QByteArray data_pose;
-    QString name_pose;
-    name_pose="/media/milad/UBUNTU1604/robot_data/";
-    //       name_pose+=QString::number(pc_time.currentTime().hour())+"_";
-    //       name_pose+=QString::number(pc_time.currentTime().minute())+"_";
-    //       name_pose+=QString::number(pc_time.currentTime().second())+"_";
-    name_pose+="pose.txt";
-    QFile myfile_pose(name_pose);
+
 
 
 
@@ -1050,6 +1044,29 @@ int main(int argc, char **argv)
                 R_F_R<<cos(PoseRFoot(4)),0,sin(PoseRFoot(4)),
                         0,1,0,
                         -sin(PoseRFoot(4)),0,cos(PoseRFoot(4));
+
+         double alpha=.9;
+         double time_margin=.01;
+         double coef_y_la;
+         double coef_y_ra;
+         double coef_y_p;
+
+         coef_y_la=1-move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.Tx+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2+time_margin,OnlineTaskSpace.TStart-time_margin)
+                 +move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.TGait-OnlineTaskSpace.TSS+time_margin,OnlineTaskSpace.TGait-time_margin);
+
+         coef_y_ra=1-move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+time_margin,OnlineTaskSpace.TStart+OnlineTaskSpace.Tc-time_margin)
+                 +move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+time_margin,OnlineTaskSpace.TGait+OnlineTaskSpace.Tc-time_margin);
+
+         coef_y_p=1-move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.TStart+OnlineTaskSpace.TDs/2+time_margin,OnlineTaskSpace.TStart+OnlineTaskSpace.TDs-time_margin)
+                 +move2pose(1-alpha,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.TGait+OnlineTaskSpace.TDs/2+time_margin,OnlineTaskSpace.TGait+OnlineTaskSpace.TDs-time_margin);
+
+
+
+
+
+         PoseLFoot(1)=PoseLFoot(1)*coef_y_la;
+PoseRFoot(1)=PoseRFoot(1)*coef_y_ra;
+PoseRoot(1)=PoseRoot(1)*coef_y_p;
 
                 if(!turning && !sidewalk)
                 {
@@ -1353,15 +1370,16 @@ int main(int argc, char **argv)
 
     }
 
+    QFile myfile_pose("/media/cast/UBUNTU1604/robot_data/pose.txt");
     myfile_pose.remove();
     myfile_pose.open(QFile::ReadWrite);
     myfile_pose.write(data_pose);
     myfile_pose.close();
 
-    myfile_time.remove();
-    myfile_time.open(QFile::ReadWrite);
-    myfile_time.write(data_time);
-    myfile_time.close();
+//    myfile_time.remove();
+//    myfile_time.open(QFile::ReadWrite);
+//    myfile_time.write(data_time);
+//    myfile_time.close();
 
 
     //    myfile_inc.open(QFile::ReadWrite);
