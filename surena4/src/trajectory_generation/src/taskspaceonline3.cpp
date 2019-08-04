@@ -13,7 +13,7 @@ _timeStep=.005;
 
     NStep=NStride*2;
 
-    StepLength=.25;
+    StepLength=.2;
     XofAnkleMaximumHeight=StepLength*1.8;
         switch (int(StepLength*100)) {
         case 45://ff
@@ -38,16 +38,16 @@ _timeStep=.005;
             Xs=0.065;
             break;
         case 25:
-            YStMax=.115;
-            ReferencePelvisHeight=.91; // 0.913 is gouth for xe=0.06 and xs=0.047
+                ReferencePelvisHeight=.91; // 0.913 is gouth for xe=0.06 and xs=0.047
             Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
             break;
         case 20:
+
             ReferencePelvisHeight=.91;
-            Xe=0.045;
-            Xs=0.045;
+            Xe=.06*.8;//0.045;
+            Xs=0.047*.8;//0.045;
             break;
         case 15:
             ReferencePelvisHeight=.92;
@@ -144,6 +144,27 @@ void TaskSpaceOnline3::numplot(double num,double min,double max){
 qDebug()<<"";
 
 
+}
+
+void TaskSpaceOnline3::matrix_view(MatrixXd M){
+
+    for (int i = 0; i <M.rows() ; ++i) {
+        QString str;
+        for (int j = 0; j <M.cols() ; ++j) {
+            str+=QString::number(M(i,j));
+            str+="   ";
+        }
+        qDebug()<<str;
+    }
+    qDebug()<<"";
+}
+
+
+void TaskSpaceOnline3::matrix_view(VectorXd M){
+    QString str;
+    for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
+    qDebug()<<str;
+    qDebug()<<"";
 }
 
 double TaskSpaceOnline3::move2pose(double max,double t_local,double T_start ,double T_end){
@@ -354,15 +375,15 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_cy_iAcc_ar(1,3);
     C_cy_iAcc_ar<<0,INFINITY, 0;
     C_cy_x_ar=CoefOffline.Coefficient(C_cy_iTime_ar,C_cy_iPos_ar,C_cy_iVel_ar,C_cy_iAcc_ar);
-
+//matrix_view(C_cy_x_ar);
     //***** z cycle1
     MatrixXd ordza(1,3);
-    ordza << 5,3,5;
+    ordza << 4,3,5;
     MatrixXd tttza(1,4);
     tttza <<0 ,Tm1 ,Tm2, TSS-T_end_of_SS;
     MatrixXd conza(3,4);
     conza<<0,.6*AnkleMaximumHeight,AnkleMaximumHeight ,h_end_of_SS,
-            0 ,0,0, vz_cycle,0 ,INFINITY,INFINITY, 0;
+            0 ,INFINITY,INFINITY, vz_cycle,0 ,INFINITY,INFINITY, 0;
 
     C_cy_z_ar.resize(3,6);
     C_cy_z_ar.fill(0);
@@ -451,8 +472,8 @@ double v_beta_toe=2*beta_toe/t_toe;
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
     //------------------Coefficient of cyclic motion in X direction--------------------
-double zmp_min=0.0391; // -0.025
-double zmp_max=0.0051; // 0.025
+double zmp_min=-0.025; // -0.025
+double zmp_max=0.025; // 0.025
 double a_0=(Xe-zmp_max)/0.1;
 double a_Ds=(-Xs-zmp_min)/0.1;
 double A_Ds=(a_Ds-a_0)/(6*TDs);
