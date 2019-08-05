@@ -39,14 +39,16 @@ double TurningRadius=1;//for on spot .01;
 bool sidewalk=false;
 int bump_threshold=75;//75 85;
 bool simulation=false;
-bool AnkleZAdaptation=false;
+bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
 double k_pitch=0*.8;//1;0.8;
 double pelvis_roll_range=2.5;
 
-double ankle_current;
-double ankle_absolute;
+double rankle_inc,lankle_inc;
+double lknee_inc,rknee_inc;
+double lankle_absolute,rankle_absolute;
+double lknee_absolute,rknee_absolute;
 
 
 double saturate(double a, double min, double max){
@@ -319,18 +321,25 @@ void qc_initial(const sensor_msgs::JointState & msg){
                 qc_offset[5],qc_offset[6],qc_offset[7],qc_offset[8],qc_offset[9],
                 qc_offset[10],qc_offset[11]);}
 
-    ankle_current=msg.position[6];
-    qc_offset[5]=0;
+    lankle_inc=msg.position[6];
+    rankle_inc=msg.position[1];
+    lknee_inc=msg.position[7];
+    rknee_inc=msg.position[3];
 
 }
 
 int abs_feedback[12];
 void abs_feedback_func(const sensor_msgs::JointState & msg){
-    for (int i = 0; i < 12; ++i) {
-        abs_feedback[i]=int(msg.position[i+1]);
-    }
+//    for (int i = 0; i < 12; ++i) {
+//        abs_feedback[i]=int(msg.position[i+1]);
+//    }
 
-    ankle_absolute=msg.position[6];
+    lankle_absolute=msg.position[6];
+    rankle_absolute=msg.position[1];
+    lknee_absolute=msg.position[7];
+    rknee_absolute=msg.position[3];
+
+
 }
 
 double Fzl,Fzr,Mxl,Mxr;
@@ -767,7 +776,7 @@ int main(int argc, char **argv)
 
     QTime pc_time;
     QByteArray data_pose;
-    QByteArray data_current;
+    QByteArray data_ankle;
 
 
 
@@ -1055,7 +1064,7 @@ int main(int argc, char **argv)
                         0,1,0,
                         -sin(PoseRFoot(4)),0,cos(PoseRFoot(4));
 
-         double alpha=.85;
+         double alpha=.9;
          double time_margin=.01;
          double coef_y_la;
          double coef_y_ra;
@@ -1371,7 +1380,11 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
 */
 //qDebug()<<"y_p="<<PoseRoot(1);
 
-       data_current.append(QString::number(GlobalTime)+","+QString::number(ankle_current)+","+QString::number(cntrl[12])+","+QString::number(ankle_absolute)+"\n");
+
+        data_ankle.append(QString::number(GlobalTime)+","+QString::number(rankle_inc)+","+QString::number(cntrl[6])+","+QString::number(rankle_absolute)+","+
+       QString::number(lankle_inc)+","+QString::number(cntrl[12])+","+QString::number(lankle_absolute)+","+
+        QString::number(rknee_inc)+","+QString::number(cntrl[4])+","+QString::number(rknee_absolute)+","+
+         QString::number(lknee_inc)+","+QString::number(cntrl[10])+","+QString::number(lknee_absolute)+"\n");
         ros::spinOnce();
 
         loop_rate.sleep();
@@ -1391,10 +1404,10 @@ if(LogDataSend){
 
 
 
-    QFile myfile_pose("/home/cast/Desktop/ankle_current.txt");
+    QFile myfile_pose("/media/cast/UBUNTU1604/robot_data/anklecurrent.txt");
     myfile_pose.remove();
     myfile_pose.open(QFile::ReadWrite);
-    myfile_pose.write(data_current);
+    myfile_pose.write(data_ankle);
     myfile_pose.close();
 
 
