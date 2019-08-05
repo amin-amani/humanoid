@@ -696,7 +696,7 @@ int main(int argc, char **argv)
     //   ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     // ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-    //  ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
+      ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
     // ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
