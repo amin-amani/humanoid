@@ -1404,11 +1404,11 @@ if(LogDataSend){
 
 
 
-    QFile myfile_pose("/media/cast/UBUNTU1604/robot_data/anklecurrent.txt");
-    myfile_pose.remove();
-    myfile_pose.open(QFile::ReadWrite);
-    myfile_pose.write(data_ankle);
-    myfile_pose.close();
+    QFile myfile_ankle("/media/cast/UBUNTU1604/robot_data/anklecurrent.txt");
+    myfile_ankle.remove();
+    myfile_ankle.open(QFile::ReadWrite);
+    myfile_ankle.write(data_ankle);
+    myfile_ankle.close();
 
 
 
