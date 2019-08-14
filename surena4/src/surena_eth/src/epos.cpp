@@ -81,7 +81,7 @@ bool Epos::ActiveWaist(bool enableDrive) //14
     return OK;
 }
 //========================================================================
-bool Epos::ActiveAllHands(bool switchOn) //13,2
+bool Epos::ActiveAllHands(bool switchOn) //13left,12right
 {
     WaitMs(700);
     for(int i=0 ;i<4;i++){
@@ -92,9 +92,13 @@ bool Epos::ActiveAllHands(bool switchOn) //13,2
     StartNode(12);
     StartNode(13);
     WaitMs(700);
+    qDebug()<<"...............";
     for(int i=0 ;i<4;i++){
         SetMode(12,PPM,i+1);
+        WaitMs(700);
         SetMode(13,PPM,i+1);
+        WaitMs(700);
+
     }
     WaitMs(700);
     for(int i=0 ;i<4;i++){
@@ -196,13 +200,17 @@ void Epos::StopNode(int devID)
 
 }
 //========================================================================
+//  SetMode(12,PPM,i+1);
 void Epos::SetMode(int devID,EPOSOperationMode mode,int canID)
 {
     try{
         QByteArray data,replay;
         data.append(mode);
-        data.append(QByteArray(7, Qt::Initialization::Uninitialized));
+        data.append((char)0x00);
+
+        data.append(QByteArray(6, Qt::Initialization::Uninitialized));
         replay=can.WriteMessage(0x300+canID,devID,data);
+        //if(devID==13)qDebug()<<replay.toHex();
     }
     catch(...)
     {

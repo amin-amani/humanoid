@@ -354,7 +354,23 @@ target_link_libraries(hand_test
 )
 install(TARGETS hand_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(hand_trajectory_offlinePublisher src/hand_trajectory_offlinePublisher.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_offlinePublisher
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_offlinePublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(malek_IK_test src/malek_IK_test.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(malek_IK_test
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS malek_IK_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #add_executable(hand_trajectory_shaking src/hand_trajectory_shaking.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_trajectory_shaking
 #    ${catkin_LIBRARIES}
@@ -472,6 +488,14 @@ target_link_libraries(hand_trajectory_func_path
 )
 install(TARGETS hand_trajectory_func_path RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(hand_trajectory_right_grip2 src/hand_trajectory_right_grip2.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_right_grip2
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_right_grip2 RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 #add_executable(trajectory_generation_turning src/trajectory_generation_turning.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(trajectory_generation_turning
 #    ${catkin_LIBRARIES}

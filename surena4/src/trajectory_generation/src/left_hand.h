@@ -9,7 +9,7 @@
 #include "Eigen/Cholesky"
 #include "Eigen/LU"
 #include<math.h>
-
+#include<qdebug.h>
 using namespace Eigen;
 using namespace std;
 
@@ -32,7 +32,7 @@ public:
     double power=1e-4;
     double left_palm_position_power=1e6;
     double left_palm_orientation_power=1e6;
-       double qdot_max=.5;
+       double qdot_max=1;
     VectorXd qdot;
     //    double q1_ra;
     //    double q2_ra;
@@ -124,6 +124,10 @@ public:
     double velocity(double d, double d0);
     
 
+    void update_left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
+    void update_left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
+    void update_left_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
+    void update_left_hand(VectorXd q_la, VectorXd v, VectorXd r_target, MatrixXd R_target);
 };
 
 #endif // LEFT_HAND_H

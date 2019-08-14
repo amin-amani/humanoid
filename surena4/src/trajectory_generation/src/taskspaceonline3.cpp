@@ -13,7 +13,7 @@ _timeStep=.005;
 
     NStep=NStride*2;
 
-    StepLength=.25;
+    StepLength=.15;
     XofAnkleMaximumHeight=StepLength*1.8;
         switch (int(StepLength*100)) {
         case 45://ff
@@ -42,6 +42,11 @@ _timeStep=.005;
             Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
+            Yd=.0562+0.008;
+            a_d= -.438;
+            zmp_min=-0.025; // -0.025
+            zmp_max=0.025; // 0.025
+            YEndMax_Coef=1.15;
             break;
         case 20:
 
@@ -50,9 +55,14 @@ _timeStep=.005;
             Xs=0.047*.8;//0.045;
             break;
         case 15:
-            ReferencePelvisHeight=.92;
-            Xe=0.034;0.040;
-            Xs=0.034;0.025;
+            ReferencePelvisHeight=.91; //0.92
+            Xs=0.0123;0.025;
+            Xe=0.0369;0.034;0.040;
+            Yd=0.0708;
+            a_d= -0.4527;
+            zmp_min=0.0009; // -0.025
+            zmp_max=0.0174; // 0.025
+            YEndMax_Coef=1.05;
             break;
         default:
             break;
@@ -60,8 +70,7 @@ _timeStep=.005;
 
 
         AnkleMaximumHeight=.045;0.035;0.03;.03;
-        Yd=.0562+0.008;
-        a_d= -.438;
+
 
         //times
         TDs =0.7;
@@ -74,7 +83,7 @@ _timeStep=.005;
         Tx=3;
         TE=2;
         TStart=Tx+TSS/2+Tc;
-        TEnd=Tc+TE;
+        TEnd=TSS+TE;
         T_st_p_sx=Tx+Tc; //0.7*TStart;
         T_s_st=Tx+Tc/2+TDs/2;//.5*TStart;
         TGait=TStart+NStride*2*Tc;
@@ -86,8 +95,8 @@ _timeStep=.005;
         T_end_of_SS=      1e-4;0;
         T_end_of_last_SS= 0;1e-4;
         h_end_of_SS=      1e-6;0;
-        T_end_p_sx_rel=TDs+0.5*TSS;
-        T_end_p_sx=TGait+TDs+0.5*TSS;
+        T_end_p_sx_rel=TDs+.5*TSS;
+        T_end_p_sx=TGait+T_end_p_sx_rel;
         T_end_a_s=TGait+TDs;
         T_end_a_e=TGait+Tc;
         t_toe=0.2*TDs;
@@ -348,7 +357,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_st_iPos(1,3);
     C_st_iPos<<0, AnkleMaximumHeight,h_end_of_SS;
     MatrixXd C_st_iVel(1,3);
-    C_st_iVel<<0 ,0, vz_start;//0 ,INFINITY, vz_start
+    C_st_iVel<<0 ,INFINITY, vz_start;//0 ,INFINITY, vz_start
     MatrixXd C_st_iAcc(1,3);
     C_st_iAcc<<0 ,INFINITY, 0;
     C_st_z_al=CoefOffline.Coefficient(C_st_iTime,C_st_iPos,C_st_iVel,C_st_iAcc);
@@ -417,7 +426,7 @@ void TaskSpaceOnline3::CoeffArrayAnkle(){
     MatrixXd C_end_z_iPos(1,3);
     C_end_z_iPos<<0, AnkleMaximumHeight, h_end_of_SS;
     MatrixXd C_end_z_iVel(1,3);
-    C_end_z_iVel<<0 ,0, vz_end;//0 ,INFINITY, vz_end
+    C_end_z_iVel<<0 ,INFINITY, vz_end;//0 ,INFINITY, vz_end
     MatrixXd C_end_z_iAcc(1,3);
     C_end_z_iAcc<<0 ,INFINITY, 0;
     C_end_z_ar=CoefOffline.Coefficient(C_end_z_iTime,C_end_z_iPos,C_end_z_iVel,C_end_z_iAcc);
@@ -472,8 +481,6 @@ double v_beta_toe=2*beta_toe/t_toe;
 
 void TaskSpaceOnline3::CoeffArrayPelvis(){
     //------------------Coefficient of cyclic motion in X direction--------------------
-double zmp_min=-0.025; // -0.025
-double zmp_max=0.025; // 0.025
 double a_0=(Xe-zmp_max)/0.1;
 double a_Ds=(-Xs-zmp_min)/0.1;
 double A_Ds=(a_Ds-a_0)/(6*TDs);
@@ -516,7 +523,7 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
     MatrixXd Cx_end_pVel(1,2);
     Cx_end_pVel<<5*Cx_p(0,0)*pow(TDs,4)+4*Cx_p(0,1)*pow(TDs,3)+3*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3)*pow(TDs,1)+Cx_p(0,4), 0;
     MatrixXd Cx_end_pAccel(1,2);
-    Cx_end_pAccel<<5*4*Cx_p(0,0)*pow(TDs,4)+4*3*Cx_p(0,1)*pow(TDs,3)+3*2*Cx_p(0,2)*pow(TDs,2)+2*Cx_p(0,3), 0;//like the last moment of first part of trajectory of cycle
+    Cx_end_pAccel<<5*4*Cx_p(0,0)*pow(TDs,3)+4*3*Cx_p(0,1)*pow(TDs,2)+3*2*Cx_p(0,2)*pow(TDs,1)+2*Cx_p(0,3), 0;//like the last moment of first part of trajectory of cycle
     Cx_end_p=CoefOffline.Coefficient(Cx_end_pTime,Cx_end_pPos,Cx_end_pVel,Cx_end_pAccel);
 
 
@@ -569,13 +576,13 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          Cy_p_S.fill(0);
 
     // -------------------Coefficient of End of Pelvis motion in y direction--------------
-         YEndMax=YpMax;
+YEndMax=YEndMax_Coef*YpMax;
          MatrixXd ordY_e(1,4);
          ordY_e << 5,5,5,5;
          MatrixXd tttY_e(1,5);
-         tttY_e <<TGait+TDs,TGait+TDs+TSS/2,TGait+Tc,TGait+Tc+TE*.5,TGait+Tc+TE;
+         tttY_e <<TGait+TDs,TGait+TDs+TSS/2,TGait+Tc,TGait+Tc+TE*0.5,TGait+Tc+TE;
          MatrixXd conY_e(3,5);
-         conY_e<<Yd,1.15*YEndMax,Yd,-0.001,0,
+         conY_e<<Yd,YEndMax,Yd,0.001,0,
                  v_d,0,-v_d,0,0,
                  a_d,a_p_max,a_d,0,0;
 
@@ -791,13 +798,13 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+Tc) && t<=TGait+Tc+TE*.5){
+    else if (t>(TGait+Tc) && t<=TGait+Tc+TE*0.5){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(2),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+Tc) && t<=TGait+Tc+TE){
+    else if (t>(TGait+Tc+TE*0.5) && t<=TGait+Tc+TE){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(3),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);

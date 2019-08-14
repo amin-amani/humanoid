@@ -32,18 +32,18 @@
 using namespace  std;
 using namespace  Eigen;
 
-bool left_first=true;//right support in first step
-bool backward=false;
+bool left_first=!true;//right support in first step
+bool backward=!false;
 bool turning=false;
 double TurningRadius=1;//for on spot .01;
 bool sidewalk=false;
 int bump_threshold=75;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
-bool LogDataSend=false;
+bool LogDataSend=!false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
 double k_pitch=0*.8;//1;0.8;
-double pelvis_roll_range=2.5;
+double pelvis_roll_range=1;
 
 double rankle_inc,lankle_inc;
 double lknee_inc,rknee_inc;
@@ -907,7 +907,8 @@ int main(int argc, char **argv)
                         else{
 
                             if(!leftzstop){
-                                if(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold){
+
+                                if((left_first&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((!left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
                                     leftzstop=true;
                                     AnkleZL=m3;
                                     AnkleZL+=AnkleZ_offsetL;
@@ -932,7 +933,7 @@ int main(int argc, char **argv)
                         }
                         else if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
                             if(!rightzstop){
-                                if(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold){
+                                if(((!left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
                                     rightzstop=true;
                                     AnkleZR=m7;
                                     AnkleZR+=AnkleZ_offsetR;
@@ -970,7 +971,9 @@ int main(int argc, char **argv)
                         }
                         else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
                             if(!leftzstop){
-                                if(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold){
+
+                                if(((left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((!left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
+
                                     leftzstop=true;
 
                                     AnkleZL=m3;

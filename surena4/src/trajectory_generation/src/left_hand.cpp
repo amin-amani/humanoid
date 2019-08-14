@@ -87,6 +87,86 @@ jacob(q_ra);
 }
 
 
+void left_hand::update_left_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target)
+{
+
+    HO_FK_left_palm(q_ra);
+
+    dist=distance(r_target,r_left_palm);
+    sai_target=sai_calc(R_target);
+    theta_target=theta_calc(R_target);
+    phi_target=phi_calc(R_target);
+
+
+}
+
+void left_hand::update_left_hand(VectorXd q_la,VectorXd v,VectorXd r_target,MatrixXd R_target)
+{
+
+    HO_FK_left_palm(q_la);
+    dist=distance(r_target,r_left_palm);
+    sai_target=sai_calc(R_target);
+    theta_target=theta_calc(R_target);
+    phi_target=phi_calc(R_target);
+    V.resize(3,1);
+    V=v;
+    sai_dot=(sai_target-sai);
+    phi_dot=(phi_target-phi);
+    theta_dot=(theta_target-theta);
+
+    euler2w();
+jacob(q_la);
+}
+
+void left_hand::update_left_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,int i,double d0)
+{
+
+HO_FK_left_palm(q_ra);
+
+dist=distance(r_target,r_left_palm);
+sai_target=sai_calc(R_target);
+theta_target=theta_calc(R_target);
+phi_target=phi_calc(R_target);
+
+
+V.resize(3,1);
+double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
+V=v_coef*(r_target-r_left_palm);
+
+double oriet_coef=1;//pow(tanh(3*(d_orient-dist)/d_orient),2);
+sai_dot=oriet_coef*(sai_target-sai);
+phi_dot=oriet_coef*(phi_target-phi);
+theta_dot=oriet_coef*(theta_target-theta);
+
+euler2w();
+jacob(q_ra);
+}
+
+
+void left_hand::update_left_hand(VectorXd q_ra,VectorXd r_target,MatrixXd R_target,double d0,double v_0, double v__target)
+{
+HO_FK_left_palm(q_ra);
+
+dist=distance(r_target,r_left_palm);
+sai_target=sai_calc(R_target);
+theta_target=theta_calc(R_target);
+phi_target=phi_calc(R_target);
+
+
+V.resize(3,1);
+//double v_coef=v_des*min(float(i)/100.0,1.0)*pow(atan(dist/d0*20.0)/M_PI*2,2)/dist;
+v0=v_0;
+v_target=v__target;
+double v_coef=velocity(dist,d0);
+V=v_coef*(r_target-r_left_palm)/dist;
+
+double oriet_coef=1;//pow(tanh(3*(d_orient-dist)/d_orient),2);
+sai_dot=oriet_coef*(sai_target-sai);
+phi_dot=oriet_coef*(phi_target-phi);
+theta_dot=oriet_coef*(theta_target-theta);
+euler2w();
+jacob(q_ra);
+}
 
 
 double left_hand::toRad(double d){
@@ -311,8 +391,8 @@ g=g+pow(tanh(5*(d_orient-dist)/d_orient),2)*left_palm_orientation_power*(-2)*J_w
 
 vector<double> minimum(7);
 vector<double> maximum(7);
-minimum={-110.0,0.0,-60.0,-90.0,-60.0,-20.0,-20.0};
-maximum={80.0 ,90.0 ,60.0 ,-1.0 ,60.0 ,20.0 ,20.0 };
+minimum={-110.0,5.0,-60.0,-90.0,-90.0,-20.0,-20.0};
+maximum={80.0 ,90.0 ,60.0 ,-1.0 ,90.0 ,20.0 ,20.0 };
 
     CI.resize(7,14);
     CI<<MatrixXd::Identity(7,7)*(-1),MatrixXd::Identity(7,7);
@@ -332,25 +412,9 @@ maximum={80.0 ,90.0 ,60.0 ,-1.0 ,60.0 ,20.0 ,20.0 };
             -max((toRad(minimum[5])-q_ra(5))/T,-qdot_max),
             -max((toRad(minimum[6])-q_ra(6))/T,-qdot_max);
 
-//    ci0<<min((toRad(45)-q_ra(0))/T,qdot_max),
-//            -max((toRad(-90)-q_ra(1))/T,-qdot_max),//
-//            -max((toRad(-45)-q_ra(2))/T,-qdot_max),//
-//            min((toRad(-5)-q_ra(3))/T,qdot_max),
-//            -max((toRad(-45)-q_ra(4))/T,-qdot_max),//
-//            min((toRad(20)-q_ra(5))/T,qdot_max),
-//            min((toRad(20)-q_ra(6))/T,qdot_max),
-//            -max((toRad(-90)-q_ra(0))/T,-qdot_max),
-//            min((toRad(10)-q_ra(1))/T,qdot_max),//
-//            min((toRad(45)-q_ra(2))/T,qdot_max),//
-//            -max((toRad(-80)-q_ra(3))/T,-qdot_max),
-//            min((toRad(45)-q_ra(4))/T,qdot_max),//
-//            -max((toRad(-20)-q_ra(5))/T,-qdot_max),
-//            -max((toRad(-20)-q_ra(6))/T,-qdot_max);
 
-CE.resize(7,1);
-ce0.resize(1,1);
-CE.fill(0);
-ce0.fill(0);
+CE.resize(0,0);
+
     qdot.resize(7,1);
 
 
@@ -361,20 +425,20 @@ ce0.fill(0);
 q_next.resize(7,1);
 q_next=q_ra+T*qdot;
 
-if(q_next(0)<toRad(minimum[0])){q_next(0)=toRad(minimum[0]);}
-if(q_next(0)>toRad(maximum[0])) {q_next(0)=toRad(maximum[0]);}
-if(q_next(1)<toRad(minimum[1])){q_next(1)=toRad(minimum[1]);}
-if(q_next(1)>toRad(maximum[1])) {q_next(1)=toRad(maximum[1]);}
-if(q_next(2)<toRad(minimum[2])){q_next(2)=toRad(minimum[2]);}
-if(q_next(2)>toRad(maximum[2])) {q_next(2)=toRad(maximum[2]);}
-if(q_next(3)<toRad(minimum[3])){q_next(3)=toRad(minimum[3]);}
-if(q_next(3)>toRad(maximum[3])) {q_next(3)=toRad(maximum[3]);}
-if(q_next(4)<toRad(minimum[4])){q_next(4)=toRad(minimum[4]);}
-if(q_next(4)>toRad(maximum[4])) {q_next(4)=toRad(maximum[4]);}
-if(q_next(5)<toRad(minimum[5])){q_next(5)=toRad(minimum[5]);}
-if(q_next(5)>toRad(maximum[5])) {q_next(5)=toRad(maximum[5]);}
-if(q_next(6)<toRad(minimum[6])){q_next(6)=toRad(minimum[6]);}
-if(q_next(6)>toRad(maximum[6])) {q_next(6)=toRad(maximum[6]);}
+if(q_next(0)<toRad(minimum[0])-.005){ q_next(0)=toRad(minimum[0]);   qDebug()<<"ql"<<1<<" out of range!";}
+if(q_next(0)>toRad(maximum[0])+.005) {q_next(0)=toRad(maximum[0]);  qDebug()<<"ql"<<1<<" out of range!";}
+if(q_next(1)<toRad(minimum[1])-.005){ q_next(1)=toRad(minimum[1]);   qDebug()<<"ql"<<2<<" out of range!";}
+if(q_next(1)>toRad(maximum[1])+.005) {q_next(1)=toRad(maximum[1]);  qDebug()<<"ql"<<2<<" out of range!";}
+if(q_next(2)<toRad(minimum[2])-.005){ q_next(2)=toRad(minimum[2]);   qDebug()<<"ql"<<3<<" out of range!";}
+if(q_next(2)>toRad(maximum[2])+.005) {q_next(2)=toRad(maximum[2]);  qDebug()<<"ql"<<3<<" out of range!";}
+if(q_next(3)<toRad(minimum[3])-.005){ q_next(3)=toRad(minimum[3]);   qDebug()<<"ql"<<4<<" out of range!";}
+if(q_next(3)>toRad(maximum[3])+.005) {q_next(3)=toRad(maximum[3]);  qDebug()<<"ql"<<4<<" out of range!";}
+if(q_next(4)<toRad(minimum[4])-.005){ q_next(4)=toRad(minimum[4]);   qDebug()<<"ql"<<5<<" out of range!";}
+if(q_next(4)>toRad(maximum[4])+.005) {q_next(4)=toRad(maximum[4]);  qDebug()<<"ql"<<5<<" out of range!";}
+if(q_next(5)<toRad(minimum[5])-.005){ q_next(5)=toRad(minimum[5]);   qDebug()<<"ql"<<6<<" out of range!";}
+if(q_next(5)>toRad(maximum[5])+.005) {q_next(5)=toRad(maximum[5]);  qDebug()<<"ql"<<6<<" out of range!";}
+if(q_next(6)<toRad(minimum[6])-.005){ q_next(6)=toRad(minimum[6]);   qDebug()<<"ql"<<7<<" out of range!";}
+if(q_next(6)>toRad(maximum[6])+.005) {q_next(6)=toRad(maximum[6]);  qDebug()<<"ql"<<7<<" out of range!";}
 
 
 

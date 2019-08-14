@@ -34,7 +34,7 @@ public:
     double power=1e-4;
     double Right_palm_position_power=1e6;
     double Right_palm_orientation_power=1e6;
-       double qdot_max=.5;
+       double qdot_max=1;
     VectorXd qdot;
     //    double q1_ra;
     //    double q2_ra;
@@ -126,6 +126,12 @@ public:
     
 
     right_hand(VectorXd q_ra, VectorXd v, VectorXd r_target, MatrixXd R_target);
+    void update_right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, double d0, double v_0, double v__target);
+    void update_right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target, int i, double d0);
+    void update_right_hand(VectorXd q_ra, VectorXd v, VectorXd r_target, MatrixXd R_target);
+    void update_right_hand(VectorXd q_ra, VectorXd r_target, MatrixXd R_target);
+    void matrix_view(MatrixXd M);
+    void matrix_view(VectorXd M);
 };
 
 #endif // RIGHT_HAND_H

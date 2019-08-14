@@ -34,8 +34,12 @@ public:
     double a_d;
     double YStMax;// Start motion parameter in y direction
     double YEndMax;//End motion parameter in y direction
+    double YEndMax_Coef;
     double Xe;// Distance of pelvis and rear ankle in DS Xe=Sc*StepLength/(Rse+1)*1.2;
     double Xs;// Distance of pelvis and front ankle in DSP Xs=Rse*Xe*.90;
+
+    double zmp_min;
+    double zmp_max;
 
     double NStride;
     double NStep;
