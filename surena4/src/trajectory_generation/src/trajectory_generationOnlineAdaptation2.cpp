@@ -33,14 +33,14 @@ using namespace  std;
 using namespace  Eigen;
 
 bool left_first=!true;//right support in first step
-bool backward=!false;
+bool backward=false;
 bool turning=false;
 double TurningRadius=1;//for on spot .01;
 bool sidewalk=false;
 int bump_threshold=75;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
-bool LogDataSend=!false;
+bool LogDataSend=false;
 double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
 double k_pitch=0*.8;//1;0.8;
 double pelvis_roll_range=1;

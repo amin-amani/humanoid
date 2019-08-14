@@ -38,7 +38,8 @@ using namespace  Eigen;
 
 bool simulation=true;
 
-VectorXd r_bottle(3);
+VectorXd r_bottle_cam(3);
+VectorXd r_bottle_shoulder(3);
 double head_yaw=0;
 double head_pitch=0;
 double head_roll=0;
@@ -218,7 +219,34 @@ void abs_read(const sensor_msgs::JointState & msg){
 
 
 }
+VectorXd r_camera2shoulder(VectorXd r_camera)
+{
+    double roll2pitch=.05;
+    double yaw2roll=.1;
+    VectorXd r_neck(3);
+    r_neck<<.03,0.3,0;
 
+    MatrixXd T0(4,4);
+    T0<<1,0,0,0,  0,cos(M_PI/12),-sin(M_PI/12),0,  0,sin(M_PI/12),cos(M_PI/12),0,  0,0,0,1;
+    MatrixXd T1(4,4);
+    T1<<1,0,0,r_camera(0),  0,1,0,r_camera(1),  0,0,1,r_camera(2),  0,0,0,1;
+  MatrixXd T2(4,4);
+  T2<<1,0,0,0,  0,cos(head_pitch),-sin(head_pitch),0,  0,sin(head_pitch),cos(head_pitch),0,  0,0,0,1;
+  MatrixXd T3(4,4);
+  T3<<cos(head_roll),0,sin(head_roll),0,  0,1,0,0,    -sin(head_roll),0,cos(head_roll),roll2pitch,   0,0,0,1;
+  MatrixXd T4(4,4);
+  T4<<cos(head_yaw),-sin(head_yaw),0,0,  sin(head_yaw),cos(head_yaw),0,0,  0,0,1,yaw2roll,  0,0,0,1;
+  MatrixXd T5(4,4);
+  T5<<1,0,0,r_neck(0),  0,1,0,r_neck(1),  0,0,1,r_neck(2),  0,0,0,1;
+  MatrixXd T(4,4);
+  T=T5*T4*T3*T2*T1*T0;
+  VectorXd temp(4); temp<<r_camera,1;
+  temp=T*temp;
+
+  return temp.block(0,0,3,1);
+
+
+}
 void object_detect(const geometry_msgs::PoseArray & msg){
     double l=640;
     double w=480;
@@ -244,38 +272,13 @@ L0=sqrt(X0*X0+Y0*Y0+Z0*Z0);
 X=z/L0*X0;
 Y=X*Y0/X0;
 Z=X*Z0/X0;
-if(X!=0){r_bottle<<X,Y,Z;}
-
-matrix_view(r_bottle);
-}
-
-VectorXd r_camera2shoulder(VectorXd r_camera)
-{
-    double roll2pitch=.05;
-    double yaw2roll=.1;
-    VectorXd r_neck(3);
-    r_neck<<.03,0.3,0;
-
-    MatrixXd T0(4,4);
-    T0<<1,0,0,0,  0,cos(M_PI/12),-sin(M_PI/12),0,  0,sin(M_PI/12),cos(M_PI/12),0,  0,0,0,1;
-    MatrixXd T1(4,4);
-    T1<<1,0,0,r_camera(0),  0,1,0,r_camera(1),  0,0,1,r_camera(2),  0,0,0,1;
-  MatrixXd T2(4,4);
-  T2<<1,0,0,0,  0,cos(head_pitch),-sin(head_pitch),0,  0,sin(head_pitch),cos(head_pitch),0,  0,0,0,1;
-  MatrixXd T3(4,4);
-  T3<<cos(head_roll),0,sin(head_roll),0,  0,1,0,0,    -sin(head_roll),0,cos(head_roll),roll2pitch,   0,0,0,1;
-  MatrixXd T4(4,4);
-  T4<<cos(head_yaw),-sin(head_yaw),0,0,  sin(head_yaw),cos(head_yaw),0,0,  0,0,1,yaw2roll,  0,0,0,1;
-  MatrixXd T5(4,4);
-  T5<<1,0,0,r_neck(0),  0,1,0,r_neck(1),  0,0,1,r_neck(2),  0,0,0,1;
-  MatrixXd T(4,4);
-  T=T5*T4*T3*T2*T1*T0;
-  VectorXd temp(4); temp<<r_camera,1;
-  temp=T*temp;
-  return temp.block(0,0,3,1);
-
+if(X!=0){r_bottle_cam<<X,Y,Z;}
+r_bottle_shoulder=r_camera2shoulder(r_bottle_cam);
+matrix_view(r_bottle_shoulder);
 
 }
+
+
 
 
 void  SendGazebo(vector<double> q){

@@ -49,15 +49,19 @@ _timeStep=.005;
             YEndMax_Coef=1.15;
             break;
         case 20:
-
             ReferencePelvisHeight=.91;
-            Xe=.06*.8;//0.045;
-            Xs=0.047*.8;//0.045;
+            Xs=0.0201;
+            Xe=0.0480;
+            Yd=0.0701;
+            a_d= -0.3745;
+            zmp_min=0.0075;
+            zmp_max=0.0049;
+            YEndMax_Coef=1.05;
             break;
         case 15:
             ReferencePelvisHeight=.91; //0.92
-            Xs=0.0123;0.025;
-            Xe=0.0369;0.034;0.040;
+            Xs=0.0123;
+            Xe=0.0369;
             Yd=0.0708;
             a_d= -0.4527;
             zmp_min=0.0009; // -0.025
@@ -69,7 +73,7 @@ _timeStep=.005;
         }
 
 
-        AnkleMaximumHeight=.045;0.035;0.03;.03;
+        AnkleMaximumHeight=.045;
 
 
         //times
@@ -89,7 +93,7 @@ _timeStep=.005;
         TGait=TStart+NStride*2*Tc;
         MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
         TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction
-        TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
+        //TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
         TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
         T_end_of_first_SS=1e-4;0;
         T_end_of_SS=      1e-4;0;
