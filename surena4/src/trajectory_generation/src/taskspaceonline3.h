@@ -79,6 +79,7 @@ public:
     double TSS;
     double Tx;
     double TE;
+    double TLastSS;
     double TDs_S;
     double TSS_S_i;
     double TSS_S;

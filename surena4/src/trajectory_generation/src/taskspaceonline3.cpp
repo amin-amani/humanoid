@@ -86,8 +86,9 @@ _timeStep=.005;
         Tc=TSS+TDs;
         Tx=3;
         TE=2;
+        TLastSS=1.3;
         TStart=Tx+TSS/2+Tc;
-        TEnd=TSS+TE;
+        TEnd=TLastSS+TE;
         T_st_p_sx=Tx+Tc; //0.7*TStart;
         T_s_st=Tx+Tc/2+TDs/2;//.5*TStart;
         TGait=TStart+NStride*2*Tc;
@@ -99,10 +100,10 @@ _timeStep=.005;
         T_end_of_SS=      1e-4;0;
         T_end_of_last_SS= 0;1e-4;
         h_end_of_SS=      1e-6;0;
-        T_end_p_sx_rel=TDs+.5*TSS;
+        T_end_p_sx_rel=TDs+.5*TLastSS;
         T_end_p_sx=TGait+T_end_p_sx_rel;
         T_end_a_s=TGait+TDs;
-        T_end_a_e=TGait+Tc;
+        T_end_a_e=TGait+TDs+TLastSS;
         t_toe=0.2*TDs;
         t_heel=0.5*TDs;
 
@@ -584,7 +585,7 @@ YEndMax=YEndMax_Coef*YpMax;
          MatrixXd ordY_e(1,4);
          ordY_e << 5,5,5,5;
          MatrixXd tttY_e(1,5);
-         tttY_e <<TGait+TDs,TGait+TDs+TSS/2,TGait+Tc,TGait+Tc+TE*0.5,TGait+Tc+TE;
+         tttY_e <<TGait+TDs,TGait+TDs+TLastSS/2,TGait+TDs+TLastSS,TGait+TDs+TLastSS+TE*0.5,TGait+TDs+TLastSS+TE;
          MatrixXd conY_e(3,5);
          conY_e<<Yd,YEndMax,Yd,0.001,0,
                  v_d,0,-v_d,0,0,
@@ -790,25 +791,25 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
     }
 
 
-    else if (t>(TDs+TGait) && t<=TGait+TDs+TSS/2){
+    else if (t>(TDs+TGait) && t<=TGait+TDs+TLastSS/2){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(0),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TDs+TGait+TSS/2) && t<=TGait+Tc){
+    else if (t>(TDs+TGait+TLastSS/2) && t<=TGait+TDs+TLastSS){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(1),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+Tc) && t<=TGait+Tc+TE*0.5){
+    else if (t>(TGait+TDs+TLastSS) && t<=TGait+TDs+TLastSS+TE*0.5){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(2),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+Tc+TE*0.5) && t<=TGait+Tc+TE){
+    else if (t>(TGait+TDs+TLastSS+TE*0.5) && t<=TGait+TDs+TLastSS+TE){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(3),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
