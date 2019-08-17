@@ -51,10 +51,84 @@ double lankle_absolute,rankle_absolute;
 double lknee_absolute,rknee_absolute;
 
 
+Robot SURENA;//model of robot & kinematics funcs(IK & FK)
+Robot SURENA_turning_side;
+TaskSpaceOnline3 OnlineTaskSpace;
+QList<LinkM> links;
+MatrixXd PoseRoot;//position of pelvis respected to global coordinate
+MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
+MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
+double GlobalTime;
+double  DurationOfStartPhase;
+double  DurationOfendPhase;
+double shoulderPitchOffset;
+MatrixXd CoefZStart;
+
+ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
+ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
+ros::Publisher pub9; ros::Publisher pub10; ros::Publisher pub11; ros::Publisher pub12;
+ros::Publisher pub13; ros::Publisher pub14; ros::Publisher pub15; ros::Publisher pub16;
+ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher pub20;
+ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
+ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
+ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
+
+MinimumJerkInterpolation CoefGen;
+
+//data of left foot sensor
+int a,b,c,d,e,f,g,h;
+
+double PitchModified;
+
+double AnkleZR,AnkleZL;
+double AnkleZ_offsetR=0;
+double AnkleZ_offsetL=0;
+
+
+int qc_offset[12];
+bool qc_initial_bool;
+
+//
+int bump_pushed[8];
+int bump_notpushed[8];
+int bump_pushed2[8];
+int bump_notpushed2[8];
+
+bool bump_initialize;
+
+int qra_offset[4];
+int qla_offset[4];
+
+int inc_feedback[12];
+int abs_feedback[12];
+double Fzl,Fzr,Mxl,Mxr;
+
+double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
+double pelvis_acceleration[3];
+double pelvis_angularVelocity[3];
+
+double teta_motor_L=0;
+double teta_motor_R=0;//pitch
+double phi_motor_L=0;
+double phi_motor_R=0;//roll
+
+PIDController teta_PID_L;
+PIDController teta_PID_R;
+PIDController phi_PID_L;
+PIDController phi_PID_R;
+
+double k1=0.00004;
+double k2=0.00004;
+double k3=0.00004;
+double k4=0.00004;
+
+double threshold=4;
+double threshold2=100;
+
 double saturate(double a, double min, double max){
-    if(a<min){ROS_INFO("subceeding!");
+    if(a<min){//ROS_INFO("subceeding!");
         return min;}
-    else if(a>max){ROS_INFO("exceeding!");
+    else if(a>max){//ROS_INFO("exceeding!");
         return max;}
     else{return a;}
 }
@@ -110,14 +184,7 @@ double move2pose(double max,double t_local,double T_start ,double T_end){
     return theta;
 }
 
-ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
-ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
-ros::Publisher pub9; ros::Publisher pub10; ros::Publisher pub11; ros::Publisher pub12;
-ros::Publisher pub13; ros::Publisher pub14; ros::Publisher pub15; ros::Publisher pub16;
-ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher pub20;
-ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
-ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
-ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
+
 
 void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
     if(links.count()<28){qDebug()<<"index err";return;}
@@ -215,25 +282,7 @@ int getch()
     return c;
 }
 
-MinimumJerkInterpolation CoefGen;
 
-//data of left foot sensor
-int a,b,c,d,e,f,g,h;
-
-double PitchModified;
-
-double AnkleZR,AnkleZL;
-double AnkleZ_offsetR=0;
-double AnkleZ_offsetL=0;
-
-
-int qc_offset[12];
-bool qc_initial_bool;
-
-//
-int bump_pushed[8];
-int bump_notpushed[8];
-bool bump_initialize;
 void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
 {
     if (msg.data.size()!=8) {
@@ -249,16 +298,48 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     //ROS_INFO("I heard: [%d  %d %d %d %d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3],(int)msg.data[4],(int)msg.data[5],(int)msg.data[6],(int)msg.data[7]);
     int temp[8];
 
-    //    bump_pushed[0]=1094;bump_pushed[1]= 844;bump_pushed[2]=3129;bump_pushed[3]=3005;
-    //    bump_pushed[4]=3126;bump_pushed[5]=2920;bump_pushed[6]=1212;bump_pushed[7]=920;
 
-    //    bump_notpushed[0]=1012;bump_notpushed[1]= 931;bump_notpushed[2]=3037;bump_notpushed[3]=3098;
-    //    bump_notpushed[4]=3042;bump_notpushed[5]=3009;bump_notpushed[6]=1120;bump_notpushed[7]=1015;
+//    bump_pushed[0]=1100;bump_pushed[1]= 835;bump_pushed[2]=3140;bump_pushed[3]=2994;
+//    bump_pushed[4]=3132;bump_pushed[5]=2916;bump_pushed[6]=1203;bump_pushed[7]=916;
+//    bump_notpushed[0]=1012;bump_notpushed[1]= 928;bump_notpushed[2]=3033;bump_notpushed[3]=3097;
+//    bump_notpushed[4]=3036;bump_notpushed[5]=3006;bump_notpushed[6]=1107;bump_notpushed[7]=1015;
 
-    bump_pushed[0]=1100;bump_pushed[1]= 835;bump_pushed[2]=3140;bump_pushed[3]=2994;
-    bump_pushed[4]=3132;bump_pushed[5]=2916;bump_pushed[6]=1203;bump_pushed[7]=916;
-    bump_notpushed[0]=1012;bump_notpushed[1]= 928;bump_notpushed[2]=3033;bump_notpushed[3]=3097;
-    bump_notpushed[4]=3036;bump_notpushed[5]=3006;bump_notpushed[6]=1107;bump_notpushed[7]=1015;
+    if (GlobalTime<1){
+        for (int i = 0; i < 8; ++i) {
+            bump_pushed[i]=msg.data[i];
+        }
+    }
+    if(left_first){
+    if(fabs(GlobalTime-(DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.TSS/2))<.2){
+        for (int i = 0; i < 4; ++i) {
+            bump_notpushed[i]=msg.data[i];
+        }
+    }
+
+    if(fabs(GlobalTime-(DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2))<.2){
+        for (int i = 4; i < 8; ++i) {
+            bump_notpushed[i]=msg.data[i];
+        }
+    }
+     }
+    else{
+        if(fabs(GlobalTime-(DurationOfStartPhase+OnlineTaskSpace.TStart-OnlineTaskSpace.TSS/2))<.2){
+            for (int i = 4; i < 8; ++i) {
+                bump_notpushed[i]=msg.data[i];
+            }
+        }
+
+        if(fabs(GlobalTime-(DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS/2))<.2){
+            for (int i = 0; i < 4; ++i) {
+                bump_notpushed[i]=msg.data[i];
+            }
+        }
+    }
+
+//    for (int i = 0; i < 8; ++i) {
+//        qDebug()<<i<<"\t"<<bump_pushed2[i]<<"("<<bump_pushed[i]<<")\t"<<bump_notpushed2[i]<<"("<<bump_notpushed[i]<<")";
+//    }
+
 
     temp[0]=msg.data[0]-bump_notpushed[0];
     temp[1]=-1*(msg.data[1]-bump_notpushed[1]);
@@ -290,10 +371,7 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     if (a<0){a=0;} if (b<0){b=0;} if (c<0){c=0;} if (d<0){d=0;}
     if (e<0){e=0;} if (f<0){f=0;} if (g<0){g=0;} if (h<0){h=0;}
 }
-int qra_offset[4];
-int qla_offset[4];
 
-int inc_feedback[12];
 void qc_initial(const sensor_msgs::JointState & msg){
     //    for (int i = 0; i < 12; ++i) {
     //        inc_feedback[i]=int(msg.position[i+1]);
@@ -330,7 +408,7 @@ void qc_initial(const sensor_msgs::JointState & msg){
 
 }
 
-int abs_feedback[12];
+
 void abs_feedback_func(const sensor_msgs::JointState & msg){
 //    for (int i = 0; i < 12; ++i) {
 //        abs_feedback[i]=int(msg.position[i+1]);
@@ -344,7 +422,7 @@ void abs_feedback_func(const sensor_msgs::JointState & msg){
 
 }
 
-double Fzl,Fzr,Mxl,Mxr;
+
 void FT_left_feedback(const geometry_msgs::Wrench &msg){
     Fzl=msg.force.z;
     Mxl=msg.torque.y;
@@ -382,9 +460,6 @@ double quaternion2euler_roll(double q0,double q1,double q2,double q3){
 }
 
 
-double pelvis_orientation_pitch,pelvis_orientation_roll,pelvis_orientation_yaw;
-double pelvis_acceleration[3];
-double pelvis_angularVelocity[3];
 
 void imu_data_process(const sensor_msgs::Imu &msg){
     //MatrixXd R_pelvis(3,3);
@@ -398,6 +473,8 @@ void imu_data_process(const sensor_msgs::Imu &msg){
     pelvis_angularVelocity[0]=msg.angular_velocity.x;
     pelvis_angularVelocity[1]=msg.angular_velocity.y;
     pelvis_angularVelocity[2]=msg.angular_velocity.z;
+ // qDebug()<<pelvis_orientation_roll<<"\t"<<pelvis_orientation_pitch<<"\t"<<pelvis_orientation_yaw;
+
 }
 
 
@@ -454,18 +531,7 @@ void ankle_states(const gazebo_msgs::LinkStates& msg){
 }
 
 
-Robot SURENA;//model of robot & kinematics funcs(IK & FK)
-Robot SURENA_turning_side;
-TaskSpaceOnline3 OnlineTaskSpace;
-QList<LinkM> links;
-MatrixXd PoseRoot;//position of pelvis respected to global coordinate
-MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
-MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
-double GlobalTime;
-double  DurationOfStartPhase;
-double  DurationOfendPhase;
-double shoulderPitchOffset;
-MatrixXd CoefZStart;
+
 void StartPhase(){
     if ( GlobalTime<=DurationOfStartPhase) {
 
@@ -547,23 +613,7 @@ void EndPhase(){
 }
 
 
-double teta_motor_L=0;
-double teta_motor_R=0;//pitch
-double phi_motor_L=0;
-double phi_motor_R=0;//roll
 
-PIDController teta_PID_L;
-PIDController teta_PID_R;
-PIDController phi_PID_L;
-PIDController phi_PID_R;
-
-double k1=0.00004;
-double k2=0.00004;
-double k3=0.00004;
-double k4=0.00004;
-
-double threshold=4;
-double threshold2=100;
 void ankleOrientationAdaptationLeft(){
     //parameters of ankle adaptation
     if(a>threshold2 &&b>threshold2&&c>threshold2&&d>threshold2){
@@ -708,7 +758,7 @@ int main(int argc, char **argv)
     // ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
       ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
-    // ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
+     ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
     if(simulation){//gazebo publishers
         pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
         pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
@@ -814,6 +864,9 @@ int main(int argc, char **argv)
 
             if (adapt_time>OnlineTaskSpace.TDs&&adapt_time<OnlineTaskSpace.Tc+OnlineTaskSpace.TDs/2) {
                 ankleOrientationAdaptationRight();
+//                if (fabs(adapt_time-(OnlineTaskSpace.Tc+OnlineTaskSpace.TDs/2))<.005) {
+//                    ROS_INFO("%f I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]",GlobalTime, a,b,c,d,e,f,g,h);
+//        }
             }
             else{
                 teta_motor_R+=phi_PID_R.Calculate(0,teta_motor_R);
@@ -821,6 +874,10 @@ int main(int argc, char **argv)
             }
             if (adapt_time<OnlineTaskSpace.TDs/2||adapt_time>OnlineTaskSpace.Tc+OnlineTaskSpace.TDs) {
                 ankleOrientationAdaptationLeft();
+                //            if (fabs(adapt_time-(OnlineTaskSpace.Tc+OnlineTaskSpace.TDs))<.005){
+                //                ROS_INFO("%f I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]",GlobalTime, a,b,c,d,e,f,g,h);
+                //            }
+
             }
             else{
                 teta_motor_L+=phi_PID_L.Calculate(0,teta_motor_L);
@@ -833,6 +890,8 @@ int main(int argc, char **argv)
             teta_motor_L+=phi_PID_L.Calculate(0,teta_motor_L);
             phi_motor_L+=phi_PID_L.Calculate(0,phi_motor_L);
         }
+
+
 
 
         StartPhase();
@@ -1376,7 +1435,7 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-                // ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+//                 ROS_INFO("%f I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]",GlobalTime, a,b,c,d,e,f,g,h);
             //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
             //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
