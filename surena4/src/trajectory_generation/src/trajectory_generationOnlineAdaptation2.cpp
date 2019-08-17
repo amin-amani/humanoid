@@ -32,7 +32,7 @@
 using namespace  std;
 using namespace  Eigen;
 
-bool left_first=!true;//right support in first step
+bool left_first=true;//right support in first step
 bool backward=false;
 bool turning=false;
 double TurningRadius=1;//for on spot .01;
@@ -41,9 +41,9 @@ int bump_threshold=75;//75 85;
 bool simulation=false;
 bool AnkleZAdaptation=!false;
 bool LogDataSend=false;
-double ankle_adaptation_switch=0;// 1 for activating adaptation 0 for siktiring adaptation
+double ankle_adaptation_switch=1;// 1 for activating adaptation 0 for siktiring adaptation
 double k_pitch=0*.8;//1;0.8;
-double pelvis_roll_range=1;
+double pelvis_roll_range=1; //1
 
 double rankle_inc,lankle_inc;
 double lknee_inc,rknee_inc;
@@ -52,8 +52,10 @@ double lknee_absolute,rknee_absolute;
 
 
 double saturate(double a, double min, double max){
-    if(a<min){return min;ROS_INFO("subceeding!");}
-    else if(a>max){return max;ROS_INFO("exceeding!");}
+    if(a<min){ROS_INFO("subceeding!");
+        return min;}
+    else if(a>max){ROS_INFO("exceeding!");
+        return max;}
     else{return a;}
 }
 
@@ -253,10 +255,10 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     //    bump_notpushed[0]=1012;bump_notpushed[1]= 931;bump_notpushed[2]=3037;bump_notpushed[3]=3098;
     //    bump_notpushed[4]=3042;bump_notpushed[5]=3009;bump_notpushed[6]=1120;bump_notpushed[7]=1015;
 
-    bump_pushed[0]=1098;bump_pushed[1]= 837;bump_pushed[2]=3129;bump_pushed[3]=3000;
-    bump_pushed[4]=3119;bump_pushed[5]=2907;bump_pushed[6]=1205;bump_pushed[7]=916;
-    bump_notpushed[0]=1018;bump_notpushed[1]= 930;bump_notpushed[2]=3033;bump_notpushed[3]=3098;
-    bump_notpushed[4]=3042;bump_notpushed[5]=3005;bump_notpushed[6]=1115;bump_notpushed[7]=1015;
+    bump_pushed[0]=1100;bump_pushed[1]= 835;bump_pushed[2]=3140;bump_pushed[3]=2994;
+    bump_pushed[4]=3132;bump_pushed[5]=2916;bump_pushed[6]=1203;bump_pushed[7]=916;
+    bump_notpushed[0]=1012;bump_notpushed[1]= 928;bump_notpushed[2]=3033;bump_notpushed[3]=3097;
+    bump_notpushed[4]=3036;bump_notpushed[5]=3006;bump_notpushed[6]=1107;bump_notpushed[7]=1015;
 
     temp[0]=msg.data[0]-bump_notpushed[0];
     temp[1]=-1*(msg.data[1]-bump_notpushed[1]);
@@ -590,8 +592,8 @@ void ankleOrientationAdaptationLeft(){
             if (abs(a-d)<120) {phi_motor_L=1*phi_motor_L+k2*(d-a);}
         }
     }
-    phi_motor_L=saturate(phi_motor_L,-M_PI/18,M_PI/18);
-    teta_motor_L=saturate(teta_motor_L,-M_PI/18,M_PI/18);
+    phi_motor_L=saturate(phi_motor_L,-M_PI/90,M_PI/90);
+    teta_motor_L=saturate(teta_motor_L,-M_PI/90,M_PI/90);
 }
 void ankleOrientationAdaptationRight(){
     if(e>threshold2 &&f>threshold2&&g>threshold2&&h>threshold2){
@@ -624,8 +626,8 @@ void ankleOrientationAdaptationRight(){
     }
 
 
-    phi_motor_R=saturate(phi_motor_R,-M_PI/18,M_PI/18);
-    teta_motor_R=saturate(teta_motor_R,-M_PI/18,M_PI/18);
+    phi_motor_R=saturate(phi_motor_R,-M_PI/90,M_PI/90);
+    teta_motor_R=saturate(teta_motor_R,-M_PI/90,M_PI/90);
     //------------------------saturation of ankle motors----------------------------//
 
 
@@ -640,8 +642,8 @@ int main(int argc, char **argv)
     if(turning&&TurningRadius<.2){OnlineTaskSpace.StepLength=TurningRadius/16*M_PI;}
 
     if(sidewalk||(turning&&TurningRadius<.2)){
-        OnlineTaskSpace.Xe=0;
-        OnlineTaskSpace.Xs=0;
+//        OnlineTaskSpace.Xe=0;
+//        OnlineTaskSpace.Xs=0;
         OnlineTaskSpace.side_extra_step_length=true;
         OnlineTaskSpace.CoeffArrayPelvis();
         OnlineTaskSpace.CoeffArrayAnkle();
@@ -1068,6 +1070,7 @@ int main(int argc, char **argv)
                         -sin(PoseRFoot(4)),0,cos(PoseRFoot(4));
 
          double alpha=.9;
+         if(sidewalk){alpha=1;}
          double time_margin=.01;
          double coef_y_la;
          double coef_y_ra;
@@ -1089,6 +1092,7 @@ int main(int argc, char **argv)
          PoseLFoot(1)=PoseLFoot(1)*coef_y_la;
 PoseRFoot(1)=PoseRFoot(1)*coef_y_ra;
 PoseRoot(1)=PoseRoot(1)*coef_y_p;
+
 
                 if(!turning && !sidewalk)
                 {
@@ -1140,7 +1144,7 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
                 }
 
                 if(sidewalk){
-                    double side_move_coef=.05/2/OnlineTaskSpace.StepLength;
+                    double side_move_coef=0.5;//.08/2/OnlineTaskSpace.StepLength;
 
 
                     //*****************************
@@ -1152,7 +1156,7 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
 
                     PoseRFoot(1,0)=PoseRFoot(1,0)+side_move_coef*PoseRFoot(0,0);
                     PoseRFoot(0,0)=0;
-                    cout<<GlobalTime<<"\t"<<PoseRoot(1)<<"\t"<<PoseRFoot(1)<<"\t"<<PoseLFoot(1)<<endl;
+                  //  cout<<GlobalTime<<"\t"<<PoseRoot(1)<<"\t"<<PoseRFoot(1)<<"\t"<<PoseLFoot(1)<<endl;
 
                     SURENA_turning_side.doIK("LLeg_AnkleR_J6",PoseLFoot,R_F_L,"Body", PoseRoot,R_P);
                     SURENA_turning_side.doIK("RLeg_AnkleR_J6",PoseRFoot,R_F_R,"Body", PoseRoot,R_P);
@@ -1372,7 +1376,7 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
         if(count%20==0){ //use to print once in n steps
             // ROS_INFO("");
             //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-//                 ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+                // ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
             //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
             //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
             //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;

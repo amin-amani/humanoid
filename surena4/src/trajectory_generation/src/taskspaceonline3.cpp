@@ -13,7 +13,7 @@ _timeStep=.005;
 
     NStep=NStride*2;
 
-    StepLength=.15;
+    StepLength=.25;
     XofAnkleMaximumHeight=StepLength*1.8;
         switch (int(StepLength*100)) {
         case 45://ff
@@ -42,8 +42,8 @@ _timeStep=.005;
             Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
             XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
-            Yd=.0562+0.008;
-            a_d= -.438;
+            Yd=.0562+0.008; //+0.008
+            a_d=-.438;
             zmp_min=-0.025; // -0.025
             zmp_max=0.025; // 0.025
             YEndMax_Coef=1.15;
@@ -53,7 +53,7 @@ _timeStep=.005;
             Xs=0.0201;
             Xe=0.0480;
             Yd=0.0701;
-            a_d= -0.3745;
+            a_d=-0.3745;
             zmp_min=0.0075;
             zmp_max=0.0049;
             YEndMax_Coef=1.05;
@@ -63,7 +63,7 @@ _timeStep=.005;
             Xs=0.0123;
             Xe=0.0369;
             Yd=0.0708;
-            a_d= -0.4527;
+            a_d=-0.4527;
             zmp_min=0.0009; // -0.025
             zmp_max=0.0174; // 0.025
             YEndMax_Coef=1.05;
@@ -93,7 +93,7 @@ _timeStep=.005;
         TGait=TStart+NStride*2*Tc;
         MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
         TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction
-        //TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
+        TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
         TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
         T_end_of_first_SS=1e-4;0;
         T_end_of_SS=      1e-4;0;
