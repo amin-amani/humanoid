@@ -46,7 +46,7 @@ _timeStep=.005;
             a_d=-.438;
             zmp_min=-0.025; // -0.025
             zmp_max=0.025; // 0.025
-            YEndMax_Coef=1.15;
+            YEndMax_Coef=1.1;
             break;
         case 20:
             ReferencePelvisHeight=.91;
@@ -85,8 +85,8 @@ _timeStep=.005;
         TStartofAnkleAdaptation=Tm2;//0.75*TSS; // Tm2 (ver43)
         Tc=TSS+TDs;
         Tx=3;
-        TE=2;
-        TLastSS=1.3;
+        TE=3;
+        TLastSS=.7;
         TStart=Tx+TSS/2+Tc;
         TEnd=TLastSS+TE;
         T_st_p_sx=Tx+Tc; //0.7*TStart;
@@ -587,7 +587,7 @@ YEndMax=YEndMax_Coef*YpMax;
          MatrixXd tttY_e(1,5);
          tttY_e <<TGait+TDs,TGait+TDs+TLastSS/2,TGait+TDs+TLastSS,TGait+TDs+TLastSS+TE*0.5,TGait+TDs+TLastSS+TE;
          MatrixXd conY_e(3,5);
-         conY_e<<Yd,YEndMax,Yd,0.001,0,
+         conY_e<<Yd,YEndMax,Yd,-0.03,0,
                  v_d,0,-v_d,0,0,
                  a_d,a_p_max,a_d,0,0;
 
