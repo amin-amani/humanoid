@@ -960,6 +960,7 @@ int main(int argc, char **argv)
                 if(!AnkleZAdaptation){AnkleZL=m3;AnkleZR=m7;}
                 else{
                     double local_time_cycle=0;
+                    //first step just stopping left
                     if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.TStart){
                         AnkleZR=m7;
                         if(GlobalTime-DurationOfStartPhase<OnlineTaskSpace.Tx+OnlineTaskSpace.Tc){
@@ -983,15 +984,17 @@ int main(int argc, char **argv)
 
                         }
                     }
+                   //cyle z
                     else if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs){
                         local_time_cycle=fmod(GlobalTime-DurationOfStartPhase-OnlineTaskSpace.TStart,2*OnlineTaskSpace.Tc);
 
-
+                        //right foot up
                         if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TStartofAnkleAdaptation){
                             rightzstop=false;
                             AnkleZR=m7;
                             AnkleZ_offsetR=0;
                         }
+                        //right foot stop
                         else if(local_time_cycle<=OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
                             if(!rightzstop){
                                 if(((!left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
@@ -1014,17 +1017,18 @@ int main(int argc, char **argv)
                                 }
                             }
                         }
-
+                        // takhlie pye rast
                         else if(local_time_cycle<=2*OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.TStartofAnkleAdaptation){
                             AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,local_time_cycle,OnlineTaskSpace.Tc,OnlineTaskSpace.Tc+OnlineTaskSpace.TDs);
 
                         }
 
-
+                        // takhlie pye chap
                         if(local_time_cycle<=OnlineTaskSpace.Tc-OnlineTaskSpace.TSS+OnlineTaskSpace.TStartofAnkleAdaptation){
                             AnkleZL=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetL-move2pose(AnkleZ_offsetL,local_time_cycle,0,OnlineTaskSpace.TDs);
 
                         }
+                        //left foot swing
                         else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TStartofAnkleAdaptation){
                             leftzstop=false;
                             AnkleZL=m3;
@@ -1032,7 +1036,7 @@ int main(int argc, char **argv)
                         }
                         else if(local_time_cycle<=OnlineTaskSpace.Tc+OnlineTaskSpace.TDs+OnlineTaskSpace.TSS){
                             if(!leftzstop){
-
+//left foot stop
                                 if(((left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((!left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
 
                                     leftzstop=true;
@@ -1055,6 +1059,86 @@ int main(int argc, char **argv)
                                 }
                             }
                         }
+
+                    }
+                    //                    else if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.MotionTime){
+
+                    //                        //right foot up
+                    //                        if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.5*OnlineTaskSpace.TLastSS){
+                    //                            rightzstop=false;
+                    //                            AnkleZR=m7;
+                    //                            AnkleZ_offsetR=0;
+                    //                        }
+
+                    //                        //right foot stop
+                    //                       else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE){
+                    //                            if(!rightzstop){
+                    //                                if(((!left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
+                    //                                    rightzstop=true;
+                    //                                    AnkleZR=m7;
+                    //                                    AnkleZR+=AnkleZ_offsetR;
+                    //                                    AnkleZ_offsetR=AnkleZR-OnlineTaskSpace._lenghtOfAnkle;
+                    //                                    qDebug()<<"rightzstop=true AnkleZR="<<AnkleZR<<"offset="<<AnkleZ_offsetR;
+                    //                                    ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+
+                    //                                }
+                    //                                else{AnkleZR=m7;
+                    //                                    AnkleZR+=AnkleZ_offsetR;
+
+
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                        // takhlie pye rast
+                    //                        else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime){
+                    //                            AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE,OnlineTaskSpace.MotionTime);
+
+                    //                        }
+
+
+
+
+                    //                    }
+                    //                    else{
+                    //                        AnkleZR=m7;
+                    //                        AnkleZL=m3;
+                    //                    }
+                    else if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.MotionTime){
+
+                        //right foot up
+                        if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.5*OnlineTaskSpace.TLastSS){
+                            rightzstop=false;
+                            AnkleZR=m7;
+                            AnkleZ_offsetR=0;
+                        }
+
+                        //right foot stop
+                       else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE/4){
+                            if(!rightzstop){
+                                if(((!left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
+                                    rightzstop=true;
+                                    AnkleZR=m7;
+                                    AnkleZR+=AnkleZ_offsetR;
+                                    AnkleZ_offsetR=AnkleZR-OnlineTaskSpace._lenghtOfAnkle;
+                                    qDebug()<<"rightzstop=true AnkleZR="<<AnkleZR<<"offset="<<AnkleZ_offsetR;
+                                    ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
+
+                                }
+                                else{AnkleZR=m7;
+                                    AnkleZR+=AnkleZ_offsetR;
+
+
+                                }
+                            }
+                        }
+                        // takhlie pye rast
+                        else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime){
+                            AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE,OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE*.75);
+
+                        }
+
+
+
 
                     }
                     else{

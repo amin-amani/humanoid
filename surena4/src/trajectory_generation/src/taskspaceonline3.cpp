@@ -3,7 +3,7 @@
 TaskSpaceOnline3::TaskSpaceOnline3()
 {
 _timeStep=.005;
-    NStride=3;
+    NStride=1;
     LeftHipRollModification= 2;3.2;3.1;2.7;2;
     RightHipRollModification=2;3.2;3.1;2.7;2;
     FirstHipRollModification=2;3.2;3.1;2.7;2;
@@ -85,8 +85,8 @@ _timeStep=.005;
         TStartofAnkleAdaptation=Tm2;//0.75*TSS; // Tm2 (ver43)
         Tc=TSS+TDs;
         Tx=3;
-        TE=3;
-        TLastSS=.7;
+        TE=24; //3
+        TLastSS=1;
         TStart=Tx+TSS/2+Tc;
         TEnd=TLastSS+TE;
         T_st_p_sx=Tx+Tc; //0.7*TStart;
@@ -581,19 +581,37 @@ double v_Ds=3*A_Ds*TDs*TDs+a_0*TDs+C_Ds;
          Cy_p_S.fill(0);
 
     // -------------------Coefficient of End of Pelvis motion in y direction--------------
-YEndMax=YEndMax_Coef*YpMax;
+//YEndMax=YEndMax_Coef*YpMax;
+//YEndMax=0.1;
+//         MatrixXd ordY_e(1,2);
+//         ordY_e << 5,5;
+//         MatrixXd tttY_e(1,3);
+//         tttY_e <<TGait+TDs,TGait+TDs+TLastSS/2,TGait+TDs+TLastSS+TE;
+//         MatrixXd conY_e(3,3);
+//         conY_e<<Yd,YEndMax,0,
+//                 v_d,0,0,
+//                 a_d,0,0;
+
+//              Cy_p_i_E.resize(2,6);
+//              Cy_p_i_E.fill(0);
+//              Cy_p_i_E.block(0,0,2,6)=CoefOffline.Coefficient1(tttY_e,ordY_e,conY_e,0.1).transpose();//.block(0,1,8,5)
+
+
+         YEndMax=YEndMax_Coef*YpMax;
+         YEndMax=0.1;
          MatrixXd ordY_e(1,4);
          ordY_e << 5,5,5,5;
          MatrixXd tttY_e(1,5);
-         tttY_e <<TGait+TDs,TGait+TDs+TLastSS/2,TGait+TDs+TLastSS,TGait+TDs+TLastSS+TE*0.5,TGait+TDs+TLastSS+TE;
+         tttY_e <<TGait+TDs,TGait+TDs+TLastSS/2,TGait+TDs+TLastSS+0.25*TE,TGait+TDs+TLastSS+0.5*TE,TGait+TDs+TLastSS+TE;
          MatrixXd conY_e(3,5);
-         conY_e<<Yd,YEndMax,Yd,-0.03,0,
-                 v_d,0,-v_d,0,0,
-                 a_d,a_p_max,a_d,0,0;
+         conY_e<<Yd,YEndMax,-YpMax,YpMax,0,
+                 v_d,0,0,0,0,
+                 a_d,0,0,0,0;
 
-              Cy_p_i_E.resize(4,6);
-              Cy_p_i_E.fill(0);
-              Cy_p_i_E.block(0,0,4,6)=CoefOffline.Coefficient1(tttY_e,ordY_e,conY_e,0.1).transpose();//.block(0,1,8,5)
+         Cy_p_i_E.resize(4,6);
+         Cy_p_i_E.fill(0);
+         Cy_p_i_E.block(0,0,4,6)=CoefOffline.Coefficient1(tttY_e,ordY_e,conY_e,0.1).transpose();//.block(0,1,8,5)
+
 
 }
 
@@ -797,24 +815,36 @@ MatrixXd TaskSpaceOnline3::PelvisTrajectory(double time){
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TDs+TGait+TLastSS/2) && t<=TGait+TDs+TLastSS){
+    else if (t>(TDs+TGait+TLastSS/2) && t<=TGait+TDs+TLastSS+0.25*TE){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(1),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+TDs+TLastSS) && t<=TGait+TDs+TLastSS+TE*0.5){
+    else if (t>(TDs+TGait+TLastSS+0.25*TE) && t<=TGait+TDs+TLastSS+0.5*TE){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(2),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
-    else if (t>(TGait+TDs+TLastSS+TE*0.5) && t<=TGait+TDs+TLastSS+TE){
+    else if (t>(TDs+TGait+TLastSS+0.5*TE) && t<=TGait+TDs+TLastSS+TE){
         MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(3),t,0,5);
         yp=output(0,0);
         dyp=output(0,1);
         ddyp=output(0,2);
     }
+//    else if (t>(TGait+TDs+TLastSS) && t<=TGait+TDs+TLastSS+TE*0.5){
+//        MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(2),t,0,5);
+//        yp=output(0,0);
+//        dyp=output(0,1);
+//        ddyp=output(0,2);
+//    }
+//    else if (t>(TGait+TDs+TLastSS+TE*0.5) && t<=TGait+TDs+TLastSS+TE){
+//        MatrixXd output=CoefOffline.GetAccVelPos(Cy_p_i_E.row(3),t,0,5);
+//        yp=output(0,0);
+//        dyp=output(0,1);
+//        ddyp=output(0,2);
+//    }
 
 
     else{
