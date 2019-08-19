@@ -85,7 +85,7 @@ _timeStep=.005;
         TStartofAnkleAdaptation=Tm2;//0.75*TSS; // Tm2 (ver43)
         Tc=TSS+TDs;
         Tx=3;
-        TE=24; //3
+        TE=12; //3
         TLastSS=1;
         TStart=Tx+TSS/2+Tc;
         TEnd=TLastSS+TE;
@@ -239,7 +239,7 @@ MatrixXd TaskSpaceOnline3::RollAngleModification(double time){
     double DechargeCoeffLeftEnd = 1+dt2;            //<1 before DS ends; >1 after SS start
     double ChargeCoeffLeftStartEndPhase =0.8; 0.4+dt;  //after DS start
     double ChargeCoeffLeftEndEndPhase =1.3; 1;      //<1 before DS ends; >1 after SS start
-    double DechargeCoeffLeftStartEndPhase = 0.6;//must be bigger than 0.5; end foot pairing DS
+    double DechargeCoeffLeftStartEndPhase =.4;// 0.6;//must be bigger than 0.5; end foot pairing DS
     double DechargeCoeffLeftEndEndPhase = 0.8;  //must be greata
 
 double KStartStartPhase=0.1;
@@ -295,7 +295,7 @@ double EndStartPhaseRatio=(Tx+TSS/2+TDs+KEndStartPhase*TSS)/(Tx+Tc+0.5*TSS);
     rollL=rollL+RollCharge(t,TStart+ChargeCoeffLeftStart*TDs,TStart+ChargeCoeffLeftEnd*TDs,D_teta_l)+
             RollDecharge(t,TStart+Tc+DechargeCoeffLeftStart*TDs,TStart+Tc+DechargeCoeffLeftEnd*TDs,D_teta_l)+
             RollCharge(t,TStart+2*Tc+ChargeCoeffLeftStartEndPhase*TDs,TStart+2*Tc+ChargeCoeffLeftEndEndPhase*TDs,D_teta_l)+
-            RollDecharge(t,TStart+2*Tc+TDs+DechargeCoeffLeftStartEndPhase*TEnd,TStart+2*Tc+TDs+DechargeCoeffLeftEndEndPhase*TEnd,D_teta_l);
+            RollDecharge(t,TStart+2*Tc+TDs+TLastSS+DechargeCoeffLeftStartEndPhase*TDs,TStart+2*Tc+TDs+TLastSS+DechargeCoeffLeftEndEndPhase*TDs,D_teta_l);
 
     rollR=rollR+RollCharge(t,ChargeCoeffRightStartStartPhase*TStart,ChargeCoeffRightEndStartPhase*TStart,D_teta_r)+
             RollDecharge(t,TStart+DechargeCoeffRightStartStartPhase*TDs,TStart+DechargeCoeffRightEndStartPhase*TDs,D_teta_r)+
