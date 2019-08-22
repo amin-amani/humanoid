@@ -8,16 +8,19 @@ project(trajectory_generation)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 ##find_package(catkin REQUIRED)
-find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    std_msgs
-     std_msgs message_generation
-     sensor_msgs
-     geometry_msgs
-     rqt_gui_cpp
-     rqt_gui
+find_package(catkin REQUIRED COMPONENTS  roscpp sensor_msgs interactive_markers  visualization_msgs  tf   message_generation message_runtime)
 
-  )
+#find_package(catkin REQUIRED COMPONENTS
+#    roscpp
+#    std_msgs
+#     std_msgs
+#     message_generation
+#     sensor_msgs
+#     geometry_msgs
+#     rqt_gui_cpp
+#     rqt_gui
+
+#  )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -97,6 +100,14 @@ find_package(catkin REQUIRED COMPONENTS
 #   cfg/DynReconf1.cfg
 #   cfg/DynReconf2.cfg
 # )
+#add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES num.msg)
+add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES walk.srv)
+### Generate added messages and services with any dependencies listed here
+ generate_messages(
+   DEPENDENCIES
+   std_msgs  # Or other packages containing msgs
+   #std_srvs
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -363,14 +374,33 @@ target_link_libraries(hand_trajectory_offlinePublisher
 )
 install(TARGETS hand_trajectory_offlinePublisher RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-add_executable(malek_IK_test src/malek_IK_test.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(malek_IK_test
+add_executable(head_trajectory_follow src/head_trajectory_follow.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(head_trajectory_follow
     ${catkin_LIBRARIES}
     Qt5::Core
     Qt5::Widgets
     Qt5::PrintSupport
 )
-install(TARGETS malek_IK_test RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS head_trajectory_follow RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(hand_trajectory_wholebody_grip src/hand_trajectory_wholebody_grip.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_wholebody_grip
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_wholebody_grip RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(hand_trajectory_home src/hand_trajectory_home.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(hand_trajectory_home
+    ${catkin_LIBRARIES}
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::PrintSupport
+)
+install(TARGETS hand_trajectory_home RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 #add_executable(hand_trajectory_shaking src/hand_trajectory_shaking.cpp ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 #target_link_libraries(hand_trajectory_shaking
 #    ${catkin_LIBRARIES}

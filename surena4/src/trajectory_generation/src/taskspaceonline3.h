@@ -328,6 +328,7 @@ public:
     MatrixXd Cz_mod_st_p;
  bool side_extra_step_length=false;
 
+    TaskSpaceOnline3(int N_s, double Ds);
     TaskSpaceOnline3();
 
     void SetParameters();

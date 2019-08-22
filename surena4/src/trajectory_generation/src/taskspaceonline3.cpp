@@ -1,9 +1,9 @@
 #include "taskspaceonline3.h"
 
-TaskSpaceOnline3::TaskSpaceOnline3()
+TaskSpaceOnline3::TaskSpaceOnline3(int N_s, double Ds)
 {
 _timeStep=.005;
-    NStride=1;
+    NStride=N_s;
     LeftHipRollModification= 2;3.2;3.1;2.7;2;
     RightHipRollModification=2;3.2;3.1;2.7;2;
     FirstHipRollModification=2;3.2;3.1;2.7;2;
@@ -13,7 +13,7 @@ _timeStep=.005;
 
     NStep=NStride*2;
 
-    StepLength=.25;
+    StepLength=Ds;
     XofAnkleMaximumHeight=StepLength*1.8;
         switch (int(StepLength*100)) {
         case 45://ff
@@ -112,6 +112,121 @@ _timeStep=.005;
     CoeffArrayPelvis();
 
 }
+
+TaskSpaceOnline3::TaskSpaceOnline3()
+{
+_timeStep=.005;
+    NStride=3;
+    LeftHipRollModification= 2;3.2;3.1;2.7;2;
+    RightHipRollModification=2;3.2;3.1;2.7;2;
+    FirstHipRollModification=2;3.2;3.1;2.7;2;
+    HipPitchModification=1;//2;
+    beta_toe=7*M_PI/18*0;
+    beta_heel=-1*M_PI/18*0;
+
+    NStep=NStride*2;
+
+    StepLength=25;
+    XofAnkleMaximumHeight=StepLength*1.8;
+        switch (int(StepLength*100)) {
+        case 45://ff
+            ReferencePelvisHeight=.8;
+            Xe=0.092;
+            Xs=0.092;
+            break;
+        case 40://ff
+            ReferencePelvisHeight=.835;
+            Xe=0.083;
+            Xs=0.083;
+            break;
+        case 35://ff
+            ReferencePelvisHeight=.86;
+            Xe=0.073;
+            Xs=0.073;
+            break;
+        case 30:
+           // YStMax=.06;
+            ReferencePelvisHeight=.885;
+            Xe=0.065;
+            Xs=0.065;
+            break;
+        case 25:
+                ReferencePelvisHeight=.91; // 0.913 is gouth for xe=0.06 and xs=0.047
+            Xe=0.06;// 0.06 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            Xs=0.047;// 0.047 is gouth for anklepitch=0 and zmp_min=-0.025 , zmp_max=0.025
+            XofAnkleMaximumHeight=StepLength*1.8; //1.9 would cause overshoot in x-direction of ankle trajectory
+            Yd=.0562+0.008; //+0.008
+            a_d=-.438;
+            zmp_min=-0.025; // -0.025
+            zmp_max=0.025; // 0.025
+            YEndMax_Coef=1.1;
+            break;
+        case 20:
+            ReferencePelvisHeight=.91;
+            Xs=0.0201;
+            Xe=0.0480;
+            Yd=0.0701;
+            a_d=-0.3745;
+            zmp_min=0.0075;
+            zmp_max=0.0049;
+            YEndMax_Coef=1.05;
+            break;
+        case 15:
+            ReferencePelvisHeight=.91; //0.92
+            Xs=0.0123;
+            Xe=0.0369;
+            Yd=0.0708;
+            a_d=-0.4527;
+            zmp_min=0.0009; // -0.025
+            zmp_max=0.0174; // 0.025
+            YEndMax_Coef=1.05;
+            break;
+        default:
+            break;
+        }
+
+
+        AnkleMaximumHeight=.045;
+
+
+        //times
+        TDs =0.7;
+        TSS=0.9;
+        Tm1=.4*TSS;//0.28
+        Tm2=0.68*TSS;
+        TStartofHeel=0.4*TSS; //Tm2 (ver43)
+        TStartofAnkleAdaptation=Tm2;//0.75*TSS; // Tm2 (ver43)
+        Tc=TSS+TDs;
+        Tx=3;
+        TE=3; //3
+        TLastSS=1;
+        TStart=Tx+TSS/2+Tc;
+        TEnd=TLastSS+TE;
+        T_st_p_sx=Tx+Tc; //0.7*TStart;
+        T_s_st=Tx+Tc/2+TDs/2;//.5*TStart;
+        TGait=TStart+NStride*2*Tc;
+        MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
+        TMinPelvisY=0.5*TDs; // The time that pelvis reaches its minimum distance in y direction
+        TMaxAnkle=TDs+0.35*TSS;//0.53 % The time that ankle reaches its maximum distance in z direction
+        TMaxPelvisY=TDs+0.5*TSS; // The time that pelvis reaches its maximum distance in y direction
+        T_end_of_first_SS=1e-4;0;
+        T_end_of_SS=      1e-4;0;
+        T_end_of_last_SS= 0;1e-4;
+        h_end_of_SS=      1e-6;0;
+        T_end_p_sx_rel=TDs+.5*TLastSS;
+        T_end_p_sx=TGait+T_end_p_sx_rel;
+        T_end_a_s=TGait+TDs;
+        T_end_a_e=TGait+TDs+TLastSS;
+        t_toe=0.2*TDs;
+        t_heel=0.5*TDs;
+
+    CoeffArrayAnkle();
+
+    CoeffArrayPelvis();
+
+}
+
+
 
 void TaskSpaceOnline3::numplot(double num,double min,double max){
   //

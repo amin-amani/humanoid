@@ -1,0 +1,7 @@
+float32 stepLengh
+int16 stepCount
+bool leftFirst
+int16 motionID
+---
+int16 result
+
