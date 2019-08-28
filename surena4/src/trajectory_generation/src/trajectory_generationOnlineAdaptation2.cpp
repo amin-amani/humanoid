@@ -1216,7 +1216,7 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
         if(GlobalTime>=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime){
             move_active=false;
 qDebug()<<"done!";
-
+SURENA_turning_side=SURENA;
             QFile myfile_pose("/media/cast/UBUNTU1604/robot_data/pose.txt");
             myfile_pose.remove();
             myfile_pose.open(QFile::ReadWrite);
