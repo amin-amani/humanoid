@@ -21,9 +21,12 @@ Robot::Robot(QObject *parent, int argc, char **argv)
     connect(_rosNode,SIGNAL(NewjointDataReceived()),this,SLOT(NewjointDataReceived()));
     connect(_rosNode,SIGNAL(SetActiveCSP(int)),this,SLOT(ActiveCSP(int)));
     connect(_rosNode,SIGNAL(DoResetAllNodes(int)),this,SLOT(ResetAllNodes(int)));
+    connect(_rosNode,SIGNAL(DoResetLegs()),this,SLOT(ResetLegs()));
+
     connect(_rosNode,SIGNAL(DoResetHands()),this,SLOT(ResetHands()));
     connect(_rosNode,SIGNAL(UpdateAllPositions()),this,SLOT(ReadAllInitialPositions()));
     connect(_rosNode,SIGNAL(DoActivateHands()),this,SLOT(ActivateHands()));
+    connect(_rosNode,SIGNAL(DoActivateLegs()),this,SLOT(ActivateLegs()));
     connect(_rosNode,SIGNAL(DoReadError()),this,SLOT(ReadErrors()));
     connect(_rosNode,SIGNAL(SetHome(int)),this,SLOT(Home(int)));
     connect(&Epos4,SIGNAL(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)),this,SLOT(FeedBackReceived(QList<int16_t>,QList<int32_t>,QList<int32_t>,QList<uint16_t>,QList<float>)));
@@ -165,11 +168,11 @@ bool Robot::ReadAllInitialPositions()
         //  positionInc.append(result);
         numberOfSuccess++;
         qDebug()<<"ABS "<<i<<"=" << result;
-//(int index,int subIndex,int canID, int devID,int timeout,int trycount)
+        //(int index,int subIndex,int canID, int devID,int timeout,int trycount)
     }
-result=Epos4.ReadRegister(0x60e4,2,1,14,10,3);
-_rosNode->ActualPositions[29]=result;
-qDebug()<<"ABS waist"<<"=" << result;
+    result=Epos4.ReadRegister(0x60e4,2,1,14,10,3);
+    _rosNode->ActualPositions[29]=result;
+    qDebug()<<"ABS waist"<<"=" << result;
     return true;
 
 }
@@ -282,16 +285,17 @@ void Robot::ReadErrors()
     _rosNode->OperationCompleted(0); //all good
 
 }
+//=================================================================================================
 void Robot::ResetHands(void)
 {
     try{
         qDebug()<<"Reset hands...";
         //12 15
         //20 //23
-        for(int i=12;i<16;i++)
+        for(int i=12;i<14;i++)
             Epos4.ResetNode(i);
-        for(int i=20;i<24;i++)
-            Epos4.ResetNode(i);
+        //for(int i=20;i<24;i++)
+          //  Epos4.ResetNode(i);
 
         _rosNode->OperationCompleted(0);
         _rosNode->RobotStatus="Ready";
@@ -304,6 +308,7 @@ void Robot::ResetHands(void)
         _rosNode->RobotStatus="Ready";
     }
 }
+//=================================================================================================
 
 void Robot::ActivateHands(void)
 {
@@ -312,35 +317,24 @@ void Robot::ActivateHands(void)
     qDebug()<<"activating hands";
     _rosNode->teststr="OK";
     timer.stop();
-//    for(int i=12;i<16;i++)
-//        Epos4.ActiveJoint(i);
-//    for(int i=20;i<24;i++)
-//        Epos4.ActiveJoint(i);
     Epos4.ActiveAllHands(true);
-
     _rosNode->OperationCompleted(0);
     _rosNode->RobotStatus="Ready";
 
+}
+//=================================================================================================
 
-    //    try{
-    //   qDebug()<<"Activate hands...";
-    //   //12 15
-    //   //20 //23
-    //   for(int i=12;i<15;i++)
-    //   Epos4.ActiveJoint(i);
-    //   for(int i=20;i<23;i++)
-    //   Epos4.ActiveJoint(i);
+void Robot::ActivateLegs(void)
+{
 
-    //   _rosNode->OperationCompleted(0);
-    //   _rosNode->RobotStatus="Ready";
-    //      qDebug()<<"operation completed!";
-    //}
-    //    catch(const std::runtime_error e)
-    //    {
-    //        _rosNode->OperationCompleted(-1);
-    //        //  timer.start(5);
-    //        _rosNode->RobotStatus="Ready";
-    //    }
+    _rosNode->RobotStatus="Lesg Motor Activating";
+    qDebug()<<"activating Legs";
+    _rosNode->teststr="OK";
+    timer.stop();
+    Epos4.ActiveLegs();
+    qDebug()<<"activating Legs ok";
+    _rosNode->OperationCompleted(0);
+    _rosNode->RobotStatus="Ready";
 
 
 }
@@ -354,28 +348,6 @@ void Robot::ResetAllNodes(int id)
         qDebug()<<"Reset all slot...";
         _rosNode->teststr="OK";
         Epos4.ResetNode(id);
-
-        //}
-        //    for(int i=0;i<12;i++){
-        //        //checking status word
-        //          int32_t val;
-        //          if( OK!=Epos4.ReadRegister(0x6041,0,1,i,val,100,10))
-        //          {
-        //                //cant read status word
-        //              qDebug()<<"cant read status word in id="<<i;
-        //                  _rosNode->OperationCompleted(-1);
-        //                  return ;
-        //          }
-        //          //status word value is unexpected
-        //          if(val!=0x1052da0)
-        //          {
-        //            qDebug()<<QString::number( val,16);
-        //              _rosNode->OperationCompleted(-1);
-        //              return ;
-        //          }
-
-        //    }
-
         _rosNode->OperationCompleted(0);
         //  timer.start(5);
         _rosNode->RobotStatus="Ready";
@@ -388,6 +360,28 @@ void Robot::ResetAllNodes(int id)
         _rosNode->RobotStatus="Ready";
     }
 }
+//=================================================================================================
+
+void Robot::ResetLegs()
+{
+    try{
+        _hommingTimer.stop();
+        _rosNode->RobotStatus="Reseting Legs";
+        qDebug()<<"Reset Legs...";
+        _rosNode->teststr="OK";
+        for(int i=0;i<12;i++)
+        Epos4.ResetNode(i);
+        _rosNode->OperationCompleted(0);
+        _rosNode->RobotStatus="Ready";
+
+    }
+    catch(const std::runtime_error e)
+    {
+        _rosNode->OperationCompleted(-1);
+        _rosNode->RobotStatus="Ready";
+    }
+}
+
 //=================================================================================================
 void Robot::Home(int id)
 {

@@ -69,6 +69,7 @@ public:
 
     void WaitMs(int ms);
 
+
 signals:
 
 
@@ -101,6 +102,8 @@ public slots:
 
     void ResetHands();
     void ActivateHands();
+    void ActivateLegs();
+    void ResetLegs();
 };
 
 #endif // ROBOT_H

@@ -87,11 +87,16 @@ bool QNode::Init() {
     _bumpPublisher = n.advertise<std_msgs::Int32MultiArray>("surena/bump_sensor_state", 1000);
 
     QLOG_TRACE()<<"Initializing all ros services";
-    _activeCSPService = n.advertiseService("ActiveCSP", &QNode::ActiveCSP, this);
+
     _hommingService = n.advertiseService("Home", &QNode::Home, this);
     _resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
     _resetHandsService = n.advertiseService("ResetHands", &QNode::ResetHands, this);
+    _resetLegsService = n.advertiseService("ResetLegs", &QNode::ResetLegs, this);
+    _activeCSPService = n.advertiseService("ActivateWholeBody", &QNode::ActiveCSP, this);
     _activateHandsService = n.advertiseService("ActivateHands", &QNode::ActivateHands, this);
+    _activateLegsService = n.advertiseService("ActivateLegs", &QNode::ActivateLegs, this);
+
+
     _updatePositions = n.advertiseService("UpdatePositions", &QNode::UpdatePositions, this);
 
      //_resetAllNodesService = n.advertiseService("ResetAllNodes", &QNode::ResetAllNodes, this);
@@ -219,6 +224,29 @@ bool QNode::ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Res
 }
 }
 //================================================================================================================================================================
+bool QNode::ResetLegs(robot_teleop::node::Request &req, robot_teleop::node::Response &res)
+{
+    _lastOperationResult=-1;
+        Q_EMIT DoResetLegs();
+
+        //===============================
+    if(!WaitExternalOperation(6000))
+    {
+    res.result=-1;
+    //res.="response timeout!";
+    return false;
+
+    }
+    if(_lastOperationResult!=0)
+    {
+        //res.success=false;
+        //res.message="response with error";
+    res.result=-1;
+        return false;
+}
+    return true;
+}
+//================================================================================================================================================================
 bool QNode::UpdatePositions(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
 {
     _lastOperationResult=-1;
@@ -256,6 +284,29 @@ bool QNode::ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::
     res.result=-1;
         return false;
 }
+}
+//================================================================================================================================================================
+bool QNode::ActivateLegs(robot_teleop::node::Request &req, robot_teleop::node::Response &res)
+{
+    _lastOperationResult=-1;
+        Q_EMIT DoActivateLegs();
+
+        //===============================
+    if(!WaitExternalOperation(6000))
+    {
+    res.result=-1;
+    //res.="response timeout!";
+    return false;
+
+    }
+    if(_lastOperationResult!=0)
+    {
+        //res.success=false;
+        //res.message="response with error";
+    res.result=-1;
+        return false;
+}
+    return true;
 }
 //================================================================================================================================================================
 bool QNode::ResetAllNodes(robot_teleop::node::Request &req, robot_teleop::node::Response &res)

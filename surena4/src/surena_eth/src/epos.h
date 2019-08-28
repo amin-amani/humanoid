@@ -268,6 +268,7 @@ public:
 
     bool ActiveJoint(int joint, bool enableDrive=true);
     bool ActiveWaist(bool enableDrive=true);
+    bool ActiveLegs(bool switchOn=true);
 signals:
 
     void NewDataReady();

@@ -141,6 +141,26 @@ double saturate(double a, double min, double max){
 
 bool StartWalk(trajectory_generation::walkRequest &req,trajectory_generation::walkResponse &res)
 {
+
+    stepLength =req.stepLengh;
+    NStride=req.stepCount;
+    left_first=req.leftFirst;//right support in first step
+
+    turning=!false;
+    TurningRadius=.01;//1.5/M_PI;//
+
+     backward=false;
+     sidewalk=false;
+
+    switch (req.motionID) {
+    case 0:
+
+        break;
+    default:
+        break;
+    }
+
+
 qDebug()<<req.leftFirst;
 res.result=10;
 return true;

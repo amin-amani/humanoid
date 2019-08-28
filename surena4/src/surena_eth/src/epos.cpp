@@ -60,7 +60,29 @@ bool Epos::ActiveHand(int nodeID,bool switchOn) //13,2
     WaitMs(700);
     return OK;
 }
-
+//========================================================================
+bool Epos::ActiveLegs(bool switchOn) //13,2
+{
+int nodeID=1;
+    WaitMs(700);
+    for(int i=0;i<12;i++)
+    SetPreoperationalMode(i+1,nodeID);
+    WaitMs(700);
+    for(int i=0;i<12;i++)
+    StartNode(i+1);
+    WaitMs(700);
+    for(int i=0;i<12;i++)
+    SetMode(i+1,PPM,nodeID);
+    WaitMs(700);
+    for(int i=0;i<12;i++)
+    SwitchOff(i+1,nodeID);
+    WaitMs(700);
+    if(!switchOn)return OK;
+    for(int i=0;i<12;i++)
+    SwitchOn(i+1,nodeID);
+    WaitMs(700);
+    return OK;
+}
 //========================================================================
 
 bool Epos::ActiveWaist(bool enableDrive) //14
@@ -92,7 +114,6 @@ bool Epos::ActiveAllHands(bool switchOn) //13left,12right
     StartNode(12);
     StartNode(13);
     WaitMs(700);
-    qDebug()<<"...............";
     for(int i=0 ;i<4;i++){
         SetMode(12,PPM,i+1);
         WaitMs(700);

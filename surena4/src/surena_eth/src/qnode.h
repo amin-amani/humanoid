@@ -78,8 +78,11 @@ private:
     ros::ServiceServer _hommingService;
     ros::ServiceServer _resetAllNodesService;
     ros::ServiceServer _resetHandsService;
+    ros::ServiceServer _resetLegsService;
     ros::ServiceServer _activateHandsService;
+    ros::ServiceServer _activateLegsService;
     ros::ServiceServer _getRobotStatus;
+
 
 public:
     /*********************
@@ -123,6 +126,7 @@ public:
     void NewJointDataReady(const std_msgs::Int32MultiArray &msg);
     //=================================================================================================
     bool ActiveCSP(robot_teleop::active_csp::Request &req, robot_teleop::active_csp::Response &res);
+    bool ActivateLegs(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
     //=================================================================================================
     bool Home(robot_teleop::home::Request &req, robot_teleop::home::Response &res);
     //=================================================================================================
@@ -136,6 +140,7 @@ public:
     bool ResetHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
     bool ActivateHands(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
 
+    bool ResetLegs(robot_teleop::node::Request &req, robot_teleop::node::Response &res);
 Q_SIGNALS:
     //=================================================================================================
 	void loggingUpdated();
@@ -150,11 +155,15 @@ Q_SIGNALS:
     //=================================================================================================
     void DoResetHands(void);
     //=================================================================================================
+    void DoResetLegs(void);
+    //=================================================================================================
     void DoActivateHands(void);
+    //=================================================================================================
+    void DoActivateLegs(void);
     //=================================================================================================
     void SetHome(int id);
    // =================================================================================================
-        void DoReadError();
+       void DoReadError();
     //=================================================================================================
   void ExternalOperationComleted();
   //=================================================================================================
