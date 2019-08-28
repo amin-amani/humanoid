@@ -198,7 +198,7 @@ MatrixXd MinimumJerkInterpolation::Coefficient1(MatrixXd xp,MatrixXd ord,MatrixX
                     //                   double m=SUM1(0,i,ord);
                     //                   double n=SUM1(0,i+1,ord);
                     A.block(count,SUM1(0,i,ord)+i,1,SUM1(0,i+1,ord)+i+1) = PMaker(xp(i)).block(j,0,1,ord(0,i+1)+1);
-                    qDebug("Salam");
+//                    qDebug("Salam");
                 }
                 else if(i == (n-1)){
                     ++count;

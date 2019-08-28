@@ -40,6 +40,7 @@ int NStride=4;
 bool left_first=!true;//right support in first step
 bool turning=!false;
 double TurningRadius=.01;//1.5/M_PI;//
+bool move_active=false;
 
 bool backward=false;
 bool sidewalk=false;
@@ -65,21 +66,14 @@ MatrixXd PoseRoot;//position of pelvis respected to global coordinate
 MatrixXd PoseRFoot;//position of right ankle joint respected to global coordinate
 MatrixXd PoseLFoot;//position of left ankle joint respected to global coordinate
 double GlobalTime;
-double  DurationOfStartPhase;
-double  DurationOfendPhase;
+double footSensorSaturation=75;//if all sensors data are bigger than this amount, this means the foot is landed on the ground
+double footSensorthreshold=4;// will start orientaition correction
+
+double DurationOfStartPhase;
+double DurationOfendPhase;
 double shoulderPitchOffset;
-MatrixXd CoefZStart;
 
-ros::Publisher pub1; ros::Publisher pub2; ros::Publisher pub3; ros::Publisher pub4;
-ros::Publisher pub5; ros::Publisher pub6; ros::Publisher pub7; ros::Publisher pub8;
-ros::Publisher pub9; ros::Publisher pub10; ros::Publisher pub11; ros::Publisher pub12;
-ros::Publisher pub13; ros::Publisher pub14; ros::Publisher pub15; ros::Publisher pub16;
-ros::Publisher pub17; ros::Publisher pub18; ros::Publisher pub19; ros::Publisher pub20;
-ros::Publisher pub21; ros::Publisher pub22; ros::Publisher pub23; ros::Publisher pub24;
-ros::Publisher pub25; ros::Publisher pub26; ros::Publisher pub27; ros::Publisher pub28;
-ros::Publisher pub29; ros::Publisher pub30; ros::Publisher pub31;
 
-MinimumJerkInterpolation CoefGen;
 
 //data of left foot sensor
 int a,b,c,d,e,f,g,h;
@@ -101,6 +95,11 @@ int bump_pushed2[8];
 int bump_notpushed2[8];
 
 bool bump_initialize;
+vector<double> cntrl(13);
+QCgenerator QC;
+
+bool leftzstop;
+bool rightzstop;
 
 int qra_offset[4];
 int qla_offset[4];
@@ -142,28 +141,89 @@ double saturate(double a, double min, double max){
 bool StartWalk(trajectory_generation::walkRequest &req,trajectory_generation::walkResponse &res)
 {
 
-    stepLength =req.stepLengh;
-    NStride=req.stepCount;
-    left_first=req.leftFirst;//right support in first step
 
-    turning=!false;
-    TurningRadius=.01;//1.5/M_PI;//
-
-     backward=false;
-     sidewalk=false;
-
-    switch (req.motionID) {
-    case 0:
-
-        break;
-    default:
-        break;
+    if(!move_active){
+    qc_initial_bool=true;
+    for (int i = 0; i < 12; ++i) {
+        qc_offset[i]=0;
     }
 
+    leftzstop=false;
+    rightzstop=false;
+    GlobalTime=0;
+    stepLength =req.stepLengh;
+    NStride=req.stepCount;
 
-qDebug()<<req.leftFirst;
+    left_first=req.leftFirst;//right support in first step
+QString note=" ";
+if(left_first){note+="left ";}
+else{note+="right ";}
+    turning=false;
+    backward=false;
+    sidewalk=false;
+
+    switch (req.motionID) {
+
+    case 1:
+        turning=true;
+        TurningRadius=1.5/M_PI;//
+        note+="turn(radius=1.5/PI)   number of strides= ";note+=QString::number(NStride);
+
+        break;
+    case 2:
+        turning=true;
+        TurningRadius=.01;//
+        note+="on spot turn   number of strides= ";note+=QString::number(NStride);
+        break;
+    case 3:
+        backward=true;
+        note+="start backward walk   number of strides= ";note+=QString::number(NStride);
+        break;
+    case 4:
+        sidewalk=true;
+        note+="side walk   number of strides= ";note+=QString::number(NStride);
+        break;
+    default:
+        turning=false;
+        backward=false;
+        sidewalk=false;
+        note+="start straight walk   step-length= ";note+=QString::number(stepLength);
+        note+="   number of strides= ";note+=QString::number(NStride);
+        break;
+    }
+    TaskSpaceOnline3 TaskSpace_temp(NStride,stepLength);
+    if(turning || sidewalk) {links = SURENA_turning_side.GetLinks();}
+    else{links = SURENA.GetLinks();}
+
+    OnlineTaskSpace.StepNumber=1;
+    OnlineTaskSpace=TaskSpace_temp;
+    if(turning&&TurningRadius<.2){OnlineTaskSpace.StepLength=TurningRadius/18*M_PI;
+        OnlineTaskSpace.XofAnkleMaximumHeight=OnlineTaskSpace.StepLength*1.8;
+                OnlineTaskSpace.Xe=0;
+                OnlineTaskSpace.Xs=0;
+                OnlineTaskSpace.zmp_max=0;
+                OnlineTaskSpace.zmp_min=0;
+    }
+
+    if(sidewalk||(turning&&TurningRadius<.2)){
+//        OnlineTaskSpace.Xe=0;
+//        OnlineTaskSpace.Xs=0;
+        OnlineTaskSpace.side_extra_step_length=true;
+        OnlineTaskSpace.CoeffArrayPelvis();
+        OnlineTaskSpace.CoeffArrayAnkle();
+        OnlineTaskSpace.CoeffSideStartEnd();
+
+    }
+
+qDebug()<<note;
+move_active=true;
 res.result=10;
+
 return true;
+}
+    else{
+    return false;
+    }
 }
 bool StopWalk(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response)
 {
@@ -221,89 +281,6 @@ double move2pose(double max,double t_local,double T_start ,double T_end){
 }
 
 
-
-void  SendGazebo(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
-    if(links.count()<28){qDebug()<<"index err";return;}
-    std_msgs::Float64 data;
-
-    data.data=links[1].JointAngle;    pub1.publish(data);
-    data.data=links[2].JointAngle+RollModifieds(0,0);    pub2.publish(data);
-    data.data=links[3].JointAngle+PitchModifieds;    pub3.publish(data);
-    data.data=links[4].JointAngle;    pub4.publish(data);
-    // data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
-    data.data=saturate(links[5].JointAngle,-M_PI/5.4,M_PI/4)+theta_r;    pub5.publish(data);
-    data.data=links[6].JointAngle+phi_r;    pub6.publish(data);
-    data.data=links[7].JointAngle;    pub7.publish(data);
-    data.data=links[8].JointAngle+RollModifieds(1,0);    pub8.publish(data);
-    data.data=links[9].JointAngle+PitchModifieds;    pub9.publish(data);
-    data.data=links[10].JointAngle;    pub10.publish(data);
-    //data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
-    data.data=saturate(links[11].JointAngle,-M_PI/5.4,M_PI/4)+theta_l;    pub11.publish(data);
-    data.data=links[12].JointAngle+phi_l;    pub12.publish(data);
-    data.data=links[13].JointAngle;    pub13.publish(data);
-    data.data=links[14].JointAngle;    pub14.publish(data);
-    data.data=links[15].JointAngle;    pub15.publish(data);
-    data.data=links[16].JointAngle;    pub16.publish(data);
-    data.data=links[17].JointAngle;    pub17.publish(data);
-    data.data=links[18].JointAngle;    pub18.publish(data);
-    data.data=links[19].JointAngle;    pub19.publish(data);
-    data.data=links[20].JointAngle;    pub20.publish(data);
-    data.data=links[21].JointAngle;    pub21.publish(data);
-    data.data=links[22].JointAngle;    pub22.publish(data);
-    data.data=links[23].JointAngle;    pub23.publish(data);
-    data.data=links[24].JointAngle;    pub24.publish(data);
-    data.data=links[25].JointAngle;    pub25.publish(data);
-    data.data=links[26].JointAngle;    pub26.publish(data);
-    data.data=links[27].JointAngle;    pub27.publish(data);
-    data.data=links[28].JointAngle;    pub28.publish(data);
-    data.data=0;    pub29.publish(data);
-    data.data=0;    pub30.publish(data);
-    data.data=0;    pub31.publish(data);
-}
-
-void  SendGazebo_reverse(QList<LinkM> links,MatrixXd RollModifieds, double PitchModifieds, double theta_r, double phi_r, double theta_l, double phi_l){
-    if(links.count()<28){qDebug()<<"index err";return;}
-    std_msgs::Float64 data;
-
-    data.data=-links[7].JointAngle;    pub1.publish(data);
-    data.data=-links[8].JointAngle+RollModifieds(0,0);    pub2.publish(data);
-    data.data=links[9].JointAngle+PitchModifieds;    pub3.publish(data);
-    data.data=links[10].JointAngle;    pub4.publish(data);
-    // data.data=links[5].JointAngle+theta_r;    pub5.publish(data);
-    data.data=saturate(links[11].JointAngle,-M_PI/5.4,M_PI/4)+theta_r;    pub5.publish(data);
-    data.data=-links[12].JointAngle+phi_r;    pub6.publish(data);
-    data.data=-links[1].JointAngle;    pub7.publish(data);
-    data.data=-links[2].JointAngle+RollModifieds(1,0);    pub8.publish(data);
-    data.data=links[3].JointAngle+PitchModifieds;    pub9.publish(data);
-    data.data=links[4].JointAngle;    pub10.publish(data);
-    //data.data=links[11].JointAngle+theta_l;    pub11.publish(data);
-    data.data=saturate(links[5].JointAngle,-M_PI/5.4,M_PI/4)+theta_l;    pub11.publish(data);
-    data.data=-links[6].JointAngle+phi_l;    pub12.publish(data);
-
-    data.data=links[13].JointAngle;  pub13.publish(data);
-    data.data=links[14].JointAngle;  pub14.publish(data);
-
-    data.data=links[15].JointAngle; pub22.publish(data);
-    data.data=-links[16].JointAngle; pub23.publish(data);
-    data.data=-links[17].JointAngle; pub24.publish(data);
-    data.data=links[18].JointAngle; pub25.publish(data);
-    data.data=-links[19].JointAngle; pub26.publish(data);
-    data.data=-links[20].JointAngle; pub27.publish(data);
-    data.data=links[21].JointAngle; pub28.publish(data);
-
-    data.data=links[22].JointAngle; pub15.publish(data);
-    data.data=-links[23].JointAngle; pub16.publish(data);
-    data.data=-links[24].JointAngle; pub17.publish(data);
-    data.data=links[25].JointAngle; pub18.publish(data);
-    data.data=-links[26].JointAngle; pub19.publish(data);
-    data.data=-links[27].JointAngle; pub20.publish(data);
-    data.data=links[28].JointAngle; pub21.publish(data);
-
-    data.data=0;    pub29.publish(data);
-    data.data=0;    pub30.publish(data);
-    data.data=0;    pub31.publish(data);
-}
-
 int getch()
 {
     static struct termios oldt, newt;
@@ -334,10 +311,6 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     //ROS_INFO("I heard: [%d  %d %d %d %d  %d %d %d]", (int)msg.data[0],(int)msg.data[1],(int)msg.data[2],(int)msg.data[3],(int)msg.data[4],(int)msg.data[5],(int)msg.data[6],(int)msg.data[7]);
     int temp[8];
 
-    //    bump_pushed2[0]=1100;bump_pushed2[1]= 835;bump_pushed2[2]=3140;bump_pushed2[3]=2994;
-    //    bump_pushed2[4]=3132;bump_pushed2[5]=2916;bump_pushed2[6]=1203;bump_pushed2[7]=916;
-    //    bump_notpushed2[0]=1012;bump_notpushed2[1]= 928;bump_notpushed2[2]=3033;bump_notpushed2[3]=3097;
-    //    bump_notpushed2[4]=3036;bump_notpushed2[5]=3006;bump_notpushed2[6]=1107;bump_notpushed2[7]=1015;
 
 
 //    bump_pushed[0]=1100;bump_pushed[1]= 835;bump_pushed[2]=3140;bump_pushed[3]=2994;
@@ -380,10 +353,14 @@ void receiveFootSensor(const std_msgs::Int32MultiArray& msg)
     }
 
 
+    //    bump_pushed2[0]=1100;bump_pushed2[1]= 835;bump_pushed2[2]=3140;bump_pushed2[3]=2994;
+    //    bump_pushed2[4]=3132;bump_pushed2[5]=2916;bump_pushed2[6]=1203;bump_pushed2[7]=916;
+    //    bump_notpushed2[0]=1012;bump_notpushed2[1]= 928;bump_notpushed2[2]=3033;bump_notpushed2[3]=3097;
+    //    bump_notpushed2[4]=3036;bump_notpushed2[5]=3006;bump_notpushed2[6]=1107;bump_notpushed2[7]=1015;
 
-//    for (int i = 0; i < 8; ++i) {
-//        qDebug()<<i<<"\t"<<bump_pushed[i]<<"("<<bump_pushed2[i]<<")\t"<<bump_notpushed[i]<<"("<<bump_notpushed2[i]<<")";
-//    }
+    //    for (int i = 0; i < 8; ++i) {
+    //        qDebug()<<i<<"\t"<<bump_pushed[i]<<"("<<bump_pushed2[i]<<")\t"<<bump_notpushed[i]<<"("<<bump_notpushed2[i]<<")";
+    //    }
 
 
     temp[0]=msg.data[0]-bump_notpushed[0];
@@ -521,61 +498,6 @@ void imu_data_process(const sensor_msgs::Imu &msg){
  // qDebug()<<pelvis_orientation_roll<<"\t"<<pelvis_orientation_pitch<<"\t"<<pelvis_orientation_yaw;
 
 }
-
-
-void ankle_states(const gazebo_msgs::LinkStates& msg){
-    double x_left, x_right,y_left, y_right,z_left, z_right;
-    Vector3d vec_A_E;
-    Vector3d vec_B_F;
-    Vector3d vec_C_G;
-    Vector3d vec_D_H;
-
-    vec_A_E<<-.085,
-            -.08,
-            -.11;
-    vec_B_F<<.135,
-            -.08,
-            -.11;
-    vec_C_G<<.135,
-            .08,
-            -.11;
-    vec_D_H<<-.085,
-            .08,
-            -.11;
-
-    x_left=msg.pose[7].position.x;
-    x_right=msg.pose[13].position.x;
-    y_left=msg.pose[7].position.y;
-    y_right=msg.pose[13].position.y;
-    z_left=msg.pose[7].position.z;
-    z_right=msg.pose[13].position.z;
-
-    MatrixXd R_left(3,3);
-    MatrixXd R_right(3,3);
-    R_left=quater2rot(msg.pose[7].orientation.w,msg.pose[7].orientation.x,msg.pose[7].orientation.y,msg.pose[7].orientation.z);
-    R_right=quater2rot(msg.pose[13].orientation.w,msg.pose[13].orientation.x,msg.pose[13].orientation.y,msg.pose[13].orientation.z);
-    Vector3d temp;
-    temp=R_left*vec_A_E;    //A=temp(2)+z_left;
-    a=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
-    temp=R_left*vec_B_F;    //B=temp(2)+z_left;
-    b=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
-    temp=R_left*vec_C_G;    //C=temp(2)+z_left;
-    c=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
-    temp=R_left*vec_D_H;    //D=temp(2)+z_left;
-    d=int(((.02-temp(2)-z_left)+abs(.02-temp(2)-z_left))*5000/2);
-    temp=R_right*vec_A_E;    //E=temp(2)+z_right;
-    e=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
-    temp=R_right*vec_B_F;    //F=temp(2)+z_right;
-    f=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
-    temp=R_right*vec_C_G;    //G=temp(2)+z_right;
-    g=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
-    temp=R_right*vec_D_H;    //H=temp(2)+z_right;
-    h=int(((.02-temp(2)-z_right)+abs(.02-temp(2)-z_right))*5000/2);
-    //ROS_INFO("z_left=%f  A=%d,B=%d,C=%d,D=%d\tz_right=%f  E=%d,F=%d,G=%d,H=%d",z_left,a,b,c,d,z_right,e,f,g,h);
-    //    ROS_INFO("x_left=%f,x_right=%f,y_left=%f,y_right=%fz_left=%f,z_right=%f",x_left,x_right,y_left,y_right,z_left,z_right);
-}
-
-
 
 void StartPhase(){
     if ( GlobalTime<=DurationOfStartPhase) {
@@ -755,16 +677,15 @@ int main(int argc, char **argv)
 
 
 
-    qc_initial_bool=!simulation;
+    qc_initial_bool=true;
     bump_initialize=false;
 
 
 
-    bool leftzstop=false;
-    bool rightzstop=false;
+    leftzstop=false;
+    rightzstop=false;
 
-    vector<double> cntrl(13);
-    QCgenerator QC;
+
     for (int i = 0; i < 12; ++i) {
         qc_offset[i]=0;
     }
@@ -775,14 +696,8 @@ int main(int argc, char **argv)
     phi_PID_L.Init(.005,.9,-.9,kp,0,0);
     phi_PID_R.Init(.005,.9,-.9,kp,0,0);
 
-    PIDController AnkleZR_PID;
-    PIDController AnkleZL_PID;
 
-    AnkleZR_PID.Init(.005,.03,-.03,.00001,0,0);
-    AnkleZL_PID.Init(.005,.03,-.03,.00001,0,0);
 
-    double footSensorSaturation=75;//if all sensors data are bigger than this amount, this means the foot is landed on the ground
-    double footSensorthreshold=4;// will start orientaition correction
 
     GlobalTime=0;
     DurationOfStartPhase=3;
@@ -809,43 +724,8 @@ int main(int argc, char **argv)
     //   ros::Subscriber ft_left = nh.subscribe("/surena/ft_l_state",1000,FT_left_feedback);
     // ros::Subscriber ft_right = nh.subscribe("/surena/ft_r_state",1000,FT_right_feedback);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-      ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
-     ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
-    if(simulation){//gazebo publishers
-        pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",1000);
-        pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",1000);
-        pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",1000);
-        pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",1000);
-        pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",1000);
-        pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",1000);
-        pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",1000);
-        pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",1000);
-        pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",1000);
-        pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",1000);
-        pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",1000);
-        pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",1000);
-        pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",1000);
-        pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",1000);
-        pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",1000);
-        pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",1000);
-        pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",1000);
-        pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",1000);
-        pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",1000);
-        pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",1000);
-        pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",1000);
-        pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",1000);
-        pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",1000);
-        pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",1000);
-        pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",1000);
-        pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",1000);
-        pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",1000);
-        pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",1000);
-        pub29 = nh.advertise<std_msgs::Float64>("rrbot/joint29_position_controller/command",1000);
-        pub30 = nh.advertise<std_msgs::Float64>("rrbot/joint30_position_controller/command",1000);
-        pub31 = nh.advertise<std_msgs::Float64>("rrbot/joint31_position_controller/command",1000);
-    }
-    ros::Subscriber ankleStates = nh.subscribe("/gazebo/link_states", 10, ankle_states);
-
+    ros::Subscriber abs_sub = nh.subscribe("/surena/abs_joint_state", 1000, abs_feedback_func);
+    ros::Subscriber imusub = nh.subscribe("/surena/imu_state", 1000, imu_data_process);
 
     int32_t contact_flag_timing=1000;    int32_t contact_flag_sensor=1000;    int32_t contact_flag_sensor2=1000;
 
@@ -866,9 +746,9 @@ int main(int argc, char **argv)
 
     MatrixXd P;
 
-    ROS_INFO("press any key to start!");
-    getch();
-    ROS_INFO("started!");
+//    ROS_INFO("press any key to start!");
+//    getch();
+//    ROS_INFO("started!");
 
 
     bool firstcontactL=true;
@@ -878,28 +758,14 @@ int main(int argc, char **argv)
 
     //*****loging data in a file
 
-    QTime pc_time;
     QByteArray data_pose;
     QByteArray data_ankle;
 
 
 
-
-    QTime timer;
-    QByteArray data_time;
-    QString name_time="/media/milad/UBUNTU1604/robot_data/timecheck.txt";
-    QFile myfile_time(name_time);
-
-
-
-
-
-
-
-
     while (ros::ok())
     {
-
+if(move_active){
         //MotionTime=TStart+NStride*2*Tc+TDs+TEnd;
 
         if (qc_initial_bool) {
@@ -908,7 +774,7 @@ int main(int argc, char **argv)
             continue;
         }
 
-
+//ankle orientation adaptation
         if (GlobalTime>DurationOfStartPhase+OnlineTaskSpace.TStart&&GlobalTime<DurationOfStartPhase+OnlineTaskSpace.MotionTime-OnlineTaskSpace.TEnd-OnlineTaskSpace.TDs) {
             double adapt_time=fmod(GlobalTime-DurationOfStartPhase-OnlineTaskSpace.TStart,2*OnlineTaskSpace.Tc);
 
@@ -1057,6 +923,7 @@ int main(int argc, char **argv)
                                     AnkleZL+=AnkleZ_offsetL;
                                     AnkleZ_offsetL=AnkleZL-OnlineTaskSpace._lenghtOfAnkle;
                                     qDebug()<<"leftzstop=true AnkleZL="<<AnkleZL<<"offset="<<AnkleZ_offsetL;
+                                    ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
                                 }
                                 else{AnkleZL=m3;
                                     AnkleZL+=AnkleZ_offsetL;
@@ -1089,11 +956,6 @@ int main(int argc, char **argv)
                                 }
                                 else{AnkleZR=m7;
                                     AnkleZR+=AnkleZ_offsetR;
-                                    if (AnkleZR<=0.132)
-                                    {
-                                        //AnkleZR-=AnkleZR_PID.Calculate(bump_threshold,(e+f+g+h)/4);
-                                   // cout<<"AnkleZR_PID"<<AnkleZR_PID.Calculate(bump_threshold,(e+f+g+h)/4)<<endl;
-                                    }
 
                                 }
                             }
@@ -1132,11 +994,7 @@ int main(int argc, char **argv)
 
                                 else{AnkleZL=m3;
                                     AnkleZL+=AnkleZ_offsetL;
-                                    if (AnkleZL<=0.132)
-                                    {
-                                    //    AnkleZL-=AnkleZL_PID.Calculate(bump_threshold,(a+b+c+d)/4);
-                                   // cout<<"AnkleZL_PID"<<AnkleZL_PID.Calculate(bump_threshold,(a+b+c+d)/4)<<endl;
-                                    }
+
                                 }
                             }
                         }
@@ -1184,48 +1042,7 @@ int main(int argc, char **argv)
                                             AnkleZR=m7;
                                             AnkleZL=m3;
                                         }
-//                    else if(GlobalTime<DurationOfStartPhase+OnlineTaskSpace.MotionTime){
 
-//                        //right foot up
-//                        if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.TGait+OnlineTaskSpace.TDs+0.5*OnlineTaskSpace.TLastSS){
-//                            rightzstop=false;
-//                            AnkleZR=m7;
-//                            AnkleZ_offsetR=0;
-//                        }
-
-//                        //right foot stop
-//                       else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE/4){
-//                            if(!rightzstop){
-//                                if(((!left_first)&&(a>bump_threshold||b>bump_threshold||c>bump_threshold||d>bump_threshold))||((left_first)&&(e>bump_threshold||f>bump_threshold||g>bump_threshold||h>bump_threshold))){
-//                                    rightzstop=true;
-//                                    AnkleZR=m7;
-//                                    AnkleZR+=AnkleZ_offsetR;
-//                                    AnkleZ_offsetR=AnkleZR-OnlineTaskSpace._lenghtOfAnkle;
-//                                    qDebug()<<"rightzstop=true AnkleZR="<<AnkleZR<<"offset="<<AnkleZ_offsetR;
-//                                    ROS_INFO("I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]", a,b,c,d,e,f,g,h);
-
-//                                }
-//                                else{AnkleZR=m7;
-//                                    AnkleZR+=AnkleZ_offsetR;
-
-
-//                                }
-//                            }
-//                        }
-//                        // takhlie pye rast
-//                        else if(GlobalTime<=DurationOfStartPhase+OnlineTaskSpace.MotionTime){
-//                            AnkleZR=OnlineTaskSpace._lenghtOfAnkle+AnkleZ_offsetR-move2pose(AnkleZ_offsetR,GlobalTime-DurationOfStartPhase,OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE,OnlineTaskSpace.MotionTime-OnlineTaskSpace.TE*.75);
-
-//                        }
-
-
-
-
-//                    }
-//                    else{
-//                        AnkleZR=m7;
-//                        AnkleZL=m3;
-//                    }
                 }
 
                 PoseRoot<<P(0,0),
@@ -1395,7 +1212,21 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
 
 
 
-        if(GlobalTime>=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime){break;}
+
+        if(GlobalTime>=DurationOfendPhase+DurationOfStartPhase+OnlineTaskSpace.MotionTime){
+            move_active=false;
+qDebug()<<"done!";
+
+            QFile myfile_pose("/media/cast/UBUNTU1604/robot_data/pose.txt");
+            myfile_pose.remove();
+            myfile_pose.open(QFile::ReadWrite);
+            myfile_pose.write(data_pose);
+            myfile_pose.close();
+            data_pose.clear();
+        }
+
+
+
         if(turning || sidewalk) {links = SURENA_turning_side.GetLinks();}
         else{links = SURENA.GetLinks();}
         EndPhase();
@@ -1500,13 +1331,20 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
         //        {
         //            msg.data.push_back(0);
         //        }
-        if(!simulation){chatter_pub.publish(msg);}
+        chatter_pub.publish(msg);
 
-        if (simulation){
-            if(left_first){SendGazebo(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
-            else{SendGazebo_reverse(links,0*RollModified,0*PitchModified,teta_motor_R,phi_motor_R,teta_motor_L,phi_motor_L);}
-        }
+
         links = SURENA.GetLinks();
+
+        data_pose.append(QString::number(GlobalTime)+","+QString::number(PoseRoot(0))+","+QString::number(PoseRoot(1))+","+QString::number(PoseRoot(2))+","+
+                         QString::number(PoseLFoot(0))+","+QString::number(PoseLFoot(1))+","+QString::number(PoseLFoot(2))+","+
+                         QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+","+
+                         QString::number(PoseRFoot(4))+","+QString::number(PoseLFoot(4))+"\n");
+}
+        ros::spinOnce();
+
+        loop_rate.sleep();
+        ++count;
 
 
         if(LogDataSend){
@@ -1595,33 +1433,13 @@ PoseRoot(1)=PoseRoot(1)*coef_y_p;
                              QString::number(PoseRFoot(0))+","+QString::number(PoseRFoot(1))+","+QString::number(PoseRFoot(2))+","+
                              QString::number(PoseRFoot(4))+","+QString::number(PoseLFoot(4))+"\n");
 
-
+            data_ankle.append(QString::number(GlobalTime)+","+QString::number(rankle_inc)+","+QString::number(cntrl[6])+","+QString::number(rankle_absolute)+","+
+           QString::number(lankle_inc)+","+QString::number(cntrl[12])+","+QString::number(lankle_absolute)+","+
+            QString::number(rknee_inc)+","+QString::number(cntrl[4])+","+QString::number(rknee_absolute)+","+
+             QString::number(lknee_inc)+","+QString::number(cntrl[10])+","+QString::number(lknee_absolute)+"\n");
         }
 
-//if(GlobalTime>=DurationOfStartPhase+OnlineTaskSpace.TStart+OnlineTaskSpace.Tc*2){break;}
-        if(count%20==0){ //use to print once in n steps
-            // ROS_INFO("");
-            //            ROS_INFO("I heard data of sensors :t=%f [%d %d %d %d] & [%d %d %d %d]",OnlineTaskSpace.globalTime,a,b,c,d,e,f,g,h);
-//                 ROS_INFO("%f I heard a b c d: [%d  %d %d %d],e f g h: [%d  %d %d %d]",GlobalTime, a,b,c,d,e,f,g,h);
-            //    ROS_INFO("teta_motor_L=%f,teta_motor_R=%f,phi_motor_L=%f,phi_motor_R=%f",teta_motor_L,teta_motor_R,phi_motor_L,phi_motor_R);
-            //   ROS_INFO("ankl pith min=%f,max=%f",min_test*180/M_PI,max_test*180/M_PI);
-            //qDebug()<<"T="<<GlobalTime<<"/tTc="<<OnlineTaskSpace.Tc;
-            //qDebug()<<"pelvis roll:"<<pelvis_orientation_roll<<"\tpitch:"<<pelvis_orientation_pitch<<"\tyaw:"<<pelvis_orientation_yaw;
-        }
 
-        /*
-*/
-//qDebug()<<"y_p="<<PoseRoot(1);
-
-
-        data_ankle.append(QString::number(GlobalTime)+","+QString::number(rankle_inc)+","+QString::number(cntrl[6])+","+QString::number(rankle_absolute)+","+
-       QString::number(lankle_inc)+","+QString::number(cntrl[12])+","+QString::number(lankle_absolute)+","+
-        QString::number(rknee_inc)+","+QString::number(cntrl[4])+","+QString::number(rknee_absolute)+","+
-         QString::number(lknee_inc)+","+QString::number(cntrl[10])+","+QString::number(lknee_absolute)+"\n");
-        ros::spinOnce();
-
-        loop_rate.sleep();
-        ++count;
 
 
         //data_time.append(QString::number(timer.elapsed())+"\n");
@@ -1633,10 +1451,6 @@ if(LogDataSend){
     myfile_pose.open(QFile::ReadWrite);
     myfile_pose.write(data_pose);
     myfile_pose.close();
- }
-
-
-
     QFile myfile_ankle("/media/cast/UBUNTU1604/robot_data/anklecurrent.txt");
     myfile_ankle.remove();
     myfile_ankle.open(QFile::ReadWrite);
@@ -1644,22 +1458,9 @@ if(LogDataSend){
     myfile_ankle.close();
 
 
-
-//    myfile_time.remove();
-//    myfile_time.open(QFile::ReadWrite);
-//    myfile_time.write(data_time);
-//    myfile_time.close();
+ }
 
 
-    //    myfile_inc.open(QFile::ReadWrite);
-    //    myfile_inc.write(data_inc);
-    //    myfile_inc.close();
-    //    myfile_abs.open(QFile::ReadWrite);
-    //    myfile_abs.write(data_abs);
-    //    myfile_abs.close();
-    //    myfile_abs.open(QFile::ReadWrite);
-    //    myfile_abs.write(data_abs);
-    //    myfile_abs.close();
 
     return 0;
 }
