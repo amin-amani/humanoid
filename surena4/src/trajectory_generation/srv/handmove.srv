@@ -1,0 +1,5 @@
+string scenario_l
+string scenario_r
+---
+int16 result
+

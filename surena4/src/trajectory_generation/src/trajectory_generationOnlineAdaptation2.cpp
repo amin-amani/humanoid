@@ -712,7 +712,7 @@ int main(int argc, char **argv)
     //*******************This part of code is for initialization of joints of the robot for walking**********************************
     int count = 0;
 
-    ros::init(argc, argv, "myNode");
+    ros::init(argc, argv, "walknode");
     ros::NodeHandle nh;
     ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",100);
     ros::Publisher  contact_flag  = nh.advertise<std_msgs::Int32MultiArray>("contact_flag_timing",100);

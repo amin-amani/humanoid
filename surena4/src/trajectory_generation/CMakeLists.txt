@@ -102,6 +102,9 @@ find_package(catkin REQUIRED COMPONENTS  roscpp sensor_msgs interactive_markers 
 # )
 #add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES num.msg)
 add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES walk.srv)
+add_service_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/srv FILES handmove.srv)
+
+
 ### Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES

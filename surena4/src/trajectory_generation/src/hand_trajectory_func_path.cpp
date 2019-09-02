@@ -32,13 +32,25 @@
 #include<termios.h>
 #include <iostream>
 #include <QTime>
+#include"trajectory_generation/handmove.h"
+#include "trajectory_generation/handmoveRequest.h"
+#include "trajectory_generation/handmoveResponse.h"
+
 
 using namespace  std;
 using namespace  Eigen;
 
-bool simulation=!true;
+bool simulation=true;
 
+bool move_activate=false;
 
+int qc_offset[12];
+int qra_offset[4];
+int qla_offset[4];
+bool qc_initial_bool;
+
+VectorXd absolute_q0_r(7);VectorXd absolute_q0_l(7);
+bool abs_initial_bool;
 
 ros::Publisher pub1  ;ros::Publisher pub2  ;ros::Publisher pub3  ;ros::Publisher pub4  ;
 ros::Publisher pub5  ;ros::Publisher pub6  ;ros::Publisher pub7  ;ros::Publisher pub8  ;
@@ -50,6 +62,45 @@ ros::Publisher pub25 ;ros::Publisher pub26 ;ros::Publisher pub27 ;ros::Publisher
 ros::Publisher pub29 ;ros::Publisher pub30 ;ros::Publisher pub31 ;
 right_hand hand_r;
 left_hand hand_l;
+// waist
+double Waist2ArmZ=0.2694;
+double Waist2RArmY=-0.239;
+double Waist2LArmY=0.239;
+//double WaistYaw=0; double WaistPitch=0;
+//MatrixXd R_shoulder(3,3);
+//VectorXd r_left_shoulder(3);
+//VectorXd r_right_shoulder(3);
+//    R_shoulder<<cos(WaistYaw)*cos(WaistPitch), -sin(WaistYaw), cos(WaistYaw)*sin(WaistPitch),
+//            cos(WaistPitch)*sin(WaistYaw),  cos(WaistYaw), sin(WaistYaw)*sin(WaistPitch),
+//            -sin(WaistPitch),              0,               cos(WaistPitch);
+//    r_left_shoulder<< Waist2ArmZ*cos(WaistYaw)*sin(WaistPitch) - Waist2LArmY*sin(WaistYaw),
+//                      Waist2LArmY*cos(WaistYaw) + Waist2ArmZ*sin(WaistYaw)*sin(WaistPitch)-Waist2LArmY,
+//                                                               Waist2ArmZ*cos(WaistPitch)-Waist2ArmZ;
+//    r_right_shoulder<< Waist2ArmZ*cos(WaistYaw)*sin(WaistPitch) - Waist2RArmY*sin(WaistYaw),
+//                       Waist2RArmY*cos(WaistYaw) + Waist2ArmZ*sin(WaistYaw)*sin(WaistPitch)-Waist2RArmY,
+//                                                                Waist2ArmZ*cos(WaistPitch)-Waist2ArmZ;
+ std::string scenario_r="n";
+ std::string scenario_l="n";
+ bool initializing=true;
+bool handMove(trajectory_generation::handmoveRequest &req, trajectory_generation::handmoveResponse &res){
+
+    qDebug()<<"req";
+    if(!move_activate){
+        scenario_l=req.scenario_l;
+        scenario_r=req.scenario_r;
+
+    //qDebug()<<"scenario_l="<<scenario_l.c_str()<<"scenario_r="<<scenario_r.c_str();
+    initializing=true;
+
+    move_activate=true;
+    res.result=1;
+    return true;
+    }
+        else{
+        return false;
+        }
+}
+
 void numplot(double num,double min,double max){
     //⬛
 
@@ -110,7 +161,6 @@ void matrix_view(MatrixXd M){
     qDebug()<<"";
 }
 
-
 void matrix_view(VectorXd M){
     QString str;
     for (int i = 0; i <M.rows() ; ++i) {str+=QString::number(M(i));str+="   ";}
@@ -144,10 +194,6 @@ int getch()
     return c;
 }
 
-int qc_offset[12];
-int qra_offset[4];
-int qla_offset[4];
-bool qc_initial_bool;
 void qc_initial(const sensor_msgs::JointState & msg){
     if (qc_initial_bool){
 
@@ -176,10 +222,6 @@ void qc_initial(const sensor_msgs::JointState & msg){
         ROS_INFO("Initialized!");
     }
 }
-
-VectorXd absolute_q0_r(7);VectorXd absolute_q0_l(7);
-bool abs_initial_bool;
-
 
 void abs_read(const sensor_msgs::JointState & msg){
     if (abs_initial_bool){
@@ -216,9 +258,6 @@ void abs_read(const sensor_msgs::JointState & msg){
 
 
 }
-
-
-
 
 void  SendGazebo(vector<double> q){
 
@@ -287,23 +326,7 @@ void  SendGazebo(vector<double> q){
     pub31.publish(data);
 
 }
-// waist
-double Waist2ArmZ=0.2694;
-double Waist2RArmY=-0.239;
-double Waist2LArmY=0.239;
-//double WaistYaw=0; double WaistPitch=0;
-//MatrixXd R_shoulder(3,3);
-//VectorXd r_left_shoulder(3);
-//VectorXd r_right_shoulder(3);
-//    R_shoulder<<cos(WaistYaw)*cos(WaistPitch), -sin(WaistYaw), cos(WaistYaw)*sin(WaistPitch),
-//            cos(WaistPitch)*sin(WaistYaw),  cos(WaistYaw), sin(WaistYaw)*sin(WaistPitch),
-//            -sin(WaistPitch),              0,               cos(WaistPitch);
-//    r_left_shoulder<< Waist2ArmZ*cos(WaistYaw)*sin(WaistPitch) - Waist2LArmY*sin(WaistYaw),
-//                      Waist2LArmY*cos(WaistYaw) + Waist2ArmZ*sin(WaistYaw)*sin(WaistPitch)-Waist2LArmY,
-//                                                               Waist2ArmZ*cos(WaistPitch)-Waist2ArmZ;
-//    r_right_shoulder<< Waist2ArmZ*cos(WaistYaw)*sin(WaistPitch) - Waist2RArmY*sin(WaistYaw),
-//                       Waist2RArmY*cos(WaistYaw) + Waist2ArmZ*sin(WaistYaw)*sin(WaistPitch)-Waist2RArmY,
-//                                                                Waist2ArmZ*cos(WaistPitch)-Waist2ArmZ;
+
 MatrixXd rightshoulder2waist(double WaistYaw, double WaistPitch){
     MatrixXd T(4,4);
     MatrixXd R(3,3);
@@ -320,6 +343,7 @@ MatrixXd rightshoulder2waist(double WaistYaw, double WaistPitch){
 
     return T;
 }
+
 MatrixXd leftshoulder2waist(double WaistYaw, double WaistPitch){
     MatrixXd T(4,4);
     MatrixXd R(3,3);
@@ -337,28 +361,29 @@ T<<R.transpose(),-R.transpose()*P,0,0,0,1;
 
 int main(int argc, char **argv)
 {
-
+//    scenario_l="a";
+//    scenario_r="b";
+//    move_activate=true;
 QByteArray joint_data;
 
 
     abs_initial_bool=!simulation;
     qc_initial_bool=!simulation;
 
-    if (simulation){    ros::init(argc, argv, "rrbot");}
-    else{ros::init(argc, argv, "jointdata");}
 
-    ros::NodeHandle nh("~");
+ros::init(argc, argv, "handnode");
+    ros::NodeHandle nh;
 
 
-    std::string scenario_r;std::string scenario_l;
-    nh.getParam("scenario_r", scenario_r);nh.getParam("scenario_l", scenario_l);
 
-    ROS_INFO("scenario_r: %s",scenario_r.c_str());ROS_INFO("scenario_l: %s",scenario_l.c_str());
+    //nh.getParam("scenario_r", scenario_r);nh.getParam("scenario_l", scenario_l);
 
-    ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("qc",1000);
+   // ROS_INFO("scenario_r: %s",scenario_r.c_str());ROS_INFO("scenario_l: %s",scenario_l.c_str());
+
+    ros::Publisher  chatter_pub  = nh.advertise<std_msgs::Int32MultiArray>("jointdata/qc",1000);
     ros::Subscriber abs_sensor = nh.subscribe("/surena/abs_joint_state", 1000, abs_read);
     ros::Subscriber qcinit = nh.subscribe("/surena/inc_joint_state", 1000, qc_initial);
-
+    ros::ServiceServer HandMoveService = nh.advertiseService("HandMove", handMove);
     std_msgs::Int32MultiArray msg;
     std_msgs::MultiArrayDimension msg_dim;
 
@@ -368,37 +393,37 @@ QByteArray joint_data;
     msg.layout.dim.push_back(msg_dim);
     double t_r_offset=0;double t_l_offset=0;
     if(simulation){
-        pub1  = nh.advertise<std_msgs::Float64>("joint1_position_controller/command",100);
-        pub2  = nh.advertise<std_msgs::Float64>("joint2_position_controller/command",100);
-        pub3  = nh.advertise<std_msgs::Float64>("joint3_position_controller/command",100);
-        pub4  = nh.advertise<std_msgs::Float64>("joint4_position_controller/command",100);
-        pub5  = nh.advertise<std_msgs::Float64>("joint5_position_controller/command",100);
-        pub6  = nh.advertise<std_msgs::Float64>("joint6_position_controller/command",100);
-        pub7  = nh.advertise<std_msgs::Float64>("joint7_position_controller/command",100);
-        pub8  = nh.advertise<std_msgs::Float64>("joint8_position_controller/command",100);
-        pub9  = nh.advertise<std_msgs::Float64>("joint9_position_controller/command",100);
-        pub10 = nh.advertise<std_msgs::Float64>("joint10_position_controller/command",100);
-        pub11 = nh.advertise<std_msgs::Float64>("joint11_position_controller/command",100);
-        pub12 = nh.advertise<std_msgs::Float64>("joint12_position_controller/command",100);
-        pub13 = nh.advertise<std_msgs::Float64>("joint13_position_controller/command",100);
-        pub14 = nh.advertise<std_msgs::Float64>("joint14_position_controller/command",100);
-        pub15 = nh.advertise<std_msgs::Float64>("joint15_position_controller/command",100);
-        pub16 = nh.advertise<std_msgs::Float64>("joint16_position_controller/command",100);
-        pub17 = nh.advertise<std_msgs::Float64>("joint17_position_controller/command",100);
-        pub18 = nh.advertise<std_msgs::Float64>("joint18_position_controller/command",100);
-        pub19 = nh.advertise<std_msgs::Float64>("joint19_position_controller/command",100);
-        pub20 = nh.advertise<std_msgs::Float64>("joint20_position_controller/command",100);
-        pub21 = nh.advertise<std_msgs::Float64>("joint21_position_controller/command",100);
-        pub22 = nh.advertise<std_msgs::Float64>("joint22_position_controller/command",100);
-        pub23 = nh.advertise<std_msgs::Float64>("joint23_position_controller/command",100);
-        pub24 = nh.advertise<std_msgs::Float64>("joint24_position_controller/command",100);
-        pub25 = nh.advertise<std_msgs::Float64>("joint25_position_controller/command",100);
-        pub26 = nh.advertise<std_msgs::Float64>("joint26_position_controller/command",100);
-        pub27 = nh.advertise<std_msgs::Float64>("joint27_position_controller/command",100);
-        pub28 = nh.advertise<std_msgs::Float64>("joint28_position_controller/command",100);
-        pub29 = nh.advertise<std_msgs::Float64>("joint29_position_controller/command",100);
-        pub30 = nh.advertise<std_msgs::Float64>("joint30_position_controller/command",100);
-        pub31 = nh.advertise<std_msgs::Float64>("joint31_position_controller/command",100);
+        pub1  = nh.advertise<std_msgs::Float64>("rrbot/joint1_position_controller/command",100);
+        pub2  = nh.advertise<std_msgs::Float64>("rrbot/joint2_position_controller/command",100);
+        pub3  = nh.advertise<std_msgs::Float64>("rrbot/joint3_position_controller/command",100);
+        pub4  = nh.advertise<std_msgs::Float64>("rrbot/joint4_position_controller/command",100);
+        pub5  = nh.advertise<std_msgs::Float64>("rrbot/joint5_position_controller/command",100);
+        pub6  = nh.advertise<std_msgs::Float64>("rrbot/joint6_position_controller/command",100);
+        pub7  = nh.advertise<std_msgs::Float64>("rrbot/joint7_position_controller/command",100);
+        pub8  = nh.advertise<std_msgs::Float64>("rrbot/joint8_position_controller/command",100);
+        pub9  = nh.advertise<std_msgs::Float64>("rrbot/joint9_position_controller/command",100);
+        pub10 = nh.advertise<std_msgs::Float64>("rrbot/joint10_position_controller/command",100);
+        pub11 = nh.advertise<std_msgs::Float64>("rrbot/joint11_position_controller/command",100);
+        pub12 = nh.advertise<std_msgs::Float64>("rrbot/joint12_position_controller/command",100);
+        pub13 = nh.advertise<std_msgs::Float64>("rrbot/joint13_position_controller/command",100);
+        pub14 = nh.advertise<std_msgs::Float64>("rrbot/joint14_position_controller/command",100);
+        pub15 = nh.advertise<std_msgs::Float64>("rrbot/joint15_position_controller/command",100);
+        pub16 = nh.advertise<std_msgs::Float64>("rrbot/joint16_position_controller/command",100);
+        pub17 = nh.advertise<std_msgs::Float64>("rrbot/joint17_position_controller/command",100);
+        pub18 = nh.advertise<std_msgs::Float64>("rrbot/joint18_position_controller/command",100);
+        pub19 = nh.advertise<std_msgs::Float64>("rrbot/joint19_position_controller/command",100);
+        pub20 = nh.advertise<std_msgs::Float64>("rrbot/joint20_position_controller/command",100);
+        pub21 = nh.advertise<std_msgs::Float64>("rrbot/joint21_position_controller/command",100);
+        pub22 = nh.advertise<std_msgs::Float64>("rrbot/joint22_position_controller/command",100);
+        pub23 = nh.advertise<std_msgs::Float64>("rrbot/joint23_position_controller/command",100);
+        pub24 = nh.advertise<std_msgs::Float64>("rrbot/joint24_position_controller/command",100);
+        pub25 = nh.advertise<std_msgs::Float64>("rrbot/joint25_position_controller/command",100);
+        pub26 = nh.advertise<std_msgs::Float64>("rrbot/joint26_position_controller/command",100);
+        pub27 = nh.advertise<std_msgs::Float64>("rrbot/joint27_position_controller/command",100);
+        pub28 = nh.advertise<std_msgs::Float64>("rrbot/joint28_position_controller/command",100);
+        pub29 = nh.advertise<std_msgs::Float64>("rrbot/joint29_position_controller/command",100);
+        pub30 = nh.advertise<std_msgs::Float64>("rrbot/joint30_position_controller/command",100);
+        pub31 = nh.advertise<std_msgs::Float64>("rrbot/joint31_position_controller/command",100);
     }
 
     right_hand hand_funcs;
@@ -472,18 +497,18 @@ QByteArray joint_data;
     int count = 0;
     double time=0.0;
     double time_r,time_l;
-    bool initializing=true;
+
     int gest_r=0;int gest_l=0;
     int gest_count;
     VectorXd qr_end(7);VectorXd ql_end(7);
     double WaistYaw=0;
     double WaistPitch=0;
     QTime chronometer;
-
+qDebug()<<"start!";
     while (ros::ok())
     {
-
-        chronometer.start();
+if(move_activate){
+    //    chronometer.start();
         if (abs_initial_bool) {
             ROS_INFO_ONCE("abs is initializing!");
             ros::spinOnce();
@@ -500,6 +525,7 @@ QByteArray joint_data;
 
 
         if(initializing){
+            qDebug()<<"scenario_l="<<scenario_l.c_str()<<"scenario_r="<<scenario_r.c_str();
 
             if(simulation){
                 q0_r<<10*M_PI/180,
@@ -517,30 +543,8 @@ QByteArray joint_data;
                         0,
                         0,
                         0;
-                //home test
-                //                q0_r<<20*M_PI/180,
-                //                        -16*M_PI/180,
-                //                        -6*M_PI/180,
-                //                        -28*M_PI/180,
-                //                        0,
-                //                        0,
-                //                        0;
-
-                //                q0_l<<45*M_PI/180,
-                //                        34*M_PI/180,
-                //                        10*M_PI/180,
-                //                        -10*M_PI/180,
-                //                        0,
-                //                        0,
-                //                        0;
-
-
-
-
-
-
-
             }
+
             else{
                 if (scenario_r=="h"){
                     q0_r=absolute_q0_r;
@@ -887,6 +891,28 @@ QByteArray joint_data;
                 R_target_r=hand_funcs.rot(2,-90*M_PI/180,3);
                 fingers_mode_r=11;}
 
+                if(scenario_r=="ws"){
+                    r_target_r<<.4,
+                           - 0.1,
+                            -0.15;
+
+                    r_middle_r<<.2,
+                            -.10,
+                            -.45;
+                    R_target_r=hand_funcs.rot(2,-90*M_PI/180,3);
+
+                fingers_mode_r=11;}
+                if(scenario_r=="wu"){
+                    r_target_r<<.4,
+                           - 0.1,
+                            -0.15;
+
+                    r_middle_r<<.2,
+                            -.10,
+                            -.45;
+                    R_target_r=hand_funcs.rot(2,-90*M_PI/180,3);
+
+                fingers_mode_r=11;}
                if(scenario_l=="s"){
                 r_target_l<<.35,
                         0.05,
@@ -908,9 +934,27 @@ QByteArray joint_data;
                 fingers_mode_l=11;
             }
 
+               if(scenario_l=="ws"){
+                r_target_l<<.4,
+                        0.1,
+                        -0.15;
+                r_middle_l<<.2,
+                        .1,
+                        -.45;
+                R_target_l=hand_funcs.rot(2,-90*M_PI/180,3);
+                fingers_mode_l=11;
+            }
 
-
-
+               if(scenario_l=="wu"){
+                r_target_l<<.4,
+                        0.1,
+                        -0.15;
+                r_middle_l<<.2,
+                        .1,
+                        -.45;
+                R_target_l=hand_funcs.rot(2,-90*M_PI/180,3);
+                fingers_mode_l=11;
+            }
 
 
 
@@ -947,6 +991,16 @@ QByteArray joint_data;
             hand0_r.HO_FK_right_palm(q0_r);           hand0_l.HO_FK_left_palm(q0_l);
 
             q_ra=q0_r;q_la=q0_l;
+
+
+            qr1.clear(); ql1.clear();
+            qr2.clear(); ql2.clear();
+            qr3.clear(); ql3.clear();
+            qr4.clear(); ql4.clear();
+            qr5.clear(); ql5.clear();
+            qr6.clear(); ql6.clear();
+            qr7.clear(); ql7.clear();
+
 
             qr1.append(q_ra(0));     ql1.append(q_la(0));
             qr2.append(q_ra(1));     ql2.append(q_la(1));
@@ -1046,12 +1100,14 @@ QByteArray joint_data;
                 ql_end=q0_l;
                 fingers_mode_l=9;
             }
+//            ROS_INFO("press any key to start!");
+//            getch();
 
-            //ROS_INFO("theta_target_r=%f,sai_target_r=%f,phi_target_r=%f",theta_target_r,sai_target_r,phi_target_r);
-            //ROS_INFO("\nr_target_r=\n%f\n%f\n%f",r_target_r(0),r_target_r(1),r_target_r(2));
-            // ROS_INFO("\nR_target_r=\n%f\t%f\t%f\n%f\t%f\t%f\n%f\t%f\t%f\n",R_target_r(0,0),R_target_r(0,1),R_target_r(0,2),R_target_r(1,0),R_target_r(1,1),R_target_r(1,2),R_target_r(2,0),R_target_r(2,1),R_target_r(2,2));
-            ROS_INFO("press any key to start!");
-            getch();
+
+            count=0;
+
+
+
             initializing=false;
         }
 
@@ -1252,6 +1308,76 @@ QByteArray joint_data;
 
 
 }
+
+
+                else if(scenario_r=="ws"){
+                    double t=time_r-t_r(2);
+
+                    double L=.1*3/2*M_PI;
+                    double T=4;
+
+                    if(t<T){
+                    double V=30*L/pow(T,3)*pow(t,2)-60*L/pow(T,4)*pow(t,3)+30*L/pow(T,5)*pow(t,4);
+                    double P=10*L/pow(T,3)*pow(t,3)-15*L/pow(T,4)*pow(t,4)+6*L/pow(T,5)*pow(t,5);
+                    if(t<T/2){V_r<<0,-V*sin(3*P/L*M_PI),V*cos(3*P/L*M_PI);}
+                    else{V_r<<0,V*cos(-3*(P-L/2)/L*M_PI),V*sin(-3*(P-L/2)/L*M_PI);}
+
+
+
+                        hand_r.update_right_hand(q_ra,V_r,r_right_palm,R_target_r);
+                        r_right_palm=hand_r.r_right_palm;
+                        hand_r.doQP(q_ra);
+                        q_ra=hand_r.q_next;
+                        d_r=hand_r.dist;
+                        theta_r=hand_r.theta;
+                        sai_r=hand_r.sai;
+                        phi_r=hand_r.phi;
+                        fingers_r=fingers_mode_r;
+                        qr_end=q_ra;
+
+
+}
+
+                    else{t_r_offset=T+t_r(2);scenario_r="h";
+                    }
+                }
+
+
+                else if(scenario_r=="wu"){
+                    double t=time_r-t_r(2);
+
+                    double L=.1*M_PI/2+.3;
+                    double T=4;
+
+                    if(t<T){
+                    double V=30*L/pow(T,3)*pow(t,2)-60*L/pow(T,4)*pow(t,3)+30*L/pow(T,5)*pow(t,4);
+                    double P=10*L/pow(T,3)*pow(t,3)-15*L/pow(T,4)*pow(t,4)+6*L/pow(T,5)*pow(t,5);
+
+
+                    if(P<L/3){V_r<<0,0,-V;}
+                    else if(P<2*L/3){V_r<<0,V*sin(-3*M_PI/L*(P-L/3)-M_PI),V*cos(-3*M_PI/L*(P-L/3)-M_PI);}
+                    else{V_r<<0,0,V;}
+
+
+
+                        hand_r.update_right_hand(q_ra,V_r,r_right_palm,R_target_r);
+                        r_right_palm=hand_r.r_right_palm;
+                        hand_r.doQP(q_ra);
+                        q_ra=hand_r.q_next;
+                        d_r=hand_r.dist;
+                        theta_r=hand_r.theta;
+                        sai_r=hand_r.sai;
+                        phi_r=hand_r.phi;
+                        fingers_r=fingers_mode_r;
+                        qr_end=q_ra;
+
+
+}
+
+                    else{t_r_offset=T+t_r(2);scenario_r="h";
+                    }
+                }
+
                 else{
 
 
@@ -1332,7 +1458,7 @@ QByteArray joint_data;
                 hand_l.update_left_hand(q_la,V_l,r_target_l,R_target_l);
 
                 r_left_palm=hand_l.r_left_palm;
-                chronometer.restart();
+                //chronometer.restart();
                 hand_l.doQP(q_la);
 
                 q_la=hand_l.q_next;
@@ -1447,6 +1573,77 @@ QByteArray joint_data;
                     }
                 }
 
+                else if(scenario_l=="ws"){
+                    double t=time_l-t_l(2);
+
+                    double L=.1*3/2*M_PI;
+                    double T=4;
+
+                    if(t<T){
+                    double V=30*L/pow(T,3)*pow(t,2)-60*L/pow(T,4)*pow(t,3)+30*L/pow(T,5)*pow(t,4);
+                    double P=10*L/pow(T,3)*pow(t,3)-15*L/pow(T,4)*pow(t,4)+6*L/pow(T,5)*pow(t,5);
+                    if(t<T/2){V_l<<0,-V*sin(3*P/L*M_PI),V*cos(3*P/L*M_PI);}
+                    else{V_l<<0,V*cos(-3*(P-L/2)/L*M_PI),V*sin(-3*(P-L/2)/L*M_PI);}
+
+
+
+                        hand_l.update_left_hand(q_la,V_l,r_left_palm,R_target_l);
+                        r_left_palm=hand_l.r_left_palm;
+                        hand_l.doQP(q_la);
+                        q_la=hand_l.q_next;
+                        d_l=hand_l.dist;
+                        theta_l=hand_l.theta;
+                        sai_l=hand_l.sai;
+                        phi_l=hand_l.phi;
+                        fingers_l=fingers_mode_l;
+                        ql_end=q_la;
+
+
+}
+
+                    else{t_l_offset=T+t_l(2);scenario_l="h";
+                    }
+                }
+
+
+                else if(scenario_l=="wu"){
+                    double t=time_l-t_l(2);
+
+                    double L=.1/2*M_PI+.3;
+                    double T=4;
+
+                    if(t<T){
+                    double V=30*L/pow(T,3)*pow(t,2)-60*L/pow(T,4)*pow(t,3)+30*L/pow(T,5)*pow(t,4);
+                    double P=10*L/pow(T,3)*pow(t,3)-15*L/pow(T,4)*pow(t,4)+6*L/pow(T,5)*pow(t,5);
+                    if(P<L/3){V_l<<0,0,-V;}
+                    else if(P<2*L/3){V_l<<0,V*sin(-3*M_PI/L*(P-L/3)-M_PI),V*cos(-3*M_PI/L*(P-L/3)-M_PI);}
+                    else{V_l<<0,0,V;}
+
+                        hand_l.update_left_hand(q_la,V_l,r_left_palm,R_target_l);
+                        r_left_palm=hand_l.r_left_palm;
+                        hand_l.doQP(q_la);
+                        q_la=hand_l.q_next;
+                        d_l=hand_l.dist;
+                        theta_l=hand_l.theta;
+                        sai_l=hand_l.sai;
+                        phi_l=hand_l.phi;
+                        fingers_l=fingers_mode_l;
+                        ql_end=q_la;
+
+
+}
+
+                    else{t_l_offset=T+t_l(2);scenario_l="h";
+                    }
+                }
+
+
+
+
+
+
+
+
                 else{
                     if (time_l<t_l(2)*2){
 
@@ -1526,7 +1723,10 @@ QByteArray joint_data;
                 }
             }
         }
-          if(time_r>2*t_r(2)&&time_l>2*t_l(2)) {break;}
+          if(time_r>2*t_r(2)&&time_l>2*t_l(2)) {
+              move_activate=false;
+              qDebug()<<"done!";
+          }
 
 
         //    matrix_view(P_r); matrix_view(P_l);
@@ -1671,11 +1871,11 @@ q[13]=move2pose(WaistYaw,time,0,t_r(2))-move2pose(WaistYaw,time,t_r(2),2*t_r(2))
 
 
 
-    ros::spinOnce();
-    loop_rate.sleep();
+
     // qDebug()<<"finger r:"<<q_motor_r[7]<<"\tl:"<<q_motor_l[7];
-
-
+}
+ros::spinOnce();
+loop_rate.sleep();
 }
 
     QFile myfile("Desktop/hands_joint_data.txt");
